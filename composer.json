@@ -1,0 +1,18 @@
+{
+	"name": "dface/code-gen",
+	"description": "Lib to generate DTO objects from spec files",
+	"keywords": ["DTO", "codegen"],
+	"type": "library",
+	"license": "MIT",
+	"authors": [{
+		"name": "Denis Ponomarev",
+		"email": "ponomarev@gmail.com"
+	}
+	],
+	"require": {
+		"php": ">=7.0.0"
+	},
+	"autoload": {
+		"psr-0": {"dface": "src/"}
+	}
+}
