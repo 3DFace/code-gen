@@ -61,6 +61,7 @@ class DTOGenerator {
 		foreach($spec->getFields() as $field){
 			$type = $this->getType($namespace, $field->getType());
 			foreach($type->getUses($namespace) as $u){
+				$u = ltrim($u, '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
@@ -82,7 +83,7 @@ class DTOGenerator {
 			}
 			$body .= "\t\t}else{\n";
 			if($field->hasDefault()){
-				$body .= "\t\t\t\$$property_name = ".var_export($field->getDefault(), true).";\n";
+				$body .= "\t\t\t\$$property_name = ".$this->varExport($field->getDefault()).";\n";
 			}else{
 				$body .= "\t\t\t"."throw new \\InvalidArgumentException('Property $property_name not specified');\n";
 			}
@@ -135,7 +136,7 @@ class DTOGenerator {
 			$type_hint = $type->getArgumentHint();
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
 			if($field->hasDefault()){
-				$def = " = ".var_export($field->getDefault(), true);
+				$def = " = ".$this->varExport($field->getDefault());
 				if($type instanceof ScalarType){
 					$type_hint = '';
 				}
@@ -207,13 +208,27 @@ class DTOGenerator {
 		$full_name = $this->fullTypeName($namespace, $type_name);
 		if(!isset($this->types[$full_name])){
 			if(substr($type_name, -2) === '[]'){
-				$inner_type = $this->getType($namespace, substr($type_name, 0, -2));
+				$el_type = substr($type_name, 0, -2);
+				if($el_type === ''){
+					throw new \InvalidArgumentException("Specify element type");
+				}
+				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new ArrayType($inner_type);
 			}else{
 				$this->types[$full_name] = new DynamicTypeDef($full_name);
 			}
 		}
 		return $this->types[$full_name];
+	}
+
+	private function varExport($var){
+		if($var === null){
+			return 'null';
+		}
+		if($var === []){
+			return '[]';
+		}
+		return var_export($var, true);
 	}
 
 }

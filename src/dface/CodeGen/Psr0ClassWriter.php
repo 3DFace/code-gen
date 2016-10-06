@@ -8,7 +8,7 @@ class Psr0ClassWriter implements ClassWriter {
 	/** @var string */
 	private $targetSrcRoot;
 
-	public function __construct($targetSrcRoot){
+	public function __construct(string $targetSrcRoot){
 		$this->targetSrcRoot = $targetSrcRoot;
 	}
 
