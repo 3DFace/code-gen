@@ -50,13 +50,14 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 				if(!is_array($aliases)){
 					$aliases = [$aliases];
 				}
-				$field = new FieldDef($name, $arr['type'], $aliases);
 				if(array_key_exists('default', $arr)){
-					$field->setDefault($arr['default']);
+					$has_default = true;
+					$default = $arr['default'];
+				}else{
+					$has_default = false;
+					$default = null;
 				}
-				if($arr['with'] ?? false){
-					$field->setWither(true);
-				}
+				$field = new FieldDef($name, $arr['type'], $aliases, $has_default, $default, $arr['with'] ?? false);
 				$fields[] = $field;
 			}
 			yield new Specification(new ClassName($className), $fields);

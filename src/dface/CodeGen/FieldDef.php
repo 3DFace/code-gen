@@ -18,19 +18,12 @@ class FieldDef {
 	/** @var string[] */
 	private $aliases;
 
-	public function __construct(string $name, string $type, array $aliases = []){
+	public function __construct(string $name, string $type, array $aliases = [], $has_default = false, $default = null, $wither = false){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
-	}
-
-	function setDefault($default){
-		$this->default = $default;
-		$this->hasDefault = true;
-	}
-
-	function setWither(bool $bool){
-		$this->wither = $bool;
+		$this->hasDefault = $has_default;
+		$this->wither = $wither;
 	}
 
 	function getName(){
