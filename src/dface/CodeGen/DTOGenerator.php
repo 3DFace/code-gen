@@ -13,15 +13,19 @@ class DTOGenerator {
 	private $types = [];
 	/** @var TypeDef[] */
 	private $predefinedTypes;
+	/** @var string */
+	private $targetVersion;
 
 	public function __construct(
 		\IteratorAggregate $specSource,
 		ClassWriter $classWriter,
-		array $predefinedTypes
+		array $predefinedTypes,
+		$target_version = PHP_VERSION
 	){
 		$this->specSource = $specSource;
 		$this->classWriter = $classWriter;
 		$this->predefinedTypes = $predefinedTypes;
+		$this->targetVersion = $target_version;
 	}
 
 	function generate(){
@@ -130,21 +134,29 @@ class DTOGenerator {
 		$body = '';
 		$constructor_params = [];
 		$constructor_body = '';
+		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$type = $this->getType($namespace, $field->getType());
 			$type_hint = $type->getArgumentHint();
+			$is_scalar = $type instanceof ScalarType;
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
 			if($field->hasDefault()){
 				$def = " = ".$this->varExport($field->getDefault());
-				if($type instanceof ScalarType){
-					$type_hint = '';
-				}
 			}else{
 				$def = "";
 			}
+			$right_val = "\$$property_name";
+			if($is_scalar){
+				if($field->hasDefault() || !$hint_scalars){
+					$type_hint = '';
+				}
+				if(!$hint_scalars){
+					$right_val = "(".$type->getArgumentHint().") $right_val";
+				}
+			}
 			$constructor_params[] = $type_hint.'$'.$property_name.$def;
-			$constructor_body .= "\t\t"."\$this->$property_name = \$$property_name;\n";
+			$constructor_body .= "\t\t"."\$this->$property_name = $right_val;\n";
 		}
 		if(count($constructor_params) > 3){
 			$params_str = "\n\t\t".implode(",\n\t\t", $constructor_params)."\n\t";

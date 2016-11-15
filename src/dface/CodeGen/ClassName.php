@@ -12,7 +12,11 @@ class ClassName {
 	/** @var string */
 	private $shortName;
 
-	public function __construct(string $fullName){
+	/**
+	 * ClassName constructor.
+	 * @param string $fullName
+	 */
+	public function __construct($fullName){
 		$parts = preg_split("|\\\\|", $fullName, -1, PREG_SPLIT_NO_EMPTY);
 		$this->shortName = array_pop($parts);
 		$this->namespace = implode("\\", $parts);

@@ -12,11 +12,11 @@ class ArrayType implements TypeDef {
 		$this->innerType = $innerType;
 	}
 
-	function getUses(string $namespace){
+	function getUses($namespace){
 		return $this->innerType->getUses($namespace);
 	}
 
-	function getSerializer(string $value_expression){
+	function getSerializer($value_expression){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}else{
@@ -27,7 +27,7 @@ class ArrayType implements TypeDef {
 		}
 	}
 
-	function getDeserializer(string $value_expression){
+	function getDeserializer($value_expression){
 		return "array_map(function(\$x){\n".
 		"\t\t\t"."return ".$this->innerType->getDeserializer('$x').";\n".
 		"\t\t}, $value_expression)";

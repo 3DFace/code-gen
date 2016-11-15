@@ -18,7 +18,16 @@ class FieldDef {
 	/** @var string[] */
 	private $aliases;
 
-	public function __construct(string $name, string $type, array $aliases = [], $has_default = false, $default = null, $wither = false){
+	/**
+	 * FieldDef constructor.
+	 * @param string $name
+	 * @param string $type
+	 * @param string[] $aliases
+	 * @param bool $has_default
+	 * @param null $default
+	 * @param bool $wither
+	 */
+	public function __construct($name, $type, array $aliases = [], $has_default = false, $default = null, $wither = false){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;

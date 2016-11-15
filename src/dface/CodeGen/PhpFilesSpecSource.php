@@ -12,14 +12,22 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	/** @var string */
 	private $relativeName;
 
-	public function __construct(string $baseNamespace, string $definitionsDir, string $relativeName = ''){
+	/**
+	 * PhpFilesSpecSource constructor.
+	 * @param string $baseNamespace
+	 * @param string $definitionsDir
+	 * @param string $relativeName
+	 */
+	public function __construct($baseNamespace, $definitionsDir, $relativeName = ''){
 		$this->baseNamespace = $baseNamespace;
 		$this->definitionsDir = $definitionsDir;
 		$this->relativeName = $relativeName;
 	}
 
 	public function getIterator(){
-		yield from $this->walkDir($this->relativeName);
+		foreach($this->walkDir($this->relativeName) as $name){
+			yield $name;
+		}
 	}
 
 	private function walkDir($relativeName){
@@ -29,9 +37,13 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			if(!in_array($entry, ['.', '..'], true)){
 				$fullName = $this->definitionsDir.$relativeName.'/'.$entry;
 				if(is_dir($fullName)){
-					yield from $this->walkDir($relativeName.'/'.$entry);
+					foreach($this->walkDir($relativeName.'/'.$entry) as $name){
+						yield $name;
+					}
 				}else{
-					yield from $this->walkFile($relativeName.'/'.$entry);
+					foreach($this->walkFile($relativeName.'/'.$entry) as $name){
+						yield $name;
+					}
 				}
 				$result[] = $entry;
 			}
@@ -46,7 +58,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$className = $namespace.'\\'.$defName;
 			$fields = [];
 			foreach($definition as $name => $arr){
-				$aliases = $arr['alias'] ?? [];
+				$aliases = isset($arr['alias']) ? $arr['alias'] : [];
 				if(!is_array($aliases)){
 					$aliases = [$aliases];
 				}
@@ -57,7 +69,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 					$has_default = false;
 					$default = null;
 				}
-				$field = new FieldDef($name, $arr['type'], $aliases, $has_default, $default, $arr['with'] ?? false);
+				$field = new FieldDef($name, $arr['type'], $aliases, $has_default, $default, isset($arr['with']) ? $arr['with'] : false);
 				$fields[] = $field;
 			}
 			yield new Specification(new ClassName($className), $fields);

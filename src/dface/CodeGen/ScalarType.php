@@ -8,19 +8,23 @@ class ScalarType implements TypeDef {
 	/** @var string */
 	private $type;
 
-	public function __construct(string $type){
+	/**
+	 * ScalarType constructor.
+	 * @param string $type
+	 */
+	public function __construct($type){
 		$this->type = $type;
 	}
 
-	function getUses(string $namespace){
+	function getUses($namespace){
 		return [];
 	}
 
-	function getSerializer(string $value_expression){
+	function getSerializer($value_expression){
 		return $value_expression;
 	}
 
-	function getDeserializer(string $value_expression){
+	function getDeserializer($value_expression){
 		return "($this->type) $value_expression";
 	}
 

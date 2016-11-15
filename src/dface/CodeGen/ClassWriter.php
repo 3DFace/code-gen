@@ -5,6 +5,11 @@ namespace dface\CodeGen;
 
 interface ClassWriter {
 
-	function writeClass(string $className, string $phpCode);
+	/**
+	 * @param string $className
+	 * @param string $phpCode
+	 * @return void
+	 */
+	function writeClass($className, $phpCode);
 
 }

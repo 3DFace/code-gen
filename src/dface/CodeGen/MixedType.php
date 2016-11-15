@@ -5,15 +5,15 @@ namespace dface\CodeGen;
 
 class MixedType implements TypeDef {
 
-	function getUses(string $namespace){
+	function getUses($namespace){
 		return [];
 	}
 
-	function getSerializer(string $value_expression){
+	function getSerializer($value_expression){
 		return $value_expression;
 	}
 
-	function getDeserializer(string $value_expression){
+	function getDeserializer($value_expression){
 		return $value_expression;
 	}
 

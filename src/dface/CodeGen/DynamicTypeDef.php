@@ -12,22 +12,26 @@ class DynamicTypeDef implements TypeDef {
 	/** @var string */
 	private $namespace;
 
-	public function __construct(string $dataClassName){
+	/**
+	 * DynamicTypeDef constructor.
+	 * @param string $dataClassName
+	 */
+	public function __construct($dataClassName){
 		$this->dataClassName = $dataClassName;
 		$x = explode('\\', $dataClassName);
 		$this->shortDataClassName = array_pop($x);
 		$this->namespace = implode("\\", $x);
 	}
 
-	function getUses(string $namespace){
+	function getUses($namespace){
 		return $namespace !== $this->namespace ? [$this->dataClassName] : [];
 	}
 
-	function getSerializer(string $value_expression){
+	function getSerializer($value_expression){
 		return $value_expression." !==null ? ".$value_expression."->jsonSerialize() : null";
 	}
 
-	function getDeserializer(string $value_expression){
+	function getDeserializer($value_expression){
 		return $this->shortDataClassName."::deserialize($value_expression)";
 	}
 
