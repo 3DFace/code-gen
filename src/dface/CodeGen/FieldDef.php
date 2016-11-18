@@ -32,6 +32,7 @@ class FieldDef {
 		$this->type = $type;
 		$this->aliases = $aliases;
 		$this->hasDefault = $has_default;
+		$this->default = $default;
 		$this->wither = $wither;
 	}
 
