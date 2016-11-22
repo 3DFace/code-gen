@@ -58,6 +58,13 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$className = $namespace.'\\'.$defName;
 			$fields = [];
 			foreach($definition as $name => $arr){
+				if(!is_array($arr)){
+					if(is_string($arr)){
+						$arr = ['type' => $arr];
+					}else{
+						throw new \InvalidArgumentException("Bad field definition type at $relativeFilename/{$defName}->{$name}");
+					}
+				}
 				$aliases = isset($arr['alias']) ? $arr['alias'] : [];
 				if(!is_array($aliases)){
 					$aliases = [$aliases];
