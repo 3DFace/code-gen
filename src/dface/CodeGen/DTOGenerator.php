@@ -233,7 +233,7 @@ class DTOGenerator {
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new ArrayType($inner_type);
 			}else{
-				$this->types[$full_name] = new DynamicTypeDef($full_name);
+				$this->types[$full_name] = new DynamicTypeDef(new ClassName($full_name));
 			}
 		}
 		return $this->types[$full_name];

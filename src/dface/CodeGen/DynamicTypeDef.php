@@ -6,25 +6,14 @@ namespace dface\CodeGen;
 class DynamicTypeDef implements TypeDef {
 
 	/** @var string */
-	private $dataClassName;
-	/** @var string */
-	private $shortDataClassName;
-	/** @var string */
-	private $namespace;
+	private $className;
 
-	/**
-	 * DynamicTypeDef constructor.
-	 * @param string $dataClassName
-	 */
-	public function __construct($dataClassName){
-		$this->dataClassName = $dataClassName;
-		$x = explode('\\', $dataClassName);
-		$this->shortDataClassName = array_pop($x);
-		$this->namespace = implode("\\", $x);
+	public function __construct(ClassName $dataClassName){
+		$this->className = $dataClassName;
 	}
 
 	function getUses($namespace){
-		return $namespace !== $this->namespace ? [$this->dataClassName] : [];
+		return $namespace !== $this->className->getNamespace() ? [$this->className->getFullName()] : [];
 	}
 
 	function getSerializer($value_expression){
@@ -32,15 +21,15 @@ class DynamicTypeDef implements TypeDef {
 	}
 
 	function getDeserializer($value_expression){
-		return $this->shortDataClassName."::deserialize($value_expression)";
+		return $this->className->getShortName()."::deserialize($value_expression)";
 	}
 
 	function getArgumentHint(){
-		return $this->shortDataClassName;
+		return$this->className->getShortName();
 	}
 
 	function getPhpDocHint(){
-		return $this->shortDataClassName;
+		return $this->className->getShortName();
 	}
 
 }
