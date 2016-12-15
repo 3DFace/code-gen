@@ -232,6 +232,13 @@ class DTOGenerator {
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new ArrayType($inner_type);
+			}elseif(substr($type_name, -2) === '{}'){
+				$el_type = substr($type_name, 0, -2);
+				if($el_type === ''){
+					throw new \InvalidArgumentException("Specify element type");
+				}
+				$inner_type = $this->getType($namespace, $el_type);
+				$this->types[$full_name] = new MapType($inner_type);
 			}else{
 				$this->types[$full_name] = new DynamicTypeDef(new ClassName($full_name));
 			}

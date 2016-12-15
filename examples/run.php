@@ -34,7 +34,7 @@ $x = new SomeClass(
 	'asd',
 	new SomeSibling('zxc'),
 	new Value('qwe'),
-	[new Value('1'), new Value('2'), new Value('3')],
+	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	new Virtual1('qaz'),
 	[new Virtual1('qaz'), new Virtual2('qaz')]);
 

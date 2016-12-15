@@ -11,7 +11,7 @@ return [
 		'field1' => ['type' => 'string', 'alias' => 'old_field1', 'with'=>true],
 		'field2' => ['type' => SomeSibling::class],
 		'field3' => ['type' => Value::class, 'default' => null],
-		'field4' => ['type' => 'Value[]'],
+		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => 'virtual'],
 		'field6' => ['type' => 'virtual[]'],
 	],

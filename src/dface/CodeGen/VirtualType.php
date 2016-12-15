@@ -16,39 +16,35 @@ class VirtualType implements TypeDef {
 		$this->baseNameSpace = $baseNameSpace;
 	}
 
-	static function serialize($val, $baseNamespace){
-		if($val === null){
-			return null;
-		}elseif($val instanceof \JsonSerializable){
-			$class = str_replace($baseNamespace.'\\', '', get_class($val));
-			return [$class, $val->jsonSerialize()];
-		}else{
-			throw new \InvalidArgumentException("Cant serialize type ".gettype($val));
-		}
-	}
-
-	static function deserialize($val, $baseNamespace){
-		if($val === null){
-			return null;
-		}elseif(is_array($val)){
-			list($type, $serialized) = $val;
-			$className = $baseNamespace.'\\'.$type;
-			return call_user_func([$className, 'deserialize'], $serialized);
-		}else{
-			throw new \InvalidArgumentException("Cant deserialize type ".gettype($val));
-		}
-	}
-
 	function getUses($namespace){
-		return [self::class];
+		return [];
 	}
 
 	function getSerializer($value_expression){
-		return 'VirtualType::serialize('.$value_expression.', "'.addslashes($this->baseNameSpace).'")';
+		return "call_user_func(function(\$val){\n".
+			"\t\t\t"."if(\$val === null){\n".
+			"\t\t\t\t"."return null;\n".
+			"\t\t\t"."}elseif(\$val instanceof \\JsonSerializable){\n".
+			"\t\t\t\t"."\$class = str_replace('$this->baseNameSpace'.'\\\\', '', get_class(\$val));\n".
+			"\t\t\t\t"."return [\$class, \$val->jsonSerialize()];\n".
+			"\t\t\t"."}else{\n".
+			"\t\t\t\t"."throw new \\InvalidArgumentException(\"Cant serialize type \".gettype(\$val));\n".
+			"\t\t\t"."}\n".
+			"\t\t}, $value_expression)";
 	}
 
 	function getDeserializer($value_expression){
-		return 'VirtualType::deserialize('.$value_expression.', "'.addslashes($this->baseNameSpace).'")';
+		return "call_user_func(function(\$val){\n".
+			"\t\t\t"."if(\$val === null){\n".
+			"\t\t\t\t"."return null;\n".
+			"\t\t\t"."}elseif(is_array(\$val)){\n".
+			"\t\t\t\t"."list(\$type, \$serialized) = \$val;\n".
+			"\t\t\t\t"."\$className = '$this->baseNameSpace'.'\\\\'.\$type;\n".
+			"\t\t\t\t"."return call_user_func([\$className, 'deserialize'], \$serialized);\n".
+			"\t\t\t"."}else{\n".
+			"\t\t\t\t"."throw new \\InvalidArgumentException(\"Cant serialize type \".gettype(\$val));\n".
+			"\t\t\t"."}\n".
+			"\t\t}, $value_expression)";
 	}
 
 	function getArgumentHint(){
