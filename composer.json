@@ -13,6 +13,6 @@
 		"php": ">=5.6.0"
 	},
 	"autoload": {
-		"psr-0": {"dface": "src/", "BaseNamespace": "examples/classes"}
+		"psr-0": {"dface": "src/", "": "examples/classes"}
 	}
 }

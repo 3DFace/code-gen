@@ -13,7 +13,7 @@ class VirtualType implements TypeDef {
 	 * @param string $baseNameSpace
 	 */
 	public function __construct($baseNameSpace){
-		$this->baseNameSpace = $baseNameSpace;
+		$this->baseNameSpace = '\\'.trim($baseNameSpace, '\\');
 	}
 
 	function getUses($namespace){
@@ -25,7 +25,7 @@ class VirtualType implements TypeDef {
 			"\t\t\t"."if(\$val === null){\n".
 			"\t\t\t\t"."return null;\n".
 			"\t\t\t"."}elseif(\$val instanceof \\JsonSerializable){\n".
-			"\t\t\t\t"."\$class = str_replace('$this->baseNameSpace'.'\\\\', '', get_class(\$val));\n".
+			"\t\t\t\t"."\$class = str_replace('$this->baseNameSpace'.'\\\\', '', '\\\\'.get_class(\$val));\n".
 			"\t\t\t\t"."return [\$class, \$val->jsonSerialize()];\n".
 			"\t\t\t"."}else{\n".
 			"\t\t\t\t"."throw new \\InvalidArgumentException(\"Cant serialize type \".gettype(\$val));\n".
@@ -39,7 +39,7 @@ class VirtualType implements TypeDef {
 			"\t\t\t\t"."return null;\n".
 			"\t\t\t"."}elseif(is_array(\$val)){\n".
 			"\t\t\t\t"."list(\$type, \$serialized) = \$val;\n".
-			"\t\t\t\t"."\$className = '$this->baseNameSpace'.'\\\\'.\$type;\n".
+			"\t\t\t\t"."\$className = substr(\$type, 0, 1) === '\\\\' ? \$type : ('$this->baseNameSpace'.'\\\\'.\$type);\n".
 			"\t\t\t\t"."return call_user_func([\$className, 'deserialize'], \$serialized);\n".
 			"\t\t\t"."}else{\n".
 			"\t\t\t\t"."throw new \\InvalidArgumentException(\"Cant serialize type \".gettype(\$val));\n".
