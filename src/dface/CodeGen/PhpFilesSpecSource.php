@@ -54,33 +54,49 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	function walkFile($relativeFilename){
 		$definitions = include $this->definitionsDir.$relativeFilename;
 		foreach($definitions as $defName => $definition){
+			$defPath = $relativeFilename.'/'.$defName;
 			$namespace = trim($this->baseNamespace.str_replace('/', '\\', substr($relativeFilename, 0, -4)), '\\');
 			$className = $namespace.'\\'.$defName;
 			$fields = [];
+			$iArr = [];
 			foreach($definition as $name => $arr){
-				if(!is_array($arr)){
-					if(is_string($arr)){
-						$arr = ['type' => $arr];
-					}else{
-						throw new \InvalidArgumentException("Bad field definition type at $relativeFilename/{$defName}->{$name}");
+				if(substr($name, 0, 1) !== '@'){
+					$fields[] = $this->createFieldDef($name, $arr, $defPath);
+				}else{
+					$optName = substr($name, 1);
+					switch($optName){
+						case 'implements':
+							$iArr = is_array($arr) ? $arr: [$arr];
+							break;
+						default:
+							throw new \InvalidArgumentException("Unsupported option $optName");
 					}
 				}
-				$aliases = isset($arr['alias']) ? $arr['alias'] : [];
-				if(!is_array($aliases)){
-					$aliases = [$aliases];
-				}
-				if(array_key_exists('default', $arr)){
-					$has_default = true;
-					$default = $arr['default'];
-				}else{
-					$has_default = false;
-					$default = null;
-				}
-				$field = new FieldDef($name, $arr['type'], $aliases, $has_default, $default, isset($arr['with']) ? $arr['with'] : false);
-				$fields[] = $field;
 			}
-			yield new Specification(new ClassName($className), $fields);
+			yield new Specification(new ClassName($className), $fields, $iArr);
 		}
+	}
+
+	private function createFieldDef($name, $arr, $defPath){
+		if(!is_array($arr)){
+			if(is_string($arr)){
+				$arr = ['type' => $arr];
+			}else{
+				throw new \InvalidArgumentException("Bad field definition type at $defPath->{$name}");
+			}
+		}
+		$aliases = isset($arr['alias']) ? $arr['alias'] : [];
+		if(!is_array($aliases)){
+			$aliases = [$aliases];
+		}
+		if(array_key_exists('default', $arr)){
+			$has_default = true;
+			$default = $arr['default'];
+		}else{
+			$has_default = false;
+			$default = null;
+		}
+		return new FieldDef($name, $arr['type'], $aliases, $has_default, $default, isset($arr['with']) ? $arr['with'] : false);
 	}
 
 }

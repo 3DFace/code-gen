@@ -9,15 +9,19 @@ class Specification {
 	private $className;
 	/** @var FieldDef[] */
 	private $fields;
+	/** @var ClassName[] */
+	private $interfaces;
 
 	/**
 	 * Specification constructor.
 	 * @param ClassName $className
 	 * @param FieldDef[] $fields
+	 * @param ClassName[] $interfaces
 	 */
-	public function __construct(ClassName $className, array $fields){
+	public function __construct(ClassName $className, array $fields, array $interfaces = []){
 		$this->className = $className;
 		$this->fields = $fields;
+		$this->interfaces = $interfaces;
 	}
 
 	function getClassName(){
@@ -26,6 +30,10 @@ class Specification {
 
 	function getFields(){
 		return $this->fields;
+	}
+
+	function getInterfaces(){
+		return $this->interfaces;
 	}
 
 }

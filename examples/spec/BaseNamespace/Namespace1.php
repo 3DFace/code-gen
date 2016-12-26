@@ -4,6 +4,7 @@
 namespace BaseNamespace\Namespace1;
 
 use BaseNamespace\Namespace2\SomeSibling;
+use dface\CodeGen\TestInterface;
 
 return [
 
@@ -22,6 +23,8 @@ return [
 
 	'Virtual1' => [
 		'val' => ['type' => 'string'],
+		'test' => ['type' => 'string'],
+		'@implements' => TestInterface::class,
 	],
 
 	'Virtual2' => [

@@ -44,7 +44,8 @@ class DTOGenerator {
 			$body .= "namespace ".ltrim($namespace, '\\').";\n\n";
 		}
 		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : "");
-		$body .= "class ".$spec->getClassName()->getShortName()." implements \\JsonSerializable {\n\n";
+		$imp = $this->generateImplements($spec);
+		$body .= "class ".$spec->getClassName()->getShortName()." implements \\JsonSerializable$imp {\n\n";
 		$body .= $this->generateFields($spec);
 		$body .= "\n";
 		$body .= $this->generateConstructor($spec);
@@ -69,7 +70,27 @@ class DTOGenerator {
 				$uses[$u] = "use $u;\n";
 			}
 		}
+		foreach($spec->getInterfaces() as $i){
+			$fullType = $this->fullTypeName($namespace, $i);
+			$className = new ClassName($fullType);
+			if($className->getNamespace() !== $namespace){
+				$u = ltrim($className->getFullName(), '\\');
+				$uses[$u] = "use $u;\n";
+			}
+		}
 		return implode($uses);
+	}
+
+	private function generateImplements(Specification $spec){
+		$namespace = $spec->getClassName()->getNamespace();
+		$arr = [];
+		foreach($spec->getInterfaces() as $i){
+			$fullType = $this->fullTypeName($namespace, $i);
+			$className = new ClassName($fullType);
+			$u = ltrim($className->getShortName(), '\\');
+			$arr[$u] = "$u";
+		}
+		return $arr ? ', '.implode(", ", $arr) : '';
 	}
 
 	private function generateDeserializerMethod(Specification $spec){

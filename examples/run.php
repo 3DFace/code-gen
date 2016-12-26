@@ -37,7 +37,7 @@ $x = new SomeClass(
 	new Value('qwe'),
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	new Stranger1('qaz'),
-	[new Virtual1('qaz'), new Virtual2('qaz')]);
+	[new Virtual1('qaz', 'gaga'), new Virtual2('qaz')]);
 
 $s = $x->jsonSerialize();
 
