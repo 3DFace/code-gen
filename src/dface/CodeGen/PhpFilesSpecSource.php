@@ -58,7 +58,8 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$namespace = trim($this->baseNamespace.str_replace('/', '\\', substr($relativeFilename, 0, -4)), '\\');
 			$className = $namespace.'\\'.$defName;
 			$fields = [];
-			$iArr = [];
+			$interfaces = [];
+			$traits = [];
 			foreach($definition as $name => $arr){
 				if(substr($name, 0, 1) !== '@'){
 					$fields[] = $this->createFieldDef($name, $arr, $defPath);
@@ -66,14 +67,17 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 					$optName = substr($name, 1);
 					switch($optName){
 						case 'implements':
-							$iArr = is_array($arr) ? $arr: [$arr];
+							$interfaces = is_array($arr) ? $arr: [$arr];
+							break;
+						case 'traits':
+							$traits = is_array($arr) ? $arr: [$arr];
 							break;
 						default:
 							throw new \InvalidArgumentException("Unsupported option $optName");
 					}
 				}
 			}
-			yield new Specification(new ClassName($className), $fields, $iArr);
+			yield new Specification(new ClassName($className), $fields, $interfaces, $traits);
 		}
 	}
 

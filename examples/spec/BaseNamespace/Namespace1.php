@@ -4,6 +4,7 @@
 namespace BaseNamespace\Namespace1;
 
 use BaseNamespace\Namespace2\SomeSibling;
+use dface\CodeGen\EqualsBySerialize;
 use dface\CodeGen\TestInterface;
 
 return [
@@ -25,6 +26,7 @@ return [
 		'val' => ['type' => 'string'],
 		'test' => ['type' => 'string'],
 		'@implements' => TestInterface::class,
+		'@traits' => EqualsBySerialize::class,
 	],
 
 	'Virtual2' => [
