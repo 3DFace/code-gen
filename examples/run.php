@@ -45,6 +45,7 @@ echo json_encode($s)."\n";
 
 $x = SomeClass::deserialize($s);
 
+/** @noinspection ForgottenDebugOutputInspection */
 var_dump($x);
 
 // see results in ./examples/classes

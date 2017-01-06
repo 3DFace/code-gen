@@ -30,6 +30,10 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		}
 	}
 
+	/**
+	 * @param $relativeName
+	 * @return \Iterator
+	 */
 	private function walkDir($relativeName){
 		/** @var \Directory $d */
 		$d = dir($this->definitionsDir.$relativeName);
@@ -51,7 +55,12 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		$d->close();
 	}
 
+	/**
+	 * @param $relativeFilename
+	 * @return \Iterator
+	 */
 	function walkFile($relativeFilename){
+		/** @var array[] $definitions */
 		$definitions = include $this->definitionsDir.$relativeFilename;
 		foreach($definitions as $defName => $definition){
 			$defPath = $relativeFilename.'/'.$defName;
@@ -61,7 +70,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$interfaces = [];
 			$traits = [];
 			foreach($definition as $name => $arr){
-				if(substr($name, 0, 1) !== '@'){
+				if($name[0] !== '@'){
 					$fields[] = $this->createFieldDef($name, $arr, $defPath);
 				}else{
 					$optName = substr($name, 1);

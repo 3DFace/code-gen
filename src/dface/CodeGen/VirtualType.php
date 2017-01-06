@@ -39,7 +39,7 @@ class VirtualType implements TypeDef {
 			"\t\t\t\t"."return null;\n".
 			"\t\t\t"."}elseif(is_array(\$val)){\n".
 			"\t\t\t\t"."list(\$type, \$serialized) = \$val;\n".
-			"\t\t\t\t"."\$className = substr(\$type, 0, 1) === '\\\\' ? \$type : ('$this->baseNameSpace'.'\\\\'.\$type);\n".
+			"\t\t\t\t"."\$className = \$type[0] === '\\\\' ? \$type : ('$this->baseNameSpace'.'\\\\'.\$type);\n".
 			"\t\t\t\t"."return call_user_func([\$className, 'deserialize'], \$serialized);\n".
 			"\t\t\t"."}else{\n".
 			"\t\t\t\t"."throw new \\InvalidArgumentException(\"Cant serialize type \".gettype(\$val));\n".
@@ -52,7 +52,7 @@ class VirtualType implements TypeDef {
 	}
 
 	function getPhpDocHint(){
-		return '\\JsonSerializable|null';
+		return '\\JsonSerializable';
 	}
 
 }

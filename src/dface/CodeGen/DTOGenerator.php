@@ -41,11 +41,11 @@ class DTOGenerator {
 		$body = '<?php'."\n\n";
 		$body .= "/** Generated class. Don't edit manually. */\n\n";
 		if($namespace){
-			$body .= "namespace ".ltrim($namespace, '\\').";\n\n";
+			$body .= 'namespace '.ltrim($namespace, '\\').";\n\n";
 		}
-		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : "");
+		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : '');
 		$imp = $this->generateImplements($spec);
-		$body .= "class ".$spec->getClassName()->getShortName()." implements \\JsonSerializable$imp {\n\n";
+		$body .= 'class '.$spec->getClassName()->getShortName()." implements \\JsonSerializable$imp {\n\n";
 		$body .= $this->generateTraits($spec);
 		$body .= $this->generateFields($spec);
 		$body .= "\n";
@@ -99,7 +99,7 @@ class DTOGenerator {
 			$iName = ltrim($className->getShortName(), '\\');
 			$arr[$iName] = "$iName";
 		}
-		return $arr ? ', '.implode(", ", $arr) : '';
+		return $arr ? ', '.implode(', ', $arr) : '';
 	}
 
 	private function generateTraits(Specification $spec){
@@ -111,7 +111,7 @@ class DTOGenerator {
 			$tName = ltrim($className->getShortName(), '\\');
 			$arr[$tName] = "$tName";
 		}
-		return $arr ? ("\t"."use ".implode(";\n\t"."use ", $arr).";\n\n") : '';
+		return $arr ? ("\t".'use '.implode(";\n\t".'use ', $arr).";\n\n") : '';
 	}
 
 	private function generateDeserializerMethod(Specification $spec){
@@ -121,23 +121,25 @@ class DTOGenerator {
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$constructor_args[] = '$'.$property_name;
+			$has_def = $field->hasDefault();
+			if($has_def){
+				$body .= "\t\t\$$property_name = ".$this->varExport($field->getDefault()).";\n";
+			}
 			$body .= "\t\t"."if(array_key_exists('$property_name', \$arr)){\n";
 			$body .= "\t\t\t\$$property_name = \$arr['$property_name'];\n";
 			foreach($field->getAliases() as $alias){
 				$body .= "\t\t}elseif(array_key_exists('$alias', \$arr)){\n";
 				$body .= "\t\t\t\$$property_name = \$arr['$alias'];\n";
 			}
-			$body .= "\t\t}else{\n";
-			if($field->hasDefault()){
-				$body .= "\t\t\t\$$property_name = ".$this->varExport($field->getDefault()).";\n";
-			}else{
+			if(!$has_def){
+				$body .= "\t\t}else{\n";
 				$body .= "\t\t\t"."throw new \\InvalidArgumentException('Property $property_name not specified');\n";
 			}
 			$body .= "\t\t}\n";
 			$type = $this->getType($namespace, $field->getType());
 			$body .= "\t\t\$$property_name = \$$property_name !== null ? ".$type->getDeserializer('$'.$property_name)." : null;\n\n";
 		}
-		$body .= "\t\t"."return new self(".implode(", ", $constructor_args).");\n";
+		$body .= "\t\t".'return new self('.implode(', ', $constructor_args).");\n";
 		$body .= "\t}\n";
 		return $body;
 	}
@@ -183,18 +185,17 @@ class DTOGenerator {
 			$type_hint = $type->getArgumentHint();
 			$is_scalar = $type instanceof ScalarType;
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+			$def = '';
 			if($field->hasDefault()){
-				$def = " = ".$this->varExport($field->getDefault());
-			}else{
-				$def = "";
+				$def = ' = '.$this->varExport($field->getDefault());
 			}
 			$right_val = "\$$property_name";
 			if($is_scalar){
-				if($field->hasDefault() || !$hint_scalars){
+				if(!$hint_scalars || $field->hasDefault()){
 					$type_hint = '';
 				}
 				if(!$hint_scalars){
-					$right_val = "(".$type->getArgumentHint().") $right_val";
+					$right_val = '('.$type->getArgumentHint().") $right_val";
 				}
 			}
 			$constructor_params[] = $type_hint.'$'.$property_name.$def;
@@ -203,9 +204,9 @@ class DTOGenerator {
 		if(count($constructor_params) > 3){
 			$params_str = "\n\t\t".implode(",\n\t\t", $constructor_params)."\n\t";
 		}else{
-			$params_str = implode(", ", $constructor_params);
+			$params_str = implode(', ', $constructor_params);
 		}
-		$body .= "\t"."function __construct(".$params_str."){\n";
+		$body .= "\t".'function __construct('.$params_str."){\n";
 		$body .= $constructor_body;
 		$body .= "\t}\n";
 		return $body;
@@ -215,7 +216,7 @@ class DTOGenerator {
 		$body = '';
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
-			$body .= "\t"."function get".$this->camelCase($property_name)."(){\n";
+			$body .= "\t".'function get'.$this->camelCase($property_name)."(){\n";
 			$body .= "\t\t"."return \$this->$property_name;\n";
 			$body .= "\t}\n\n";
 		}
@@ -237,7 +238,7 @@ class DTOGenerator {
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t * @return self\n";
 				$body .= "\t */\n";
-				$body .= "\t"."function with".$this->camelCase($property_name)."($type_hint\$val = null)$ret_hint{\n";
+				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null)$ret_hint{\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";
@@ -248,10 +249,10 @@ class DTOGenerator {
 	}
 
 	private function camelCase($property_name){
-		$camelCase = preg_replace_callback("/_([a-z])/", function ($m){
+		$camelCase = preg_replace_callback('/_([a-z])/', function ($m){
 			return strtoupper($m[1]);
 		}, $property_name);
-		return strtoupper(substr($camelCase, 0, 1)).substr($camelCase, 1);
+		return strtoupper($camelCase[0]).substr($camelCase, 1);
 	}
 
 	private function fullTypeName($namespace, $type_name){
@@ -270,14 +271,14 @@ class DTOGenerator {
 			if(substr($type_name, -2) === '[]'){
 				$el_type = substr($type_name, 0, -2);
 				if($el_type === ''){
-					throw new \InvalidArgumentException("Specify element type");
+					throw new \InvalidArgumentException('Specify element type');
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new ArrayType($inner_type);
 			}elseif(substr($type_name, -2) === '{}'){
 				$el_type = substr($type_name, 0, -2);
 				if($el_type === ''){
-					throw new \InvalidArgumentException("Specify element type");
+					throw new \InvalidArgumentException('Specify element type');
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new MapType($inner_type);

@@ -31,14 +31,6 @@ class MapType implements TypeDef {
 		}
 	}
 
-	static function map($fn, $map){
-		$result = [];
-		foreach($map as $k=>$v){
-			$result[$k] = $fn($v);
-		}
-		return $result;
-	}
-
 	function getDeserializer($value_expression){
 		return "call_user_func(function(\$map){\n".
 			"\t\t\t"."\$x = [];\n".
@@ -50,7 +42,7 @@ class MapType implements TypeDef {
 	}
 
 	function getArgumentHint(){
-		return "array";
+		return 'array';
 	}
 
 	function getPhpDocHint(){

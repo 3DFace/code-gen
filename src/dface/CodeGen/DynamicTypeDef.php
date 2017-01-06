@@ -17,7 +17,7 @@ class DynamicTypeDef implements TypeDef {
 	}
 
 	function getSerializer($value_expression){
-		return $value_expression." !==null ? ".$value_expression."->jsonSerialize() : null";
+		return $value_expression.' !==null ? '.$value_expression.'->jsonSerialize() : null';
 	}
 
 	function getDeserializer($value_expression){

@@ -18,7 +18,7 @@ class MixedType implements TypeDef {
 	}
 
 	function getArgumentHint(){
-		return "";
+		return '';
 	}
 
 	function getPhpDocHint(){
