@@ -37,7 +37,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	private function walkDir($relativeName){
 		/** @var \Directory $d */
 		$d = dir($this->definitionsDir.$relativeName);
-		while (false !== ($entry = $d->read())) {
+		while(false !== ($entry = $d->read())){
 			if(!in_array($entry, ['.', '..'], true)){
 				$fullName = $this->definitionsDir.$relativeName.'/'.$entry;
 				if(is_dir($fullName)){
@@ -76,10 +76,10 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 					$optName = substr($name, 1);
 					switch($optName){
 						case 'implements':
-							$interfaces = is_array($arr) ? $arr: [$arr];
+							$interfaces = is_array($arr) ? $arr : [$arr];
 							break;
 						case 'traits':
-							$traits = is_array($arr) ? $arr: [$arr];
+							$traits = is_array($arr) ? $arr : [$arr];
 							break;
 						default:
 							throw new \InvalidArgumentException("Unsupported option $optName");
@@ -109,7 +109,15 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$has_default = false;
 			$default = null;
 		}
-		return new FieldDef($name, $arr['type'], $aliases, $has_default, $default, isset($arr['with']) ? $arr['with'] : false);
+		return new FieldDef(
+			$name,
+			$arr['type'],
+			$aliases,
+			$has_default,
+			$default,
+			isset($arr['with']) ? $arr['with'] : false,
+			isset($arr['set']) ? $arr['set'] : false
+		);
 	}
 
 }

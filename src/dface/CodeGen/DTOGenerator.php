@@ -52,6 +52,7 @@ class DTOGenerator {
 		$body .= $this->generateConstructor($spec);
 		$body .= "\n";
 		$body .= $this->generateGetters($spec);
+		$body .= $this->generateSetters($spec);
 		$body .= $this->generateWithers($spec);
 		$body .= $this->generateSerializerMethod($spec);
 		$body .= "\n";
@@ -219,6 +220,27 @@ class DTOGenerator {
 			$body .= "\t".'function get'.$this->camelCase($property_name)."(){\n";
 			$body .= "\t\t"."return \$this->$property_name;\n";
 			$body .= "\t}\n\n";
+		}
+		return $body;
+	}
+
+	private function generateSetters(Specification $spec){
+		$namespace = $spec->getClassName()->getNamespace();
+		$body = '';
+		foreach($spec->getFields() as $field){
+			$property_name = $field->getName();
+			if($field->getSetter()){
+				$type = $this->getType($namespace, $field->getType());
+				$doc_hint = $type->getPhpDocHint();
+				$type_hint = $type->getArgumentHint();
+				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+				$body .= "\t/**\n";
+				$body .= "\t * @param $doc_hint \$val\n";
+				$body .= "\t */\n";
+				$body .= "\t".'function set'.$this->camelCase($property_name)."($type_hint\$val = null){\n";
+				$body .= "\t\t\$this->$property_name = \$val;\n";
+				$body .= "\t}\n\n";
+			}
 		}
 		return $body;
 	}

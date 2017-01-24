@@ -19,7 +19,7 @@ return [
 	],
 
 	'Value' => [
-		'val' => ['type' => 'string'],
+		'val' => ['type' => 'string', 'set' => true],
 	],
 
 	'Virtual1' => [

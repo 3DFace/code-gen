@@ -15,6 +15,8 @@ class FieldDef {
 	private $default;
 	/** @var bool */
 	private $wither = false;
+	/** @var bool */
+	private $setter = false;
 	/** @var string[] */
 	private $aliases;
 
@@ -26,14 +28,16 @@ class FieldDef {
 	 * @param bool $has_default
 	 * @param null $default
 	 * @param bool $wither
+	 * @param bool $setter
 	 */
-	public function __construct($name, $type, array $aliases = [], $has_default = false, $default = null, $wither = false){
+	public function __construct($name, $type, array $aliases = [], $has_default = false, $default = null, $wither = false, $setter = false){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
 		$this->hasDefault = $has_default;
 		$this->default = $default;
 		$this->wither = $wither;
+		$this->setter = $setter;
 	}
 
 	function getName(){
@@ -54,6 +58,10 @@ class FieldDef {
 
 	function getWither(){
 		return $this->wither;
+	}
+
+	function getSetter(){
+		return $this->setter;
 	}
 
 	function getAliases(){
