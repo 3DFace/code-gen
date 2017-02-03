@@ -5,12 +5,13 @@ namespace BaseNamespace\Namespace1;
 
 use BaseNamespace\Namespace2\SomeSibling;
 use dface\CodeGen\EqualsBySerialize;
+use dface\CodeGen\ScalarType;
 use dface\CodeGen\TestInterface;
 
 return [
 
 	'SomeClass' => [
-		'field1' => ['type' => 'string', 'alias' => 'old_field1', 'with'=>true],
+		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true],
 		'field2' => ['type' => SomeSibling::class],
 		'field3' => ['type' => Value::class, 'default' => null],
 		'field4' => ['type' => 'Value{}'],

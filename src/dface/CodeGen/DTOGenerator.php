@@ -282,6 +282,9 @@ class DTOGenerator {
 	}
 
 	private function getType($namespace, $type_name){
+		if($type_name instanceof TypeDef){
+			return $type_name;
+		}
 		if(is_array($type_name)){
 			$type_name = $type_name[0].'[]';
 		}
@@ -304,6 +307,8 @@ class DTOGenerator {
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new MapType($inner_type);
+			}elseif(is_a($full_name, TypeDef::class)){
+				$this->types[$full_name] = new $full_name;
 			}else{
 				$this->types[$full_name] = new DynamicTypeDef(new ClassName($full_name));
 			}

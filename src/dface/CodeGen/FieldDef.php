@@ -7,7 +7,7 @@ class FieldDef {
 
 	/** @var string */
 	private $name;
-	/** @var string */
+	/** @var string|TypeDef */
 	private $type;
 	/** @var bool */
 	private $hasDefault;
@@ -23,7 +23,7 @@ class FieldDef {
 	/**
 	 * FieldDef constructor.
 	 * @param string $name
-	 * @param string $type
+	 * @param string|TypeDef $type
 	 * @param string[] $aliases
 	 * @param bool $has_default
 	 * @param null $default
