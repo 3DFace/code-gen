@@ -16,26 +16,27 @@ class VirtualType implements TypeDef {
 	 * @param string $baseType
 	 */
 	public function __construct($baseNameSpace = null, $baseType = \JsonSerializable::class){
-		$this->baseNameSpace = strlen($baseNameSpace) ? '\\'.trim($baseNameSpace, '\\') : null;
+		$this->baseNameSpace = strlen($baseNameSpace) ? trim($baseNameSpace, '\\') : null;
 		$this->baseType = new ClassName($baseType);
 	}
 
 	function getUses($namespace){
-		return [$this->baseType->getFullName()];
+		return $this->baseType->getNamespace() === $namespace ? [] : [$this->baseType->getFullName()];
 	}
 
 	function getSerializer($value_expression){
-		$classNameEval = "'\\\\'.\$class";
+		$classNameToTypeTransform = '';
 		if($this->baseNameSpace !== null){
-			$classNameEval =  "str_replace('$this->baseNameSpace'.'\\\\', '', '\\\\'.\$class)";
+			$ns = str_replace('\\', '\\\\', $this->baseNameSpace);
+			$classNameToTypeTransform =  "\t\t\t\t"."\$type = str_replace('\\\\$ns\\\\', '', \$type);\n";
 		}
 		return "call_user_func(function(\$val){\n".
 			"\t\t\t"."if(\$val === null){\n".
 			"\t\t\t\t"."return null;\n".
 			"\t\t\t"."}elseif(\$val instanceof \\JsonSerializable){\n".
-			"\t\t\t\t"."\$class = get_class(\$val);\n".
-			"\t\t\t\t"."\$class = $classNameEval;\n".
-			"\t\t\t\t"."return [\$class, \$val->jsonSerialize()];\n".
+			"\t\t\t\t"."\$type = '\\\\'.get_class(\$val);\n".
+			$classNameToTypeTransform.
+			"\t\t\t\t"."return [\$type, \$val->jsonSerialize()];\n".
 			"\t\t\t"."}else{\n".
 			"\t\t\t\t"."throw new \\InvalidArgumentException('Cant serialize type '.gettype(\$val));\n".
 			"\t\t\t"."}\n".
@@ -43,20 +44,21 @@ class VirtualType implements TypeDef {
 	}
 
 	function getDeserializer($value_expression){
-		$classNameEval = '$type';
+		$typeToClassNameTransform = "\t\t\t\t"."\$className = \$type;\n";
 		if($this->baseNameSpace !== null){
-			$classNameEval =  "\$type[0] === '\\\\' ? \$type : ('$this->baseNameSpace'.'\\\\'.\$type)";
+			$ns = str_replace('\\', '\\\\', $this->baseNameSpace);
+			$typeToClassNameTransform =  "\t\t\t\t"."\$className = \$type[0] === '\\\\' ? \$type : ('$ns\\\\'.\$type);\n";
 		}
 		return "call_user_func(function(\$val){\n".
 			"\t\t\t"."if(\$val === null){\n".
 			"\t\t\t\t"."return null;\n".
 			"\t\t\t"."}elseif(is_array(\$val)){\n".
 			"\t\t\t\t"."list(\$type, \$serialized) = \$val;\n".
-			"\t\t\t\t"."\$className = $classNameEval;\n".
+			$typeToClassNameTransform.
 			"\t\t\t\t"."return \$className::deserialize(\$serialized);\n".
 //			"\t\t\t\t"."return call_user_func([\$className, 'deserialize'], \$serialized);\n".
 			"\t\t\t"."}else{\n".
-			"\t\t\t\t"."throw new \\InvalidArgumentException('Cant serialize type '.gettype(\$val));\n".
+			"\t\t\t\t"."throw new \\InvalidArgumentException('Cant deserialize type '.gettype(\$val));\n".
 			"\t\t\t"."}\n".
 			"\t\t}, $value_expression)";
 	}
