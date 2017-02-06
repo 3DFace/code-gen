@@ -7,6 +7,7 @@ use BaseNamespace\Namespace2\SomeSibling;
 use dface\CodeGen\EqualsBySerialize;
 use dface\CodeGen\ScalarType;
 use dface\CodeGen\TestInterface;
+use dface\CodeGen\VirtualType;
 
 return [
 
@@ -15,7 +16,7 @@ return [
 		'field2' => ['type' => SomeSibling::class],
 		'field3' => ['type' => Value::class, 'default' => null],
 		'field4' => ['type' => 'Value{}'],
-		'field5' => ['type' => 'virtual'],
+		'field5' => ['type' => new VirtualType('BaseNamespace\Namespace1'), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
 	],
 

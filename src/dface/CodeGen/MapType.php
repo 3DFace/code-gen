@@ -20,11 +20,11 @@ class MapType implements TypeDef {
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}else{
-			return "call_user_func(function(\$map){\n".
+			return "call_user_func(function(array \$map){\n".
 				"\t\t\t"."\$x = [];\n".
 				"\t\t\t"."foreach(\$map as \$k=>\$v){\n".
 				"\t\t\t\t"."/** @var \$v \\JsonSerializable */\n".
-				"\t\t\t\t"."\$x[\$k] = ".$this->innerType->getSerializer('$v').";\n".
+				"\t\t\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v').";\n".
 				"\t\t\t"."}\n".
 				"\t\t\t"."return \$x;\n".
 				"\t\t}, $value_expression)";
@@ -32,10 +32,10 @@ class MapType implements TypeDef {
 	}
 
 	function getDeserializer($value_expression){
-		return "call_user_func(function(\$map){\n".
+		return "call_user_func(function(array \$map){\n".
 			"\t\t\t"."\$x = [];\n".
 			"\t\t\t"."foreach(\$map as \$k=>\$v){\n".
-			"\t\t\t\t"."\$x[\$k] = ".$this->innerType->getDeserializer('$v').";\n".
+			"\t\t\t\t".'$x[$k] = '.$this->innerType->getDeserializer('$v').";\n".
 			"\t\t\t"."}\n".
 			"\t\t\t"."return \$x;\n".
 			"\t\t}, $value_expression)";

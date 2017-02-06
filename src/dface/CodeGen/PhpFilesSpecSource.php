@@ -92,7 +92,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 
 	private function createFieldDef($name, $arr, $defPath){
 		if(!is_array($arr)){
-			if(is_string($arr)){
+			if(is_string($arr) || $arr instanceof TypeDef){
 				$arr = ['type' => $arr];
 			}else{
 				throw new \InvalidArgumentException("Bad field definition type at $defPath->{$name}");
