@@ -122,9 +122,9 @@ class DTOGenerator {
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$constructor_args[] = '$'.$property_name;
-			$has_def = $field->hasDefault();
+			$has_def = $field->hasSerializedDefault();
 			if($has_def){
-				$body .= "\t\t\$$property_name = ".$this->varExport($field->getDefault()).";\n";
+				$body .= "\t\t\$$property_name = ".$this->varExport($field->getSerializedDefault()).";\n";
 			}
 			$body .= "\t\t"."if(array_key_exists('$property_name', \$arr)){\n";
 			$body .= "\t\t\t\$$property_name = \$arr['$property_name'];\n";
@@ -138,7 +138,7 @@ class DTOGenerator {
 			}
 			$body .= "\t\t}\n";
 			$type = $this->getType($namespace, $field->getType());
-			$body .= "\t\t\$$property_name = \$$property_name !== null ? ".$type->getDeserializer('$'.$property_name)." : null;\n\n";
+			$body .= "\t\t\$$property_name = ".$type->getDeserializer('$'.$property_name, "\t\t").";\n\n";
 		}
 		$body .= "\t\t".'return new self('.implode(', ', $constructor_args).");\n";
 		$body .= "\t}\n";
@@ -153,7 +153,7 @@ class DTOGenerator {
 			$property_name = $field->getName();
 			$getter = '$this->'.$property_name;
 			$type = $this->getType($namespace, $field->getType());
-			$property_serializer = $type->getSerializer($getter);
+			$property_serializer = $type->getSerializer($getter, "\t\t\t");
 			$body .= "\t\t\t"."'$property_name' => $property_serializer,\n";
 		}
 		$body .= "\t\t"."];\n";
@@ -186,13 +186,14 @@ class DTOGenerator {
 			$type_hint = $type->getArgumentHint();
 			$is_scalar = $type instanceof ScalarType;
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+			$has_def = $field->hasConstructorDefault();
 			$def = '';
-			if($field->hasDefault()){
-				$def = ' = '.$this->varExport($field->getDefault());
+			if($has_def){
+				$def = ' = '.$this->varExport($field->getConstructorDefault());
 			}
 			$right_val = "\$$property_name";
 			if($is_scalar){
-				if(!$hint_scalars || $field->hasDefault()){
+				if(!$hint_scalars || $has_def){
 					$type_hint = '';
 				}
 				if(!$hint_scalars){

@@ -24,43 +24,42 @@ class VirtualType implements TypeDef {
 		return $this->baseType->getNamespace() === $namespace ? [] : [$this->baseType->getFullName()];
 	}
 
-	function getSerializer($value_expression){
+	function getSerializer($value_expression, $indent){
 		$classNameToTypeTransform = '';
 		if($this->baseNameSpace !== null){
 			$ns = str_replace('\\', '\\\\', $this->baseNameSpace);
-			$classNameToTypeTransform =  "\t\t\t\t"."\$type = str_replace('\\\\$ns\\\\', '', \$type);\n";
+			$classNameToTypeTransform =  $indent."\t\t"."\$type = str_replace('\\\\$ns\\\\', '', \$type);\n";
 		}
-		return "call_user_func(function(\$val){\n".
-			"\t\t\t"."if(\$val === null){\n".
-			"\t\t\t\t"."return null;\n".
-			"\t\t\t"."}elseif(\$val instanceof \\JsonSerializable){\n".
-			"\t\t\t\t"."\$type = '\\\\'.get_class(\$val);\n".
+		return "$value_expression !== null ? call_user_func(function (\$val){\n".
+			$indent."\t"."if(\$val === null){\n".
+			$indent."\t\t"."return null;\n".
+			$indent."\t"."}elseif(\$val instanceof \\JsonSerializable){\n".
+			$indent."\t\t"."\$type = '\\\\'.get_class(\$val);\n".
 			$classNameToTypeTransform.
-			"\t\t\t\t"."return [\$type, \$val->jsonSerialize()];\n".
-			"\t\t\t"."}else{\n".
-			"\t\t\t\t"."throw new \\InvalidArgumentException('Cant serialize type '.gettype(\$val));\n".
-			"\t\t\t"."}\n".
-			"\t\t}, $value_expression)";
+			$indent."\t\t"."return [\$type, \$val->jsonSerialize()];\n".
+			$indent."\t"."}else{\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException('Cant serialize type '.gettype(\$val));\n".
+			$indent."\t"."}\n".
+			$indent."}, $value_expression) : null";
 	}
 
-	function getDeserializer($value_expression){
-		$typeToClassNameTransform = "\t\t\t\t"."\$className = \$type;\n";
+	function getDeserializer($value_expression, $indent){
+		$typeToClassNameTransform = $indent."\t\t"."\$className = \$type;\n";
 		if($this->baseNameSpace !== null){
 			$ns = str_replace('\\', '\\\\', $this->baseNameSpace);
-			$typeToClassNameTransform =  "\t\t\t\t"."\$className = \$type[0] === '\\\\' ? \$type : ('$ns\\\\'.\$type);\n";
+			$typeToClassNameTransform =  $indent."\t\t"."\$className = \$type[0] === '\\\\' ? \$type : ('$ns\\\\'.\$type);\n";
 		}
-		return "call_user_func(function(\$val){\n".
-			"\t\t\t"."if(\$val === null){\n".
-			"\t\t\t\t"."return null;\n".
-			"\t\t\t"."}elseif(is_array(\$val)){\n".
-			"\t\t\t\t"."list(\$type, \$serialized) = \$val;\n".
+		return "$value_expression !== null ? call_user_func(function (\$val){\n".
+			$indent."\t"."if(\$val === null){\n".
+			$indent."\t\t"."return null;\n".
+			$indent."\t"."}elseif(is_array(\$val)){\n".
+			$indent."\t\t"."list(\$type, \$serialized) = \$val;\n".
 			$typeToClassNameTransform.
-			"\t\t\t\t"."return \$className::deserialize(\$serialized);\n".
-//			"\t\t\t\t"."return call_user_func([\$className, 'deserialize'], \$serialized);\n".
-			"\t\t\t"."}else{\n".
-			"\t\t\t\t"."throw new \\InvalidArgumentException('Cant deserialize type '.gettype(\$val));\n".
-			"\t\t\t"."}\n".
-			"\t\t}, $value_expression)";
+			$indent."\t\t"."return \$className::deserialize(\$serialized);\n".
+			$indent."\t"."}else{\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize type '.gettype(\$val));\n".
+			$indent."\t"."}\n".
+			$indent."}, $value_expression) : null";
 	}
 
 	function getArgumentHint(){

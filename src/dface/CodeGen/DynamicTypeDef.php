@@ -16,12 +16,12 @@ class DynamicTypeDef implements TypeDef {
 		return $namespace !== $this->className->getNamespace() ? [$this->className->getFullName()] : [];
 	}
 
-	function getSerializer($value_expression){
-		return $value_expression.' !==null ? '.$value_expression.'->jsonSerialize() : null';
+	function getSerializer($value_expression, $indent){
+		return $value_expression.' !== null ? '.$value_expression.'->jsonSerialize() : null';
 	}
 
-	function getDeserializer($value_expression){
-		return $this->className->getShortName()."::deserialize($value_expression)";
+	function getDeserializer($value_expression, $indent){
+		return "$value_expression !== null ? ".$this->className->getShortName()."::deserialize($value_expression) : null";
 	}
 
 	function getArgumentHint(){

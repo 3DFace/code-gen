@@ -14,7 +14,7 @@ return [
 	'SomeClass' => [
 		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true],
 		'field2' => ['type' => SomeSibling::class],
-		'field3' => ['type' => Value::class, 'default' => null],
+		'field3' => ['type' => Value::class, 'default' => null, 'empty' => []],
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType('BaseNamespace\Namespace1'), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],

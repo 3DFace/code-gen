@@ -16,29 +16,29 @@ class MapType implements TypeDef {
 		return $this->innerType->getUses($namespace);
 	}
 
-	function getSerializer($value_expression){
+	function getSerializer($value_expression, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}else{
-			return "call_user_func(function(array \$map){\n".
-				"\t\t\t"."\$x = [];\n".
-				"\t\t\t"."foreach(\$map as \$k=>\$v){\n".
-				"\t\t\t\t"."/** @var \$v \\JsonSerializable */\n".
-				"\t\t\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v').";\n".
-				"\t\t\t"."}\n".
-				"\t\t\t"."return \$x;\n".
-				"\t\t}, $value_expression)";
+			return "$value_expression !== null ? call_user_func(function (array \$map){\n".
+				$indent."\t"."\$x = [];\n".
+				$indent."\t"."foreach(\$map as \$k => \$v){\n".
+				$indent."\t\t"."/** @var \$v \\JsonSerializable */\n".
+				$indent."\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v', $indent."\t\t").";\n".
+				$indent."\t"."}\n".
+				$indent."\t"."return \$x;\n".
+				$indent."}, $value_expression) : null";
 		}
 	}
 
-	function getDeserializer($value_expression){
-		return "call_user_func(function(array \$map){\n".
-			"\t\t\t"."\$x = [];\n".
-			"\t\t\t"."foreach(\$map as \$k=>\$v){\n".
-			"\t\t\t\t".'$x[$k] = '.$this->innerType->getDeserializer('$v').";\n".
-			"\t\t\t"."}\n".
-			"\t\t\t"."return \$x;\n".
-			"\t\t}, $value_expression)";
+	function getDeserializer($value_expression, $indent){
+		return "$value_expression !== null ? call_user_func(function (array \$map){\n".
+			$indent."\t"."\$x = [];\n".
+			$indent."\t"."foreach(\$map as \$k => \$v){\n".
+			$indent."\t\t".'$x[$k] = '.$this->innerType->getDeserializer('$v', $indent."\t\t").";\n".
+			$indent."\t"."}\n".
+			$indent."\t"."return \$x;\n".
+			$indent."}, $value_expression) : null";
 	}
 
 	function getArgumentHint(){

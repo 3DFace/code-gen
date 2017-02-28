@@ -10,9 +10,13 @@ class FieldDef {
 	/** @var string|TypeDef */
 	private $type;
 	/** @var bool */
-	private $hasDefault;
+	private $hasConstructorDefault;
 	/** @var mixed */
-	private $default;
+	private $constructorDefault;
+	/** @var bool */
+	private $hasSerializedDefault;
+	/** @var mixed */
+	private $serializedDefault;
 	/** @var bool */
 	private $wither = false;
 	/** @var bool */
@@ -25,17 +29,19 @@ class FieldDef {
 	 * @param string $name
 	 * @param string|TypeDef $type
 	 * @param string[] $aliases
-	 * @param bool $has_default
-	 * @param null $default
+	 * @param array $constructor_default
+	 * @param array $serialized_default
 	 * @param bool $wither
 	 * @param bool $setter
 	 */
-	public function __construct($name, $type, array $aliases = [], $has_default = false, $default = null, $wither = false, $setter = false){
+	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default, $wither, $setter){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
-		$this->hasDefault = $has_default;
-		$this->default = $default;
+		$this->hasConstructorDefault = $constructor_default[0];
+		$this->constructorDefault = $constructor_default[1];
+		$this->hasSerializedDefault = $constructor_default[0] || $serialized_default[0];
+		$this->serializedDefault = $serialized_default[0] ? $serialized_default[1] : $constructor_default[1];
 		$this->wither = $wither;
 		$this->setter = $setter;
 	}
@@ -48,12 +54,20 @@ class FieldDef {
 		return $this->type;
 	}
 
-	function hasDefault(){
-		return $this->hasDefault;
+	function hasConstructorDefault(){
+		return $this->hasConstructorDefault;
 	}
 
-	function getDefault(){
-		return $this->default;
+	function getConstructorDefault(){
+		return $this->constructorDefault;
+	}
+
+	function hasSerializedDefault(){
+		return $this->hasSerializedDefault;
+	}
+
+	function getSerializedDefault(){
+		return $this->serializedDefault;
 	}
 
 	function getWither(){

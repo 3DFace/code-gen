@@ -109,12 +109,19 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$has_default = false;
 			$default = null;
 		}
+		if(array_key_exists('empty', $arr)){
+			$has_default_serialized = true;
+			$default_serialized = $arr['empty'];
+		}else{
+			$has_default_serialized = false;
+			$default_serialized = null;
+		}
 		return new FieldDef(
 			$name,
 			$arr['type'],
 			$aliases,
-			$has_default,
-			$default,
+			[$has_default, $default],
+			[$has_default_serialized, $default_serialized],
 			isset($arr['with']) ? $arr['with'] : false,
 			isset($arr['set']) ? $arr['set'] : false
 		);

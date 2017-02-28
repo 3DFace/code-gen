@@ -16,21 +16,21 @@ class ArrayType implements TypeDef {
 		return $this->innerType->getUses($namespace);
 	}
 
-	function getSerializer($value_expression){
+	function getSerializer($value_expression, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}else{
 			$type_hint = $this->innerType->getArgumentHint();
-			return "array_map(function($type_hint \$x){\n".
-			"\t\t\t\t".'return '.$this->innerType->getSerializer('$x').";\n".
-			"\t\t\t}, $value_expression)";
+			return "$value_expression !== null ? array_map(function ($type_hint \$x){\n".
+				$indent."\t".'return '.$this->innerType->getSerializer('$x', $indent."\t").";\n".
+				$indent."}, $value_expression) : null";
 		}
 	}
 
-	function getDeserializer($value_expression){
-		return "array_map(function(\$x){\n".
-		"\t\t\t".'return '.$this->innerType->getDeserializer('$x').";\n".
-		"\t\t}, $value_expression)";
+	function getDeserializer($value_expression, $indent){
+		return "$value_expression !== null ? array_map(function (\$x){\n".
+			$indent."\t".'return '.$this->innerType->getDeserializer('$x', $indent."\t").";\n".
+			$indent."}, $value_expression) : null";
 	}
 
 	function getArgumentHint(){

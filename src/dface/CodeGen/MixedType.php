@@ -9,11 +9,11 @@ class MixedType implements TypeDef {
 		return [];
 	}
 
-	function getSerializer($value_expression){
+	function getSerializer($value_expression, $indent){
 		return $value_expression;
 	}
 
-	function getDeserializer($value_expression){
+	function getDeserializer($value_expression, $indent){
 		return $value_expression;
 	}
 
