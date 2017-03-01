@@ -249,6 +249,7 @@ class DTOGenerator {
 	private function generateWithers(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
+		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
 		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
@@ -256,6 +257,9 @@ class DTOGenerator {
 				$type = $this->getType($namespace, $field->getType());
 				$doc_hint = $type->getPhpDocHint();
 				$type_hint = $type->getArgumentHint();
+				if($type instanceof ScalarType && !$hint_scalars){
+					$type_hint = '';
+				}
 				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
