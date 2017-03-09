@@ -18,6 +18,7 @@ return [
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType('BaseNamespace\Namespace1'), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
+		'field7' => ['type' => 'mixed', 'default' => null],
 	],
 
 	'Value' => [

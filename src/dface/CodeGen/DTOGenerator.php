@@ -138,7 +138,10 @@ class DTOGenerator {
 			}
 			$body .= "\t\t}\n";
 			$type = $this->getType($namespace, $field->getType());
-			$body .= "\t\t\$$property_name = ".$type->getDeserializer('$'.$property_name, "\t\t").";\n\n";
+			$deserializer = $type->getDeserializer('$'.$property_name, "\t\t");
+			if($deserializer !== "\$$property_name"){
+				$body .= "\t\t\$$property_name = ".$deserializer.";\n\n";
+			}
 		}
 		$body .= "\t\t".'return new self('.implode(', ', $constructor_args).");\n";
 		$body .= "\t}\n";
