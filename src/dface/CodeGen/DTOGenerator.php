@@ -122,28 +122,32 @@ class DTOGenerator {
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$constructor_args[] = '$'.$property_name;
-			$has_def = $field->hasSerializedDefault();
-			if($has_def){
-				$body .= "\t\t\$$property_name = ".$this->varExport($field->getSerializedDefault()).";\n";
+			if($field->getMerged()){
+				$body .= "\t\t\$$property_name = \$arr;\n";
+			}else{
+				$has_def = $field->hasSerializedDefault();
+				if($has_def){
+					$body .= "\t\t\$$property_name = ".$this->varExport($field->getSerializedDefault()).";\n";
+				}
+				$body .= "\t\t"."if(array_key_exists('$property_name', \$arr)){\n";
+				$body .= "\t\t\t\$$property_name = \$arr['$property_name'];\n";
+				foreach($field->getAliases() as $alias){
+					$body .= "\t\t}elseif(array_key_exists('$alias', \$arr)){\n";
+					$body .= "\t\t\t\$$property_name = \$arr['$alias'];\n";
+				}
+				if(!$has_def){
+					$body .= "\t\t}else{\n";
+					$body .= "\t\t\t"."throw new \\InvalidArgumentException('Property $property_name not specified');\n";
+				}
+				$body .= "\t\t}\n";
 			}
-			$body .= "\t\t"."if(array_key_exists('$property_name', \$arr)){\n";
-			$body .= "\t\t\t\$$property_name = \$arr['$property_name'];\n";
-			foreach($field->getAliases() as $alias){
-				$body .= "\t\t}elseif(array_key_exists('$alias', \$arr)){\n";
-				$body .= "\t\t\t\$$property_name = \$arr['$alias'];\n";
-			}
-			if(!$has_def){
-				$body .= "\t\t}else{\n";
-				$body .= "\t\t\t"."throw new \\InvalidArgumentException('Property $property_name not specified');\n";
-			}
-			$body .= "\t\t}\n";
 			$type = $this->getType($namespace, $field->getType());
 			$deserializer = $type->getDeserializer('$'.$property_name, "\t\t");
 			if($deserializer !== "\$$property_name"){
 				$body .= "\t\t\$$property_name = ".$deserializer.";\n\n";
 			}
 		}
-		$body .= "\t\t".'return new self('.implode(', ', $constructor_args).");\n";
+		$body .= "\t\t".'return new static('.implode(', ', $constructor_args).");\n";
 		$body .= "\t}\n";
 		return $body;
 	}
@@ -151,15 +155,30 @@ class DTOGenerator {
 	private function generateSerializerMethod(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = "\t"."function jsonSerialize(){\n";
-		$body .= "\t\t"."return [\n";
+		$prop_body = '';
+		$merge = [];
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$getter = '$this->'.$property_name;
 			$type = $this->getType($namespace, $field->getType());
 			$property_serializer = $type->getSerializer($getter, "\t\t\t");
-			$body .= "\t\t\t"."'$property_name' => $property_serializer,\n";
+			if($field->getMerged()){
+				$merge["\$merge_${property_name}"] .= "\t\t"."\$merge_${property_name} = $property_serializer;\n";
+			}else{
+				$prop_body .= "\t\t\t"."'$property_name' => $property_serializer,\n";
+			}
 		}
-		$body .= "\t\t"."];\n";
+		if(!$merge){
+			$body .= "\t\t"."return [\n";
+			$body .= $prop_body;
+			$body .= "\t\t"."];\n";
+		}else{
+			$body .= "\t\t"."\$result = [\n";
+			$body .= $prop_body;
+			$body .= "\t\t"."];\n";
+			$body .= implode('', $merge);
+			$body .= "\t\t".'return array_replace($result, '.implode(', ', array_keys($merge))." ?: []);\n";
+		}
 		$body .= "\t}\n";
 		return $body;
 	}
@@ -253,7 +272,7 @@ class DTOGenerator {
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
-		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
+//		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			if($field->getWither()){
@@ -266,9 +285,9 @@ class DTOGenerator {
 				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
-				$body .= "\t * @return self\n";
+				$body .= "\t * @return static\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null)$ret_hint{\n";
+				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null){\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";

@@ -18,11 +18,15 @@ class FieldDef {
 	/** @var mixed */
 	private $serializedDefault;
 	/** @var bool */
-	private $wither = false;
+	private $wither;
 	/** @var bool */
-	private $setter = false;
+	private $setter;
 	/** @var string[] */
 	private $aliases;
+	/** @var bool */
+	private $merged;
+	/** @var bool */
+	private $silent;
 
 	/**
 	 * FieldDef constructor.
@@ -33,8 +37,11 @@ class FieldDef {
 	 * @param array $serialized_default
 	 * @param bool $wither
 	 * @param bool $setter
+	 * @param $merged
+	 * @param $silent
 	 */
-	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default, $wither, $setter){
+	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default,
+		$wither, $setter, $merged, $silent){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
@@ -44,6 +51,8 @@ class FieldDef {
 		$this->serializedDefault = $serialized_default[0] ? $serialized_default[1] : $constructor_default[1];
 		$this->wither = $wither;
 		$this->setter = $setter;
+		$this->merged = $merged;
+		$this->silent = $silent;
 	}
 
 	function getName(){
@@ -80,6 +89,14 @@ class FieldDef {
 
 	function getAliases(){
 		return $this->aliases;
+	}
+
+	function getMerged(){
+		return $this->merged;
+	}
+
+	function getSilent(){
+		return $this->silent;
 	}
 
 }
