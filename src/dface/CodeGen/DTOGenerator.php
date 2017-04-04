@@ -117,7 +117,11 @@ class DTOGenerator {
 
 	private function generateDeserializerMethod(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
-		$body = "\t"."static function deserialize(\$arr){\n";
+		$body = "\t/**\n";
+		$body .= "\t * @param mixed \$arr\n";
+		$body .= "\t * @return self\n";
+		$body .= "\t */\n";
+		$body .= "\t"."static function deserialize(\$arr){\n";
 		$constructor_args = [];
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
@@ -272,7 +276,7 @@ class DTOGenerator {
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
-//		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
+		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			if($field->getWither()){
@@ -285,9 +289,9 @@ class DTOGenerator {
 				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
-				$body .= "\t * @return static\n";
+				$body .= "\t * @return self\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null){\n";
+				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null)$ret_hint{\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";
