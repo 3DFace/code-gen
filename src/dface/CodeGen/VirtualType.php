@@ -27,7 +27,7 @@ class VirtualType implements TypeDef {
 			/** @var ClassName $class */
 			$class = $class_and_id[0];
 			if($class->getNamespace() !== $namespace){
-				$uses[$class->getNamespace()] = 1;
+				$uses[$class->getFullName()] = 1;
 			}
 		}
 		return array_keys($uses);
