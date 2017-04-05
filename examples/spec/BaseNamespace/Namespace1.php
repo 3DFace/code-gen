@@ -16,7 +16,9 @@ return [
 		'field2' => ['type' => SomeSibling::class],
 		'field3' => ['type' => Value::class, 'default' => null, 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
-		'field5' => ['type' => new VirtualType('BaseNamespace\Namespace1'), 'with' => 1],
+		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
+			Value::class => 1,
+		]), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
 		'field7' => ['type' => 'mixed', 'default' => null],
 	],

@@ -24,7 +24,10 @@ $predefinedTypes = [
 	'float' => new ScalarType('float'),
 	'bool' => new ScalarType('bool'),
 	'mixed' => new MixedType(),
-	'virtual' => new VirtualType('\\BaseNamespace'),
+	'virtual' => new VirtualType(\JsonSerializable::class, [
+		Virtual1::class => 1,
+		Virtual2::class => 2,
+	]),
 ];
 
 $gen = new DTOGenerator($specSrc, $writer, $predefinedTypes);
