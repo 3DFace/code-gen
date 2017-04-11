@@ -141,7 +141,7 @@ class DTOGenerator {
 				}
 				if(!$has_def){
 					$body .= "\t\t}else{\n";
-					$body .= "\t\t\t"."throw new \\InvalidArgumentException('Property $property_name not specified');\n";
+					$body .= "\t\t\t"."throw new \\InvalidArgumentException(\"Property '$property_name' not specified\");\n";
 				}
 				$body .= "\t\t}\n";
 			}
