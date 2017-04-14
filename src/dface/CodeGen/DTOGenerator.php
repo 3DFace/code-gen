@@ -241,8 +241,14 @@ class DTOGenerator {
 	}
 
 	private function generateGetters(Specification $spec){
+		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		foreach($spec->getFields() as $field){
+			$type = $this->getType($namespace, $field->getType());
+			$doc_hint = $type->getPhpDocHint();
+			$body .= "\t/**\n";
+			$body .= "\t * @return $doc_hint \$val\n";
+			$body .= "\t */\n";
 			$property_name = $field->getName();
 			$body .= "\t".'function get'.$this->camelCase($property_name)."(){\n";
 			$body .= "\t\t"."return \$this->$property_name;\n";
