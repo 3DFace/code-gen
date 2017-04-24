@@ -127,7 +127,7 @@ class DTOGenerator {
 		$body .= "\t * @return self\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."static function deserialize(\$arr)$ret_hint{\n";
+		$body .= "\t"."static function deserialize(array \$arr)$ret_hint{\n";
 		$constructor_args = [];
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
