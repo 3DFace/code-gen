@@ -117,12 +117,17 @@ class DTOGenerator {
 
 	private function generateDeserializerMethod(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
+		$ret_hint = '';
+		$support_ret_hint = version_compare($this->targetVersion, '7.1') >= 0;
+		if($support_ret_hint){
+			 $ret_hint = ' : '.$spec->getClassName()->getShortName().' ';
+		}
 		$body = "\t/**\n";
-		$body .= "\t * @param mixed \$arr\n";
+		$body .= "\t * @param array \$arr\n";
 		$body .= "\t * @return self\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."static function deserialize(\$arr){\n";
+		$body .= "\t"."static function deserialize(array \$arr)$ret_hint{\n";
 		$constructor_args = [];
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
@@ -207,12 +212,16 @@ class DTOGenerator {
 		$constructor_params = [];
 		$constructor_body = '';
 		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
+		$hint_nulls = version_compare($this->targetVersion, '7.1') >= 0;
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			$type = $this->getType($namespace, $field->getType());
 			$type_hint = $type->getArgumentHint();
 			$is_scalar = $type instanceof ScalarType;
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+			if($hint_nulls && $field->getNullAble() && $type_hint){
+				$type_hint = '?'.$type_hint;
+			}
 			$has_def = $field->hasConstructorDefault();
 			$def = '';
 			if($has_def){
@@ -224,7 +233,11 @@ class DTOGenerator {
 					$type_hint = '';
 				}
 				if(!$hint_scalars){
-					$right_val = '('.$type->getArgumentHint().") $right_val";
+					if($field->getNullAble()){
+						$right_val =  "$right_val === null ? null : (".$type->getArgumentHint().") $right_val";
+					}else{
+						$right_val = '('.$type->getArgumentHint().") $right_val";
+					}
 				}
 			}
 			$constructor_params[] = $type_hint.'$'.$property_name.$def;
@@ -254,6 +267,9 @@ class DTOGenerator {
 			$property_name = $field->getName();
 			$ret_hint = '';
 			if($support_ret_hint && ($arg_hint = $type->getArgumentHint())){
+				if($field->getNullAble()){
+					$arg_hint = '?'.$arg_hint;
+				}
 				$ret_hint = ' : '.$arg_hint.' ';
 			}
 			$body .= "\t".'function get'.$this->camelCase($property_name)."()$ret_hint{\n";

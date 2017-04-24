@@ -125,7 +125,8 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			isset($arr['with']) ? $arr['with'] : false,
 			isset($arr['set']) ? $arr['set'] : false,
 			isset($arr['merged']) ? $arr['merged'] : false,
-			isset($arr['silent']) ? $arr['silent'] : false
+			isset($arr['silent']) ? $arr['silent'] : false,
+			isset($arr['null']) ? $arr['null'] : ($has_default && $default === null)
 		);
 	}
 

@@ -28,6 +28,8 @@ class FieldDef {
 	/** @var bool */
 	private $silent;
 
+	private $null_able;
+
 	/**
 	 * FieldDef constructor.
 	 * @param string $name
@@ -39,9 +41,10 @@ class FieldDef {
 	 * @param bool $setter
 	 * @param $merged
 	 * @param $silent
+	 * @param $null_able
 	 */
 	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default,
-		$wither, $setter, $merged, $silent){
+		$wither, $setter, $merged, $silent, $null_able){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
@@ -53,6 +56,7 @@ class FieldDef {
 		$this->setter = $setter;
 		$this->merged = $merged;
 		$this->silent = $silent;
+		$this->null_able = $null_able;
 	}
 
 	function getName(){
@@ -97,6 +101,10 @@ class FieldDef {
 
 	function getSilent(){
 		return $this->silent;
+	}
+
+	function getNullAble(){
+		return $this->null_able;
 	}
 
 }
