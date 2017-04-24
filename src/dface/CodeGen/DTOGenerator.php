@@ -120,6 +120,7 @@ class DTOGenerator {
 		$body = "\t/**\n";
 		$body .= "\t * @param mixed \$arr\n";
 		$body .= "\t * @return self\n";
+		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
 		$body .= "\t"."static function deserialize(\$arr){\n";
 		$constructor_args = [];
@@ -243,6 +244,7 @@ class DTOGenerator {
 	private function generateGetters(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
+		$support_ret_hint = version_compare($this->targetVersion, '7.1') >= 0;
 		foreach($spec->getFields() as $field){
 			$type = $this->getType($namespace, $field->getType());
 			$doc_hint = $type->getPhpDocHint();
@@ -250,7 +252,11 @@ class DTOGenerator {
 			$body .= "\t * @return $doc_hint \$val\n";
 			$body .= "\t */\n";
 			$property_name = $field->getName();
-			$body .= "\t".'function get'.$this->camelCase($property_name)."(){\n";
+			$ret_hint = '';
+			if($support_ret_hint && ($arg_hint = $type->getArgumentHint())){
+				$ret_hint = ' : '.$arg_hint.' ';
+			}
+			$body .= "\t".'function get'.$this->camelCase($property_name)."()$ret_hint{\n";
 			$body .= "\t\t"."return \$this->$property_name;\n";
 			$body .= "\t}\n\n";
 		}

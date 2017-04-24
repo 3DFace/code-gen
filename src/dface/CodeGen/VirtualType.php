@@ -35,19 +35,18 @@ class VirtualType implements TypeDef {
 
 	function getSerializer($value_expression, $indent){
 		$result = "$value_expression !== null ? call_user_func(function (\$val){\n";
-		$result .= $indent."\t";
+
 		foreach($this->types as $class_and_id){
 			/** @var ClassName $class */
 			list($class, $id) = $class_and_id;
 			$short = $class->getShortName();
 			$result .=
-				"if(\$val instanceof $short){\n".
-				$indent."\t\t"."return [$id, \"$short\", \$val->jsonSerialize()];\n".
-				$indent."\t"."}else";
+				$indent."\t"."if(\$val instanceof $short){\n".
+				$indent."\t\t"."return [$id, '$short', \$val->jsonSerialize()];\n".
+				$indent."\t"."}\n";
 		}
-		$result .= "{\n".
-			$indent."\t\t"."throw new \\InvalidArgumentException('Unsupported virtual type '.gettype(\$val));\n".
-			$indent."\t"."}\n".
+		$result .=
+			$indent."\t"."throw new \\InvalidArgumentException('Unsupported virtual type '.gettype(\$val));\n".
 			$indent."}, $value_expression) : null";
 		return $result;
 	}
