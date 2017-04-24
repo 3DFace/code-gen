@@ -219,7 +219,7 @@ class DTOGenerator {
 			$type_hint = $type->getArgumentHint();
 			$is_scalar = $type instanceof ScalarType;
 			$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
-			if($hint_nulls && $field->getNullAble() && $type_hint){
+			if($hint_nulls && $type_hint && $field->getNullAble()){
 				$type_hint = '?'.$type_hint;
 			}
 			$has_def = $field->hasConstructorDefault();
@@ -282,17 +282,26 @@ class DTOGenerator {
 	private function generateSetters(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
+		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
+		$hint_nulls = version_compare($this->targetVersion, '7.1') >= 0;
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			if($field->getSetter()){
 				$type = $this->getType($namespace, $field->getType());
 				$doc_hint = $type->getPhpDocHint();
 				$type_hint = $type->getArgumentHint();
+				if($type instanceof ScalarType && !$hint_scalars){
+					$type_hint = '';
+				}
+				if($hint_nulls && $type_hint && $field->getNullAble()){
+					$type_hint = '?'.$type_hint;
+				}
 				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+				$def_null = $hint_nulls ? '' : ' = null';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function set'.$this->camelCase($property_name)."($type_hint\$val = null){\n";
+				$body .= "\t".'function set'.$this->camelCase($property_name)."($type_hint\$val$def_null){\n";
 				$body .= "\t\t\$this->$property_name = \$val;\n";
 				$body .= "\t}\n\n";
 			}
@@ -305,6 +314,7 @@ class DTOGenerator {
 		$body = '';
 		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
 		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
+		$hint_nulls = version_compare($this->targetVersion, '7.1') >= 0;
 		foreach($spec->getFields() as $field){
 			$property_name = $field->getName();
 			if($field->getWither()){
@@ -314,12 +324,16 @@ class DTOGenerator {
 				if($type instanceof ScalarType && !$hint_scalars){
 					$type_hint = '';
 				}
+				if($hint_nulls && $type_hint && $field->getNullAble()){
+					$type_hint = '?'.$type_hint;
+				}
 				$type_hint .= strlen($type_hint) > 0 ? ' ' : '';
+				$def_null = $hint_nulls ? '' : ' = null';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t * @return self\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val = null)$ret_hint{\n";
+				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val$def_null)$ret_hint{\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";
