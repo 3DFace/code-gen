@@ -21,7 +21,7 @@ class Psr0ClassWriter implements ClassWriter {
 		$dir = dirname($class_filename);
 		if(!@mkdir($dir, 0777, true) && !is_dir($dir)){
 			throw new \InvalidArgumentException("Can't create dir $dir");
-		};
+		}
 		file_put_contents($class_filename, $phpCode);
 	}
 

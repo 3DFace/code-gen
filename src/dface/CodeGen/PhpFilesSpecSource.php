@@ -58,6 +58,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	/**
 	 * @param $relativeFilename
 	 * @return \Iterator
+	 * @throws \InvalidArgumentException
 	 */
 	function walkFile($relativeFilename){
 		/** @var array[] $definitions */

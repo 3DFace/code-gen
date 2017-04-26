@@ -262,7 +262,7 @@ class DTOGenerator {
 			$type = $this->getType($namespace, $field->getType());
 			$doc_hint = $type->getPhpDocHint();
 			$body .= "\t/**\n";
-			$body .= "\t * @return $doc_hint \$val\n";
+			$body .= "\t * @return $doc_hint\n";
 			$body .= "\t */\n";
 			$property_name = $field->getName();
 			$ret_hint = '';

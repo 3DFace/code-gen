@@ -8,7 +8,6 @@ use BaseNamespace\Namespace1\Value;
 use BaseNamespace\Namespace1\Virtual1;
 use BaseNamespace\Namespace1\Virtual2;
 use BaseNamespace\Namespace2\SomeSibling;
-use ForeignNamespace\Strangers\Stranger1;
 
 include_once __DIR__.'/../vendor/autoload.php';
 

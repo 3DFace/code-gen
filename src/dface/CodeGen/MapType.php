@@ -19,16 +19,15 @@ class MapType implements TypeDef {
 	function getSerializer($value_expression, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
-		}else{
-			return "$value_expression !== null ? call_user_func(function (array \$map){\n".
-				$indent."\t"."\$x = [];\n".
-				$indent."\t"."foreach(\$map as \$k => \$v){\n".
-				$indent."\t\t"."/** @var \$v \\JsonSerializable */\n".
-				$indent."\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v', $indent."\t\t").";\n".
-				$indent."\t"."}\n".
-				$indent."\t"."return \$x;\n".
-				$indent."}, $value_expression) : null";
 		}
+		return "$value_expression !== null ? call_user_func(function (array \$map){\n".
+			$indent."\t"."\$x = [];\n".
+			$indent."\t"."foreach(\$map as \$k => \$v){\n".
+			$indent."\t\t"."/** @var \$v \\JsonSerializable */\n".
+			$indent."\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v', $indent."\t\t").";\n".
+			$indent."\t"."}\n".
+			$indent."\t"."return \$x;\n".
+			$indent."}, $value_expression) : null";
 	}
 
 	function getDeserializer($value_expression, $indent){

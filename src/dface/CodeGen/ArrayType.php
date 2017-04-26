@@ -19,12 +19,11 @@ class ArrayType implements TypeDef {
 	function getSerializer($value_expression, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
-		}else{
-			$type_hint = $this->innerType->getArgumentHint();
-			return "$value_expression !== null ? array_map(function ($type_hint \$x){\n".
-				$indent."\t".'return '.$this->innerType->getSerializer('$x', $indent."\t").";\n".
-				$indent."}, $value_expression) : null";
 		}
+		$type_hint = $this->innerType->getArgumentHint();
+		return "$value_expression !== null ? array_map(function ($type_hint \$x){\n".
+			$indent."\t".'return '.$this->innerType->getSerializer('$x', $indent."\t").";\n".
+			$indent."}, $value_expression) : null";
 	}
 
 	function getDeserializer($value_expression, $indent){
