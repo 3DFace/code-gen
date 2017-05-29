@@ -36,6 +36,7 @@ $gen->generate();
 $x = new SomeClass(
 	'asd',
 	new SomeSibling('zxc'),
+	new SomeSibling('asd'),
 	new Value('qwe'),
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	new Value(2),

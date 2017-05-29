@@ -4,7 +4,10 @@
 namespace BaseNamespace\Namespace1;
 
 use BaseNamespace\Namespace2\SomeSibling;
+use dface\CodeGen\ClassName;
+use dface\CodeGen\DynamicTypeDef;
 use dface\CodeGen\EqualsBySerialize;
+use dface\CodeGen\JsonType;
 use dface\CodeGen\ScalarType;
 use dface\CodeGen\TestInterface;
 use dface\CodeGen\VirtualType;
@@ -14,6 +17,7 @@ return [
 	'SomeClass' => [
 		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true, 'null' => true],
 		'field2' => ['type' => SomeSibling::class],
+		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class))), 'default' => null],
 		'field3' => ['type' => Value::class, 'default' => null, 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
