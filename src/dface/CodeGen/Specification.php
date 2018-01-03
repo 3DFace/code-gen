@@ -13,24 +13,29 @@ class Specification {
 	private $interfaces;
 	/** @var string[] */
 	private $traits;
+	/** @var bool */
+	private $deprecated;
 
-	/**
-	 * Specification constructor.
-	 * @param ClassName $className
-	 * @param FieldDef[] $fields
-	 * @param string[] $interfaces
-	 * @param string[] $traits
-	 */
+    /**
+     * Specification constructor.
+     * @param ClassName $className
+     * @param FieldDef[] $fields
+     * @param string[] $interfaces
+     * @param string[] $traits
+     * @param bool $deprecated
+     */
 	public function __construct(
 		ClassName $className,
 		array $fields,
 		array $interfaces,
-		array $traits
+		array $traits,
+        $deprecated
 	){
 		$this->className = $className;
 		$this->fields = $fields;
 		$this->interfaces = $interfaces;
 		$this->traits = $traits;
+		$this->deprecated = $deprecated;
 	}
 
 	function getClassName(){
@@ -48,5 +53,9 @@ class Specification {
 	function getTraits(){
 		return $this->traits;
 	}
+
+    function getDeprecated(){
+        return $this->deprecated;
+    }
 
 }

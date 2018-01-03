@@ -45,6 +45,11 @@ class DTOGenerator {
 		}
 		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : '');
 		$imp = $this->generateImplements($spec);
+        if($spec->getDeprecated()){
+            $body .= "\t/**\n";
+            $body .= "\t * @deprecated\n";
+            $body .= "\t */\n";
+        }
 		$body .= 'class '.$spec->getClassName()->getShortName()." implements \\JsonSerializable$imp {\n\n";
 		$body .= $this->generateTraits($spec);
 		$body .= $this->generateFields($spec);

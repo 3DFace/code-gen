@@ -63,6 +63,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	function walkFile($relativeFilename){
 		/** @var array[] $definitions */
 		$definitions = include $this->definitionsDir.$relativeFilename;
+		$deprecated = false;
 		foreach($definitions as $defName => $definition){
 			$defPath = $relativeFilename.'/'.$defName;
 			$namespace = trim($this->baseNamespace.str_replace('/', '\\', substr($relativeFilename, 0, -4)), '\\');
@@ -82,12 +83,15 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 						case 'traits':
 							$traits = is_array($arr) ? $arr : [$arr];
 							break;
+                        case 'deprecated':
+                            $deprecated = (bool)$arr;
+                            break;
 						default:
 							throw new \InvalidArgumentException("Unsupported option $optName");
 					}
 				}
 			}
-			yield new Specification(new ClassName($className), $fields, $interfaces, $traits);
+			yield new Specification(new ClassName($className), $fields, $interfaces, $traits, $deprecated);
 		}
 	}
 

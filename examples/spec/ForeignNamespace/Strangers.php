@@ -9,6 +9,7 @@ return [
 
 	'Stranger1' => [
 		'val' => ['type' => new ScalarType('int')],
+        '@deprecated' => true,
 	],
 
 ];
