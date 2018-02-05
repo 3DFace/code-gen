@@ -15,17 +15,33 @@ class DTOGenerator {
 	private $predefinedTypes;
 	/** @var string */
 	private $targetVersion;
+	/** @var string */
+	private $fieldsVisibility;
 
+	/**
+	 * @param \IteratorAggregate $specSource
+	 * @param ClassWriter $classWriter
+	 * @param array $predefinedTypes
+	 * @param string $target_version
+	 * @param string $fieldsVisibility
+	 * @throws \InvalidArgumentException
+	 */
 	public function __construct(
 		\IteratorAggregate $specSource,
 		ClassWriter $classWriter,
 		array $predefinedTypes,
-		$target_version = PHP_VERSION
+		$target_version = PHP_VERSION,
+		$fieldsVisibility = 'private'
 	){
 		$this->specSource = $specSource;
 		$this->classWriter = $classWriter;
 		$this->predefinedTypes = $predefinedTypes;
 		$this->targetVersion = $target_version;
+		$visibilitySet = ['private', 'protected', 'public'];
+		if(!in_array($fieldsVisibility, $visibilitySet, true)){
+			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
+		}
+		$this->fieldsVisibility = $fieldsVisibility;
 	}
 
 	function generate(){
@@ -206,7 +222,11 @@ class DTOGenerator {
 			$type = $this->getType($namespace, $field->getType());
 			$type_hint = $type->getPhpDocHint();
 			$body .= "\t/** @var $type_hint */\n";
-			$body .= "\t"."protected \$$property_name;\n";
+			$visibility = $field->getFieldVisibility();
+			if($visibility === null){
+				$visibility = $this->fieldsVisibility;
+			}
+			$body .= "\t"."$visibility \$$property_name;\n";
 		}
 		return $body;
 	}

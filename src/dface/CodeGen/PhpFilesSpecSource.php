@@ -95,6 +95,13 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		}
 	}
 
+	/**
+	 * @param $name
+	 * @param $arr
+	 * @param $defPath
+	 * @return FieldDef
+	 * @throws \InvalidArgumentException
+	 */
 	private function createFieldDef($name, $arr, $defPath){
 		if(!is_array($arr)){
 			if(is_string($arr) || $arr instanceof TypeDef){
@@ -131,7 +138,8 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			isset($arr['set']) ? $arr['set'] : false,
 			isset($arr['merged']) ? $arr['merged'] : false,
 			isset($arr['silent']) ? $arr['silent'] : false,
-			isset($arr['null']) ? $arr['null'] : ($has_default && $default === null)
+			isset($arr['null']) ? $arr['null'] : ($has_default && $default === null),
+			isset($arr['field_visibility']) ? $arr['field_visibility'] : null
 		);
 	}
 

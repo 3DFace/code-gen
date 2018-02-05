@@ -27,11 +27,12 @@ class FieldDef {
 	private $merged;
 	/** @var bool */
 	private $silent;
-
+	/** @var bool */
 	private $null_able;
+	/** @var string */
+	private $field_visibility;
 
 	/**
-	 * FieldDef constructor.
 	 * @param string $name
 	 * @param string|TypeDef $type
 	 * @param string[] $aliases
@@ -42,9 +43,11 @@ class FieldDef {
 	 * @param $merged
 	 * @param $silent
 	 * @param $null_able
+	 * @param $field_visibility
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default,
-		$wither, $setter, $merged, $silent, $null_able){
+		$wither, $setter, $merged, $silent, $null_able, $field_visibility){
 		$this->name = $name;
 		$this->type = $type;
 		$this->aliases = $aliases;
@@ -57,6 +60,11 @@ class FieldDef {
 		$this->merged = $merged;
 		$this->silent = $silent;
 		$this->null_able = $null_able;
+		$visibilitySet = ['private', 'protected', 'public', null];
+		if(!in_array($field_visibility, $visibilitySet, true)){
+			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
+		}
+		$this->field_visibility = $field_visibility;
 	}
 
 	function getName(){
@@ -105,6 +113,10 @@ class FieldDef {
 
 	function getNullAble(){
 		return $this->null_able;
+	}
+
+	public function getFieldVisibility(){
+		return $this->field_visibility;
 	}
 
 }
