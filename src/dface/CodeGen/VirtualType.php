@@ -51,8 +51,8 @@ class VirtualType implements TypeDef {
 		return $result;
 	}
 
-	function getDeserializer($value_expression, $indent){
-		$result = "$value_expression !== null ? call_user_func(function (\$val){\n".
+	function getDeserializer($target, $value_expression, $indent){
+		$result = "$target = $value_expression !== null ? call_user_func(function (\$val){\n".
 			$indent."\t"."if(is_array(\$val)){\n".
 			$indent."\t\t"."list(\$type, , \$serialized) = \$val;\n".
 			$indent."\t\t"."switch(\$type){\n";
@@ -71,7 +71,7 @@ class VirtualType implements TypeDef {
 			$indent."\t"."}else{\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize '.gettype(\$val));\n".
 			$indent."\t"."}\n".
-			$indent."}, $value_expression) : null";
+			$indent."}, $value_expression) : null;\n";
 		return $result;
 	}
 

@@ -26,10 +26,11 @@ class ArrayType implements TypeDef {
 			$indent."}, $value_expression) : null";
 	}
 
-	function getDeserializer($value_expression, $indent){
-		return "$value_expression !== null ? array_map(function (\$x){\n".
-			$indent."\t".'return '.$this->innerType->getDeserializer('$x', $indent."\t").";\n".
-			$indent."}, $value_expression) : null";
+	function getDeserializer($target, $value_expression, $indent){
+		return "$target = $value_expression !== null ? array_map(function (\$x){\n".
+			$indent."\t".$this->innerType->getDeserializer('$x','$x', $indent."\t").";\n".
+			$indent."\t".'return $x'.";\n".
+			$indent."}, $value_expression) : null;\n";
 	}
 
 	function getArgumentHint(){

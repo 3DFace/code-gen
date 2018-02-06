@@ -20,8 +20,14 @@ class DynamicTypeDef implements TypeDef {
 		return $value_expression.' !== null ? '.$value_expression.'->jsonSerialize() : null';
 	}
 
-	function getDeserializer($value_expression, $indent){
-		return "$value_expression !== null ? ".$this->className->getShortName()."::deserialize($value_expression) : null";
+	function getDeserializer($target, $value_expression, $indent){
+		$deserializer = "$target = $value_expression !== null ? ".$this->className->getShortName()."::deserialize($value_expression) : null";
+		$body = "try {\n";
+		$body .= $indent."\t$deserializer;\n";
+		$body .= $indent."}catch (\Exception \$e){\n";
+		$body .= $indent."\t"."throw new \InvalidArgumentException('Deserialization error: '.\$e->getMessage(), 0, \$e);\n";
+		$body .= $indent."}\n";
+		return $body;
 	}
 
 	function getArgumentHint(){

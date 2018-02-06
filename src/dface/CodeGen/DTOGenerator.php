@@ -173,10 +173,7 @@ class DTOGenerator {
 				$body .= "\t\t}\n";
 			}
 			$type = $this->getType($namespace, $field->getType());
-			$deserializer = $type->getDeserializer('$'.$property_name, "\t\t");
-			if($deserializer !== "\$$property_name"){
-				$body .= "\t\t\$$property_name = ".$deserializer.";\n\n";
-			}
+			$body .= "\t\t".$type->getDeserializer('$'.$property_name, '$'.$property_name, "\t\t")."\n";
 		}
 		$body .= "\t\t".'return new static('.implode(', ', $constructor_args).");\n";
 		$body .= "\t}\n";
@@ -185,7 +182,11 @@ class DTOGenerator {
 
 	private function generateSerializerMethod(Specification $spec){
 		$namespace = $spec->getClassName()->getNamespace();
-		$body = "\t"."function jsonSerialize(){\n";
+		$body = "\t/**\n";
+		$body .= "\t * @return mixed\n";
+		$body .= "\t * @throws \\InvalidArgumentException\n";
+		$body .= "\t */\n";
+		$body .= "\t"."function jsonSerialize(){\n";
 		$prop_body = '';
 		$merge = [];
 		foreach($spec->getFields() as $field){

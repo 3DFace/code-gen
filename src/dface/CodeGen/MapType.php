@@ -30,14 +30,15 @@ class MapType implements TypeDef {
 			$indent."}, $value_expression) : null";
 	}
 
-	function getDeserializer($value_expression, $indent){
-		return "$value_expression !== null ? call_user_func(function (array \$map){\n".
+	function getDeserializer($target, $value_expression, $indent){
+		$exp = $this->innerType->getDeserializer('$x[$k]', '$v', $indent."\t\t");
+		return "$target = $value_expression !== null ? call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
-			$indent."\t\t".'$x[$k] = '.$this->innerType->getDeserializer('$v', $indent."\t\t").";\n".
+			$indent."\t\t".$exp.";\n".
 			$indent."\t"."}\n".
 			$indent."\t"."return \$x;\n".
-			$indent."}, $value_expression) : null";
+			$indent."}, $value_expression) : null;\n";
 	}
 
 	function getArgumentHint(){

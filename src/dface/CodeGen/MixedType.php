@@ -13,8 +13,11 @@ class MixedType implements TypeDef {
 		return $value_expression;
 	}
 
-	function getDeserializer($value_expression, $indent){
-		return $value_expression;
+	function getDeserializer($target, $value_expression, $indent){
+		if($target === $value_expression){
+			return '';
+		}
+		return "$target = $value_expression;\n";
 	}
 
 	function getArgumentHint(){

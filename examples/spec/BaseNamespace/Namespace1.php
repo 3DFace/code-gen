@@ -25,6 +25,8 @@ return [
 		]), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
 		'field7' => ['type' => 'mixed', 'default' => null],
+		'field8' => ['type' => 'DateTime', 'default' => null],
+		'field9' => ['type' => 'TimeStamp', 'default' => null],
 	],
 
 	'Value' => [

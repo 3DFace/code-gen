@@ -22,11 +22,12 @@ interface TypeDef {
 
 	/**
 	 * Makes PHP-code that deserializes values returned from 'serialize'-method to target type.
+	 * @param $l_value
 	 * @param string $value_expression - PHP-expression that represents a value being deserialized
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	function getDeserializer($value_expression, $indent);
+	function getDeserializer($l_value, $value_expression, $indent);
 
 	/**
 	 * Returns PHP-lang type hinting

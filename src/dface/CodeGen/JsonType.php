@@ -36,12 +36,13 @@ class JsonType implements TypeDef {
 			$indent."}, $value_expression) : null";
 	}
 
-	function getDeserializer($value_expression, $indent) {
-		$exp = $this->innerType->getDeserializer('$x', $indent."\t");
-		return "$value_expression !== null ? call_user_func(function (\$val){\n".
+	function getDeserializer($target, $value_expression, $indent) {
+		$exp = $this->innerType->getDeserializer('$x', '$x', $indent."\t");
+		return "$target = $value_expression !== null ? call_user_func(function (\$val){\n".
 			$indent."\t"."\$x = json_decode(\$val, true, 512, $this->decode_options);\n".
-			$indent."\t"."return $exp;\n".
-			$indent."}, $value_expression) : null";
+			$indent."\t".$exp.";\n".
+			$indent."\t"."return \$x;\n".
+			$indent."}, $value_expression) : null;\n";
 	}
 
 	function getArgumentHint() {

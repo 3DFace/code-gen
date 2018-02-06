@@ -24,8 +24,8 @@ class ScalarType implements TypeDef {
 		return $value_expression;
 	}
 
-	function getDeserializer($value_expression, $indent){
-		return "$value_expression !== null ? ($this->type)$value_expression : null";
+	function getDeserializer($target, $value_expression, $indent){
+		return "$target = $value_expression !== null ? ($this->type)$value_expression : null;\n";
 	}
 
 	function getArgumentHint(){
