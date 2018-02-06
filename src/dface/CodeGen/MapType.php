@@ -20,10 +20,11 @@ class MapType implements TypeDef {
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}
+		$inner_hint = $this->innerType->getPhpDocHint();
 		return "$value_expression !== null ? call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
-			$indent."\t\t"."/** @var \$v \\JsonSerializable */\n".
+			$indent."\t\t/** @var $inner_hint \$v */\n".
 			$indent."\t\t".'$x[$k] = '.$this->innerType->getSerializer('$v', $indent."\t\t").";\n".
 			$indent."\t"."}\n".
 			$indent."\t"."return \$x;\n".
@@ -35,7 +36,7 @@ class MapType implements TypeDef {
 		return "$target = $value_expression !== null ? call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
-			$indent."\t\t".$exp.";\n".
+			$indent."\t\t".$exp.
 			$indent."\t"."}\n".
 			$indent."\t"."return \$x;\n".
 			$indent."}, $value_expression) : null;\n";

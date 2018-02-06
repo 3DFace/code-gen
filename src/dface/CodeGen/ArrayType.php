@@ -28,7 +28,7 @@ class ArrayType implements TypeDef {
 
 	function getDeserializer($target, $value_expression, $indent){
 		return "$target = $value_expression !== null ? array_map(function (\$x){\n".
-			$indent."\t".$this->innerType->getDeserializer('$x','$x', $indent."\t").";\n".
+			$indent."\t".$this->innerType->getDeserializer('$x','$x', $indent."\t").
 			$indent."\t".'return $x'.";\n".
 			$indent."}, $value_expression) : null;\n";
 	}
