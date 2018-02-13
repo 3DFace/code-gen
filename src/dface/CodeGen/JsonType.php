@@ -40,7 +40,7 @@ class JsonType implements TypeDef {
 		$exp = $this->innerType->getDeserializer('$x', '$x', $indent."\t");
 		return "$target = $value_expression !== null ? call_user_func(function (\$val){\n".
 			$indent."\t"."\$x = json_decode(\$val, true, 512, $this->decode_options);\n".
-			$indent."\t".$exp.";\n".
+			$indent."\t".$exp.
 			$indent."\t"."return \$x;\n".
 			$indent."}, $value_expression) : null;\n";
 	}

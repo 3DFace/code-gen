@@ -110,10 +110,26 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 				throw new \InvalidArgumentException("Bad field definition type at $defPath->{$name}");
 			}
 		}
-		$aliases = isset($arr['alias']) ? $arr['alias'] : [];
-		if(!is_array($aliases)){
-			$aliases = [$aliases];
+
+		$read_as = [$name];
+		if(isset($arr['alias'])){
+			$read_as[] = $arr['alias'];
 		}
+		if(isset($arr['read_as'])){
+			$read_as = $arr['read_as'];
+			if(!is_array($read_as)){
+				$read_as = [$read_as];
+			}
+		}
+
+		$write_as = [$name];
+		if(isset($arr['write_as'])){
+			$write_as = $arr['write_as'];
+			if(!is_array($write_as)){
+				$write_as = [$write_as];
+			}
+		}
+
 		if(array_key_exists('default', $arr)){
 			$has_default = true;
 			$default = $arr['default'];
@@ -128,10 +144,12 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$has_default_serialized = false;
 			$default_serialized = null;
 		}
+		$target = [$name];
 		return new FieldDef(
 			$name,
 			$arr['type'],
-			$aliases,
+			$read_as,
+			$write_as,
 			[$has_default, $default],
 			[$has_default_serialized, $default_serialized],
 			isset($arr['with']) ? $arr['with'] : false,
@@ -139,7 +157,8 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			isset($arr['merged']) ? $arr['merged'] : false,
 			isset($arr['silent']) ? $arr['silent'] : false,
 			isset($arr['null']) ? $arr['null'] : ($has_default && $default === null),
-			isset($arr['field_visibility']) ? $arr['field_visibility'] : null
+			isset($arr['field_visibility']) ? $arr['field_visibility'] : null,
+			$target
 		);
 	}
 

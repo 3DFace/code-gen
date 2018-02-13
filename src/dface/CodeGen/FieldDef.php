@@ -3,7 +3,8 @@
 
 namespace dface\CodeGen;
 
-class FieldDef {
+class FieldDef
+{
 
 	/** @var string */
 	private $name;
@@ -22,7 +23,9 @@ class FieldDef {
 	/** @var bool */
 	private $setter;
 	/** @var string[] */
-	private $aliases;
+	private $read_as;
+	/** @var string[] */
+	private $write_as;
 	/** @var bool */
 	private $merged;
 	/** @var bool */
@@ -35,7 +38,8 @@ class FieldDef {
 	/**
 	 * @param string $name
 	 * @param string|TypeDef $type
-	 * @param string[] $aliases
+	 * @param array $read_as
+	 * @param array $write_as
 	 * @param array $constructor_default
 	 * @param array $serialized_default
 	 * @param bool $wither
@@ -46,11 +50,24 @@ class FieldDef {
 	 * @param $field_visibility
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct($name, $type, array $aliases, $constructor_default, array $serialized_default,
-		$wither, $setter, $merged, $silent, $null_able, $field_visibility){
+	public function __construct(
+		$name,
+		$type,
+		array $read_as,
+		array $write_as,
+		$constructor_default,
+		array $serialized_default,
+		$wither,
+		$setter,
+		$merged,
+		$silent,
+		$null_able,
+		$field_visibility
+	) {
 		$this->name = $name;
 		$this->type = $type;
-		$this->aliases = $aliases;
+		$this->read_as = $read_as;
+		$this->write_as = $write_as;
 		$this->hasConstructorDefault = $constructor_default[0];
 		$this->constructorDefault = $constructor_default[1];
 		$this->hasSerializedDefault = $constructor_default[0] || $serialized_default[0];
@@ -61,61 +78,79 @@ class FieldDef {
 		$this->silent = $silent;
 		$this->null_able = $null_able;
 		$visibilitySet = ['private', 'protected', 'public', null];
-		if(!in_array($field_visibility, $visibilitySet, true)){
+		if (!in_array($field_visibility, $visibilitySet, true)) {
 			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
 		}
 		$this->field_visibility = $field_visibility;
 	}
 
-	function getName(){
+	function getName()
+	{
 		return $this->name;
 	}
 
-	function getType(){
+	function getType()
+	{
 		return $this->type;
 	}
 
-	function hasConstructorDefault(){
+	function hasConstructorDefault()
+	{
 		return $this->hasConstructorDefault;
 	}
 
-	function getConstructorDefault(){
+	function getConstructorDefault()
+	{
 		return $this->constructorDefault;
 	}
 
-	function hasSerializedDefault(){
+	function hasSerializedDefault()
+	{
 		return $this->hasSerializedDefault;
 	}
 
-	function getSerializedDefault(){
+	function getSerializedDefault()
+	{
 		return $this->serializedDefault;
 	}
 
-	function getWither(){
+	function getWither()
+	{
 		return $this->wither;
 	}
 
-	function getSetter(){
+	function getSetter()
+	{
 		return $this->setter;
 	}
 
-	function getAliases(){
-		return $this->aliases;
+	public function getReadAs()
+	{
+		return $this->read_as;
 	}
 
-	function getMerged(){
+	public function getWriteAs()
+	{
+		return $this->write_as;
+	}
+
+	function getMerged()
+	{
 		return $this->merged;
 	}
 
-	function getSilent(){
+	function getSilent()
+	{
 		return $this->silent;
 	}
 
-	function getNullAble(){
+	function getNullAble()
+	{
 		return $this->null_able;
 	}
 
-	public function getFieldVisibility(){
+	public function getFieldVisibility()
+	{
 		return $this->field_visibility;
 	}
 
