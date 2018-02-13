@@ -27,10 +27,14 @@ return [
 		'field7' => ['type' => 'mixed', 'default' => null],
 		'field8' => ['type' => 'DateTime[]', 'default' => null, 'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],
+		'field10' => ['type' => TagType::class, 'default' => null],
 	],
 
 	'Value' => [
 		'val' => ['type' => 'string', 'set' => true, 'null' => true, 'empty' => null],
+	],
+
+	'TagType' => [
 	],
 
 	'Virtual1' => [

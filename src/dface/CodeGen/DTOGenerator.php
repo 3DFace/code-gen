@@ -167,8 +167,17 @@ class DTOGenerator {
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
 		$body .= "\t"."static function deserialize(array \$arr)$ret_hint{\n";
+		$fields = $spec->getFields();
+		if(empty($fields)){
+			$body .= "\t\t"."if(\$arr !== []){\n";
+			$body .= "\t\t\t"."throw new \InvalidArgumentException('Empty array expected');\n";
+			$body .= "\t\t"."}\n";
+			$body .= "\t\t"."return new static();\n";
+			$body .= "\t}\n";
+			return $body;
+		}
 		$constructor_args = [];
-		foreach($spec->getFields() as $field){
+		foreach($fields as $field){
 			$property_name = $field->getName();
 			$constructor_args[] = '$'.$property_name;
 			if($field->getMerged()){
@@ -211,12 +220,17 @@ class DTOGenerator {
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = "\t/**\n";
 		$body .= "\t * @return mixed\n";
-		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."function jsonSerialize(){\n\n";
-		$body .= "\t\t"."\$result = [];\n\n";
+		$body .= "\t"."function jsonSerialize(){\n";
+		$fields = $spec->getFields();
+		if(empty($fields)){
+			$body .= "\t\t"."return [];\n";
+			$body .= "\t}\n";
+			return $body;
+		}
+		$body .= "\n\t\t"."\$result = [];\n\n";
 		$merge = [];
-		foreach($spec->getFields() as $field){
+		foreach($fields as $field){
 			$property_name = $field->getName();
 			$getter = '$this->'.$property_name;
 			$type = $this->getType($namespace, $field->getType());

@@ -46,7 +46,7 @@ class VirtualType implements TypeDef {
 				$indent."\t"."}\n";
 		}
 		$result .=
-			$indent."\t"."throw new \\InvalidArgumentException('Unsupported virtual type '.\gettype(\$val));\n".
+			$indent."\t"."throw new \\RuntimeException('Unsupported virtual type '.\gettype(\$val));\n".
 			$indent."}, $value_expression)";
 		return $result;
 	}
