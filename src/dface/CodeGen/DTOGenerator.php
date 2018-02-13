@@ -222,11 +222,11 @@ class DTOGenerator {
 			$type = $this->getType($namespace, $field->getType());
 			if($field->getMerged()){
 				$target = "\$merge_${property_name}";
-				$merge[$target] = $target.' = '.$type->getSerializer($getter, "\t\t").";\n";
+				$merge[$target] = $target.' = '.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n";
 			}else{
 				foreach($field->getWriteAs() as $target_name){
 					$target = "\$result['$target_name']";
-					$body .= "\t\t".$target.' = '.$type->getSerializer($getter, "\t\t").";\n\n";
+					$body .= "\t\t".$target.' = '.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n\n";
 				}
 			}
 		}

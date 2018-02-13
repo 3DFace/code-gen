@@ -11,9 +11,9 @@ class TimeStampType implements TypeDef
 		return [\DateTimeImmutable::class];
 	}
 
-	function getSerializer($value_expression, $indent)
+	function getSerializer($value_expression, $null_able, $indent)
 	{
-		return $value_expression.' !==null ? '.$value_expression.'->getTimestamp() : null';
+		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression.'->getTimestamp()';
 	}
 
 	function getDeserializer($target, $value_expression, $indent)

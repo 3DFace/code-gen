@@ -15,10 +15,11 @@ interface TypeDef {
 	/**
 	 * Makes PHP-code that serializes values of target type.
 	 * @param string $value_expression - PHP-expression that represents a value being serialized
+	 * @param bool $null_able
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	function getSerializer($value_expression, $indent);
+	function getSerializer($value_expression, $null_able, $indent);
 
 	/**
 	 * Makes PHP-code that deserializes values returned from 'serialize'-method to target type.

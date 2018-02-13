@@ -9,7 +9,7 @@ class MixedType implements TypeDef {
 		return [];
 	}
 
-	function getSerializer($value_expression, $indent){
+	function getSerializer($value_expression, $null_able, $indent){
 		return $value_expression;
 	}
 

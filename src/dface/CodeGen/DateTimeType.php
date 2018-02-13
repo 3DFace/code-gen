@@ -16,8 +16,8 @@ class DateTimeType implements TypeDef {
 		return [\DateTimeImmutable::class];
 	}
 
-	function getSerializer($value_expression, $indent){
-		return $value_expression.' !==null ? '.$value_expression."->format('$this->serializeFormat') : null";
+	function getSerializer($value_expression, $null_able, $indent){
+		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression."->format('$this->serializeFormat')";
 	}
 
 	function getDeserializer($target, $value_expression, $indent){
