@@ -21,7 +21,7 @@ class MapType implements TypeDef {
 			return $value_expression;
 		}
 		$inner_hint = $this->innerType->getPhpDocHint();
-		return ($null_able ? "$value_expression === null ? null : " : '')."call_user_func(function (array \$map){\n".
+		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
 			$indent."\t\t/** @var $inner_hint \$v */\n".
@@ -33,7 +33,7 @@ class MapType implements TypeDef {
 
 	function getDeserializer($target, $value_expression, $indent){
 		$exp = $this->innerType->getDeserializer('$x[$k]', '$v', $indent."\t\t");
-		return "$target = $value_expression !== null ? call_user_func(function (array \$map){\n".
+		return "$target = $value_expression !== null ? \call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
 			$indent."\t\t".$exp.

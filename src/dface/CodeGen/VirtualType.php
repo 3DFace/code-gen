@@ -34,7 +34,7 @@ class VirtualType implements TypeDef {
 	}
 
 	function getSerializer($value_expression, $null_able, $indent){
-		$result = ($null_able ? "$value_expression === null ? null : " : '')."call_user_func(function (\$val){\n";
+		$result = ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (\$val){\n";
 
 		foreach($this->types as $class_and_id){
 			/** @var ClassName $class */
@@ -52,7 +52,7 @@ class VirtualType implements TypeDef {
 	}
 
 	function getDeserializer($target, $value_expression, $indent){
-		$result = "$target = $value_expression !== null ? call_user_func(function (\$val){\n".
+		$result = "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
 			$indent."\t"."if(is_array(\$val)){\n".
 			$indent."\t\t"."list(\$type, , \$serialized) = \$val;\n".
 			$indent."\t\t"."switch(\$type){\n";
