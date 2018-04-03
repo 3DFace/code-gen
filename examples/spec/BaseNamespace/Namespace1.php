@@ -28,6 +28,7 @@ return [
 		'field8' => ['type' => 'DateTime[]', 'default' => null, 'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],
 		'field10' => ['type' => TagType::class, 'default' => null],
+		'field11' => ['type' => 'DateTime', 'default' => null],
 	],
 
 	'Value' => [
