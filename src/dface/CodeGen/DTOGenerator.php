@@ -132,7 +132,7 @@ class DTOGenerator {
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
 			$iName = ltrim($className->getShortName(), '\\');
-			$arr[$iName] = "$iName";
+			$arr[$iName] = $iName;
 		}
 		return $arr ? ', '.implode(', ', $arr) : '';
 	}
@@ -144,7 +144,7 @@ class DTOGenerator {
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
 			$tName = ltrim($className->getShortName(), '\\');
-			$arr[$tName] = "$tName";
+			$arr[$tName] = $tName;
 		}
 		return $arr ? ("\t".'use '.implode(";\n\t".'use ', $arr).";\n\n") : '';
 	}
@@ -166,7 +166,7 @@ class DTOGenerator {
 		$body .= "\t * @return self\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."static function deserialize(array \$arr)$ret_hint{\n";
+		$body .= "\t"."public static function deserialize(array \$arr)$ret_hint{\n";
 		$fields = $spec->getFields();
 		if(empty($fields)){
 			$body .= "\t\t"."if(\$arr !== []){\n";
@@ -221,7 +221,7 @@ class DTOGenerator {
 		$body = "\t/**\n";
 		$body .= "\t * @return mixed\n";
 		$body .= "\t */\n";
-		$body .= "\t"."function jsonSerialize(){\n";
+		$body .= "\t"."public function jsonSerialize(){\n";
 		$fields = $spec->getFields();
 		if(empty($fields)){
 			$body .= "\t\t"."return [];\n";
@@ -322,7 +322,7 @@ class DTOGenerator {
 		}else{
 			$params_str = implode(', ', $constructor_params);
 		}
-		$body .= "\t".'function __construct('.$params_str."){\n";
+		$body .= "\t".'public function __construct('.$params_str."){\n";
 		$body .= $constructor_body;
 		$body .= "\t}\n";
 		return $body;
@@ -351,7 +351,7 @@ class DTOGenerator {
 				}
 				$ret_hint = ' : '.$arg_hint.' ';
 			}
-			$body .= "\t".'function get'.$this->camelCase($property_name)."()$ret_hint{\n";
+			$body .= "\t".'public function get'.$this->camelCase($property_name)."()$ret_hint{\n";
 			$body .= "\t\t"."return \$this->$property_name;\n";
 			$body .= "\t}\n\n";
 		}
@@ -385,7 +385,7 @@ class DTOGenerator {
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function set'.$this->camelCase($property_name)."($type_hint\$val$def_null){\n";
+				$body .= "\t".'public function set'.$this->camelCase($property_name)."($type_hint\$val$def_null){\n";
 				$body .= "\t\t\$this->$property_name = \$val;\n";
 				$body .= "\t}\n\n";
 			}
@@ -422,7 +422,7 @@ class DTOGenerator {
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t * @return self\n";
 				$body .= "\t */\n";
-				$body .= "\t".'function with'.$this->camelCase($property_name)."($type_hint\$val$def_null)$ret_hint{\n";
+				$body .= "\t".'public function with'.$this->camelCase($property_name)."($type_hint\$val$def_null)$ret_hint{\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";
