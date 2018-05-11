@@ -22,7 +22,13 @@ class Psr0ClassWriter implements ClassWriter {
 		if(!@mkdir($dir, 0777, true) && !is_dir($dir)){
 			throw new \InvalidArgumentException("Can't create dir $dir");
 		}
-		file_put_contents($class_filename, $phpCode);
+		if(\is_readable($class_filename)){
+			$present = \file_get_contents($class_filename);
+			if($present === $phpCode){
+				return;
+			}
+		}
+		\file_put_contents($class_filename, $phpCode);
 	}
 
 	private function classNameToPsr0Name($className){
