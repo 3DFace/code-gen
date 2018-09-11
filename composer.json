@@ -12,7 +12,16 @@
 	"require": {
 		"php": ">=5.6.0"
 	},
+    "require-dev": {
+      "ext-json": "*"
+    },
 	"autoload": {
-		"psr-0": {"dface": "src/", "": "examples/classes"}
+		"psr-0": {"dface\\CodeGen": "src/"}
+	},
+	"autoload-dev": {
+		"psr-0": {
+			"dface\\CodeGen" : "test/",
+			"": "examples/classes"
+		}
 	}
 }

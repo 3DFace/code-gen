@@ -38,23 +38,23 @@ class Specification {
 		$this->deprecated = $deprecated;
 	}
 
-	function getClassName(){
+	public function getClassName(){
 		return $this->className;
 	}
 
-	function getFields(){
+	public function getFields(){
 		return $this->fields;
 	}
 
-	function getInterfaces(){
+	public function getInterfaces(){
 		return $this->interfaces;
 	}
 
-	function getTraits(){
+	public function getTraits(){
 		return $this->traits;
 	}
 
-    function getDeprecated(){
+    public function getDeprecated(){
         return $this->deprecated;
     }
 

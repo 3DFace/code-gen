@@ -10,7 +10,7 @@ interface TypeDef {
 	 * @param string $namespace - generated class's namespace
 	 * @return string[] class names
 	 */
-	function getUses($namespace);
+	public function getUses($namespace);
 
 	/**
 	 * Makes PHP-code that serializes values of target type.
@@ -19,7 +19,7 @@ interface TypeDef {
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	function getSerializer($value_expression, $null_able, $indent);
+	public function getSerializer($value_expression, $null_able, $indent);
 
 	/**
 	 * Makes PHP-code that deserializes values returned from 'serialize'-method to target type.
@@ -28,18 +28,18 @@ interface TypeDef {
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	function getDeserializer($l_value, $value_expression, $indent);
+	public function getDeserializer($l_value, $value_expression, $indent);
 
 	/**
 	 * Returns PHP-lang type hinting
 	 * @return string
 	 */
-	function getArgumentHint();
+	public function getArgumentHint();
 
 	/**
 	 * Returns PHPDOC type hinting
 	 * @return string
 	 */
-	function getPhpDocHint();
+	public function getPhpDocHint();
 
 }

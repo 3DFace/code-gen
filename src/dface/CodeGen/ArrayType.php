@@ -12,11 +12,11 @@ class ArrayType implements TypeDef {
 		$this->innerType = $innerType;
 	}
 
-	function getUses($namespace){
+	public function getUses($namespace){
 		return $this->innerType->getUses($namespace);
 	}
 
-	function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer($value_expression, $null_able, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}
@@ -26,18 +26,18 @@ class ArrayType implements TypeDef {
 			$indent."}, $value_expression)";
 	}
 
-	function getDeserializer($target, $value_expression, $indent){
+	public function getDeserializer($target, $value_expression, $indent){
 		return "$target = $value_expression !== null ? array_map(function (\$x){\n".
 			$indent."\t".$this->innerType->getDeserializer('$x','$x', $indent."\t").
 			$indent."\t".'return $x'.";\n".
 			$indent."}, $value_expression) : null;\n";
 	}
 
-	function getArgumentHint(){
+	public function getArgumentHint(){
 		return 'array';
 	}
 
-	function getPhpDocHint(){
+	public function getPhpDocHint(){
 		$inner = $this->innerType->getPhpDocHint();
 		return str_replace('|', '[]|', $inner).'[]';
 	}

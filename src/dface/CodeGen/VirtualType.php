@@ -18,7 +18,7 @@ class VirtualType implements TypeDef {
 		}
 	}
 
-	function getUses($namespace){
+	public function getUses($namespace){
 		$uses = [];
 		if($this->baseType->getNamespace() !== $namespace){
 			$uses[$this->baseType->getFullName()] = 1;
@@ -33,7 +33,7 @@ class VirtualType implements TypeDef {
 		return array_keys($uses);
 	}
 
-	function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer($value_expression, $null_able, $indent){
 		$result = ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (\$val){\n";
 
 		foreach($this->types as $class_and_id){
@@ -51,9 +51,9 @@ class VirtualType implements TypeDef {
 		return $result;
 	}
 
-	function getDeserializer($target, $value_expression, $indent){
+	public function getDeserializer($target, $value_expression, $indent){
 		$result = "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
-			$indent."\t"."if(is_array(\$val)){\n".
+			$indent."\t"."if(\is_array(\$val)){\n".
 			$indent."\t\t"."list(\$type, , \$serialized) = \$val;\n".
 			$indent."\t\t"."switch(\$type){\n";
 		foreach($this->types as $class_and_id){
@@ -75,11 +75,11 @@ class VirtualType implements TypeDef {
 		return $result;
 	}
 
-	function getArgumentHint(){
+	public function getArgumentHint(){
 		return $this->baseType->getShortName();
 	}
 
-	function getPhpDocHint(){
+	public function getPhpDocHint(){
 		return $this->baseType->getShortName();
 	}
 

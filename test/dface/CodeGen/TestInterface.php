@@ -5,6 +5,6 @@ namespace dface\CodeGen;
 
 interface TestInterface {
 
-	function getTest();
+	public function getTest();
 
 }

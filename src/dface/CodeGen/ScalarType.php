@@ -16,23 +16,23 @@ class ScalarType implements TypeDef {
 		$this->type = $type;
 	}
 
-	function getUses($namespace){
+	public function getUses($namespace){
 		return [];
 	}
 
-	function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer($value_expression, $null_able, $indent){
 		return $value_expression;
 	}
 
-	function getDeserializer($target, $value_expression, $indent){
+	public function getDeserializer($target, $value_expression, $indent){
 		return "$target = $value_expression !== null ? ($this->type)$value_expression : null;\n";
 	}
 
-	function getArgumentHint(){
+	public function getArgumentHint(){
 		return $this->type;
 	}
 
-	function getPhpDocHint(){
+	public function getPhpDocHint(){
 		return $this->type;
 	}
 

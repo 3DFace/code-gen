@@ -47,7 +47,7 @@ class DTOGenerator {
 	/**
 	 * @throws \InvalidArgumentException
 	 */
-	function generate(){
+	public function generate(){
 		foreach($this->specSource as $spec){
 			/** @var Specification $spec */
 			$code = $this->generateDataClass($spec);

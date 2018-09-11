@@ -84,42 +84,42 @@ class FieldDef
 		$this->field_visibility = $field_visibility;
 	}
 
-	function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
 
-	function getType()
+	public function getType()
 	{
 		return $this->type;
 	}
 
-	function hasConstructorDefault()
+	public function hasConstructorDefault()
 	{
 		return $this->hasConstructorDefault;
 	}
 
-	function getConstructorDefault()
+	public function getConstructorDefault()
 	{
 		return $this->constructorDefault;
 	}
 
-	function hasSerializedDefault()
+	public function hasSerializedDefault()
 	{
 		return $this->hasSerializedDefault;
 	}
 
-	function getSerializedDefault()
+	public function getSerializedDefault()
 	{
 		return $this->serializedDefault;
 	}
 
-	function getWither()
+	public function getWither()
 	{
 		return $this->wither;
 	}
 
-	function getSetter()
+	public function getSetter()
 	{
 		return $this->setter;
 	}
@@ -134,17 +134,17 @@ class FieldDef
 		return $this->write_as;
 	}
 
-	function getMerged()
+	public function getMerged()
 	{
 		return $this->merged;
 	}
 
-	function getSilent()
+	public function getSilent()
 	{
 		return $this->silent;
 	}
 
-	function getNullAble()
+	public function getNullAble()
 	{
 		return $this->null_able;
 	}

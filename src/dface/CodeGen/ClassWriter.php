@@ -10,6 +10,6 @@ interface ClassWriter {
 	 * @param string $phpCode
 	 * @return void
 	 */
-	function writeClass($className, $phpCode);
+	public function writeClass($className, $phpCode);
 
 }

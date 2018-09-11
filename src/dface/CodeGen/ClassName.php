@@ -23,19 +23,19 @@ class ClassName {
 		$this->fullName = $this->namespace.'\\'.$this->shortName;
 	}
 
-	function getFullName(){
+	public function getFullName(){
 		return $this->fullName;
 	}
 
-	function getNamespace(){
+	public function getNamespace(){
 		return $this->namespace;
 	}
 
-	function getShortName(){
+	public function getShortName(){
 		return $this->shortName;
 	}
 
-	function __toString(){
+	public function __toString(){
 		return $this->fullName;
 	}
 

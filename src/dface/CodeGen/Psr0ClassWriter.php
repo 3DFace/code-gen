@@ -16,7 +16,7 @@ class Psr0ClassWriter implements ClassWriter {
 		$this->targetSrcRoot = $targetSrcRoot;
 	}
 
-	function writeClass($className, $phpCode){
+	public function writeClass($className, $phpCode){
 		$class_filename = $this->targetSrcRoot.'/'.$this->classNameToPsr0Name($className);
 		$dir = dirname($class_filename);
 		if(!@mkdir($dir, 0777, true) && !is_dir($dir)){

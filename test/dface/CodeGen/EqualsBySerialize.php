@@ -10,7 +10,7 @@ trait EqualsBySerialize {
 	 * @return bool
 	 * @throws \InvalidArgumentException
 	 */
-	function equals($val){
+	public function equals($val){
 		if(!$this instanceof \JsonSerializable){
 			throw new \InvalidArgumentException('Cant JSON-serialize '.get_class($this).' instances');
 		}

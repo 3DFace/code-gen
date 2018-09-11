@@ -12,15 +12,15 @@ class DateTimeType implements TypeDef {
 		$this->serializeFormat = $serializeFormat;
 	}
 
-	function getUses($namespace){
+	public function getUses($namespace){
 		return [\DateTimeImmutable::class];
 	}
 
-	function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer($value_expression, $null_able, $indent){
 		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression."->format('$this->serializeFormat')";
 	}
 
-	function getDeserializer($target, $value_expression, $indent){
+	public function getDeserializer($target, $value_expression, $indent){
 		$body = "try {\n";
 		$body .= $indent."\t"."$target = $value_expression !== null ? new DateTimeImmutable($value_expression) : null;\n";
 		$body .= $indent."}catch (\Exception \$e){\n";
@@ -29,11 +29,11 @@ class DateTimeType implements TypeDef {
 		return $body;
 	}
 
-	function getArgumentHint(){
+	public function getArgumentHint(){
 		return 'DateTimeImmutable';
 	}
 
-	function getPhpDocHint(){
+	public function getPhpDocHint(){
 		return 'DateTimeImmutable';
 	}
 

@@ -12,11 +12,11 @@ class MapType implements TypeDef {
 		$this->innerType = $innerType;
 	}
 
-	function getUses($namespace){
+	public function getUses($namespace){
 		return $this->innerType->getUses($namespace);
 	}
 
-	function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer($value_expression, $null_able, $indent){
 		if(is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}
@@ -31,7 +31,7 @@ class MapType implements TypeDef {
 			$indent."}, $value_expression)";
 	}
 
-	function getDeserializer($target, $value_expression, $indent){
+	public function getDeserializer($target, $value_expression, $indent){
 		$exp = $this->innerType->getDeserializer('$x[$k]', '$v', $indent."\t\t");
 		return "$target = $value_expression !== null ? \call_user_func(function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
@@ -42,11 +42,11 @@ class MapType implements TypeDef {
 			$indent."}, $value_expression) : null;\n";
 	}
 
-	function getArgumentHint(){
+	public function getArgumentHint(){
 		return 'array';
 	}
 
-	function getPhpDocHint(){
+	public function getPhpDocHint(){
 		return $this->innerType->getPhpDocHint().'[]';
 	}
 

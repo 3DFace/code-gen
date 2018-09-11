@@ -60,8 +60,9 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	 * @return \Iterator
 	 * @throws \InvalidArgumentException
 	 */
-	function walkFile($relativeFilename){
+	public function walkFile($relativeFilename){
 		/** @var array[] $definitions */
+		/** @noinspection PhpIncludeInspection */
 		$definitions = include $this->definitionsDir.$relativeFilename;
 		$deprecated = false;
 		foreach($definitions as $defName => $definition){
@@ -144,7 +145,6 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			$has_default_serialized = false;
 			$default_serialized = null;
 		}
-		$target = [$name];
 		return new FieldDef(
 			$name,
 			$arr['type'],
@@ -157,8 +157,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 			isset($arr['merged']) ? $arr['merged'] : false,
 			isset($arr['silent']) ? $arr['silent'] : false,
 			isset($arr['null']) ? $arr['null'] : ($has_default && $default === null),
-			isset($arr['field_visibility']) ? $arr['field_visibility'] : null,
-			$target
+			isset($arr['field_visibility']) ? $arr['field_visibility'] : null
 		);
 	}
 
