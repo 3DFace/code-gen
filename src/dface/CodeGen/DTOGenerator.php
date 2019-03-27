@@ -455,7 +455,7 @@ class DTOGenerator
 
 	private function fullTypeName($namespace, $type_name)
 	{
-		return \strposstrpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
+		return \strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
 	}
 
 	/**
