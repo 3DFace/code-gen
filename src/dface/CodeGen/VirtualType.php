@@ -53,7 +53,7 @@ class VirtualType implements TypeDef {
 
 	public function getDeserializer($target, $value_expression, $indent){
 		$result = "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
-			$indent."\t"."if(\is_array(\$val)){\n".
+			$indent."\t"."if(\\is_array(\$val)){\n".
 			$indent."\t\t"."list(\$type, , \$serialized) = \$val;\n".
 			$indent."\t\t"."switch(\$type){\n";
 		foreach($this->types as $class_and_id){

@@ -32,14 +32,14 @@ class JsonType implements TypeDef {
 		$exp = $this->innerType->getSerializer('$val', false, $indent."\t");
 		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (\JsonSerializable \$val){\n".
 			$indent."\t"."\$x = $exp;\n".
-			$indent."\t"."return json_encode(\$x, $this->encode_options);\n".
+			$indent."\t"."return \\json_encode(\$x, $this->encode_options);\n".
 			$indent."}, $value_expression)";
 	}
 
 	public function getDeserializer($target, $value_expression, $indent) {
 		$exp = $this->innerType->getDeserializer('$x', '$x', $indent."\t");
 		return "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
-			$indent."\t"."\$x = json_decode(\$val, true, 512, $this->decode_options);\n".
+			$indent."\t"."\$x = \\json_decode(\$val, true, 512, $this->decode_options);\n".
 			$indent."\t".$exp.
 			$indent."\t"."return \$x;\n".
 			$indent."}, $value_expression) : null;\n";
