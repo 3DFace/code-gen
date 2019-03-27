@@ -21,13 +21,13 @@ class ArrayType implements TypeDef {
 			return $value_expression;
 		}
 		$type_hint = $this->innerType->getArgumentHint();
-		return ($null_able ? "$value_expression === null ? null : " : '')."array_map(function ($type_hint \$x){\n".
+		return ($null_able ? "$value_expression === null ? null : " : '')."\\array_map(function ($type_hint \$x){\n".
 			$indent."\t".'return '.$this->innerType->getSerializer('$x', false, $indent."\t").";\n".
 			$indent."}, $value_expression)";
 	}
 
 	public function getDeserializer($target, $value_expression, $indent){
-		return "$target = $value_expression !== null ? array_map(function (\$x){\n".
+		return "$target = $value_expression !== null ? \\array_map(function (\$x){\n".
 			$indent."\t".$this->innerType->getDeserializer('$x','$x', $indent."\t").
 			$indent."\t".'return $x'.";\n".
 			$indent."}, $value_expression) : null;\n";

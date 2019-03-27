@@ -30,7 +30,7 @@ class VirtualType implements TypeDef {
 				$uses[$class->getFullName()] = 1;
 			}
 		}
-		return array_keys($uses);
+		return \array_keys($uses);
 	}
 
 	public function getSerializer($value_expression, $null_able, $indent){
