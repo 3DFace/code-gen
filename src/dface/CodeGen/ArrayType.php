@@ -17,7 +17,7 @@ class ArrayType implements TypeDef {
 	}
 
 	public function getSerializer($value_expression, $null_able, $indent){
-		if(is_a($this->innerType, ScalarType::class)){
+		if(\is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}
 		$type_hint = $this->innerType->getArgumentHint();
@@ -39,7 +39,7 @@ class ArrayType implements TypeDef {
 
 	public function getPhpDocHint(){
 		$inner = $this->innerType->getPhpDocHint();
-		return str_replace('|', '[]|', $inner).'[]';
+		return \str_replace('|', '[]|', $inner).'[]';
 	}
 
 }

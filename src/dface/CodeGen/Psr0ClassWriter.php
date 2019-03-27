@@ -18,8 +18,8 @@ class Psr0ClassWriter implements ClassWriter {
 
 	public function writeClass($className, $phpCode){
 		$class_filename = $this->targetSrcRoot.'/'.$this->classNameToPsr0Name($className);
-		$dir = dirname($class_filename);
-		if(!@mkdir($dir, 0777, true) && !is_dir($dir)){
+		$dir = \dirname($class_filename);
+		if(!@\mkdir($dir, 0777, true) && !\is_dir($dir)){
 			throw new \InvalidArgumentException("Can't create dir $dir");
 		}
 		if(\is_readable($class_filename)){
@@ -32,7 +32,7 @@ class Psr0ClassWriter implements ClassWriter {
 	}
 
 	private function classNameToPsr0Name($className){
-		return str_replace('\\', DIRECTORY_SEPARATOR, $className).'.php';
+		return \str_replace('\\', DIRECTORY_SEPARATOR, $className).'.php';
 	}
 
 }

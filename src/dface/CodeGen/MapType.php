@@ -17,7 +17,7 @@ class MapType implements TypeDef {
 	}
 
 	public function getSerializer($value_expression, $null_able, $indent){
-		if(is_a($this->innerType, ScalarType::class)){
+		if(\is_a($this->innerType, ScalarType::class)){
 			return $value_expression;
 		}
 		$inner_hint = $this->innerType->getPhpDocHint();

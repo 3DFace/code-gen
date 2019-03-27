@@ -36,11 +36,11 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	 */
 	private function walkDir($relativeName){
 		/** @var \Directory $d */
-		$d = dir($this->definitionsDir.$relativeName);
+		$d = \dir($this->definitionsDir.$relativeName);
 		while(false !== ($entry = $d->read())){
-			if(!in_array($entry, ['.', '..'], true)){
+			if(!\in_array($entry, ['.', '..'], true)){
 				$fullName = $this->definitionsDir.$relativeName.'/'.$entry;
-				if(is_dir($fullName)){
+				if(\is_dir($fullName)){
 					foreach($this->walkDir($relativeName.'/'.$entry) as $name){
 						yield $name;
 					}
@@ -67,7 +67,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		$deprecated = false;
 		foreach($definitions as $defName => $definition){
 			$defPath = $relativeFilename.'/'.$defName;
-			$namespace = trim($this->baseNamespace.str_replace('/', '\\', substr($relativeFilename, 0, -4)), '\\');
+			$namespace = \trim($this->baseNamespace.\str_replace('/', '\\', \substr($relativeFilename, 0, -4)), '\\');
 			$className = $namespace.'\\'.$defName;
 			$fields = [];
 			$interfaces = [];
@@ -76,13 +76,13 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 				if($name[0] !== '@'){
 					$fields[] = $this->createFieldDef($name, $arr, $defPath);
 				}else{
-					$optName = substr($name, 1);
+					$optName = \substr($name, 1);
 					switch($optName){
 						case 'implements':
-							$interfaces = is_array($arr) ? $arr : [$arr];
+							$interfaces = \is_array($arr) ? $arr : [$arr];
 							break;
 						case 'traits':
-							$traits = is_array($arr) ? $arr : [$arr];
+							$traits = \is_array($arr) ? $arr : [$arr];
 							break;
                         case 'deprecated':
                             $deprecated = (bool)$arr;
@@ -104,8 +104,8 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	 * @throws \InvalidArgumentException
 	 */
 	private function createFieldDef($name, $arr, $defPath){
-		if(!is_array($arr)){
-			if(is_string($arr) || $arr instanceof TypeDef){
+		if(!\is_array($arr)){
+			if(\is_string($arr) || $arr instanceof TypeDef){
 				$arr = ['type' => $arr];
 			}else{
 				throw new \InvalidArgumentException("Bad field definition type at $defPath->{$name}");
@@ -118,7 +118,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		}
 		if(isset($arr['read_as'])){
 			$read_as = $arr['read_as'];
-			if(!is_array($read_as)){
+			if(!\is_array($read_as)){
 				$read_as = [$read_as];
 			}
 		}
@@ -126,19 +126,19 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 		$write_as = [$name];
 		if(isset($arr['write_as'])){
 			$write_as = $arr['write_as'];
-			if(!is_array($write_as)){
+			if(!\is_array($write_as)){
 				$write_as = [$write_as];
 			}
 		}
 
-		if(array_key_exists('default', $arr)){
+		if(\array_key_exists('default', $arr)){
 			$has_default = true;
 			$default = $arr['default'];
 		}else{
 			$has_default = false;
 			$default = null;
 		}
-		if(array_key_exists('empty', $arr)){
+		if(\array_key_exists('empty', $arr)){
 			$has_default_serialized = true;
 			$default_serialized = $arr['empty'];
 		}else{

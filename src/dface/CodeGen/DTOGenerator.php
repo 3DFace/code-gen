@@ -39,7 +39,7 @@ class DTOGenerator
 		$this->predefinedTypes = $predefinedTypes;
 		$this->targetVersion = $target_version;
 		$visibilitySet = ['private', 'protected', 'public'];
-		if (!in_array($fieldsVisibility, $visibilitySet, true)) {
+		if (!\in_array($fieldsVisibility, $visibilitySet, true)) {
 			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
 		}
 		$this->fieldsVisibility = $fieldsVisibility;
@@ -68,7 +68,7 @@ class DTOGenerator
 		$body = '<?php'."\n\n";
 		$body .= "/** Generated class. Don't edit manually. */\n\n";
 		if ($namespace) {
-			$body .= 'namespace '.ltrim($namespace, '\\').";\n\n";
+			$body .= 'namespace '.\ltrim($namespace, '\\').";\n\n";
 		}
 		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : '');
 		$imp = $this->generateImplements($spec);
@@ -106,7 +106,7 @@ class DTOGenerator
 		foreach ($spec->getFields() as $field) {
 			$type = $this->getType($namespace, $field->getType());
 			foreach ($type->getUses($namespace) as $u) {
-				$u = ltrim($u, '\\');
+				$u = \ltrim($u, '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
@@ -114,7 +114,7 @@ class DTOGenerator
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
 			if ($className->getNamespace() !== $namespace) {
-				$u = ltrim($className->getFullName(), '\\');
+				$u = \ltrim($className->getFullName(), '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
@@ -122,11 +122,11 @@ class DTOGenerator
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
 			if ($className->getNamespace() !== $namespace) {
-				$u = ltrim($className->getFullName(), '\\');
+				$u = \ltrim($className->getFullName(), '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
-		return implode($uses);
+		return \implode($uses);
 	}
 
 	private function generateImplements(Specification $spec)
@@ -136,10 +136,10 @@ class DTOGenerator
 		foreach ($spec->getInterfaces() as $i) {
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
-			$iName = ltrim($className->getShortName(), '\\');
+			$iName = \ltrim($className->getShortName(), '\\');
 			$arr[$iName] = $iName;
 		}
-		return $arr ? ', '.implode(', ', $arr) : '';
+		return $arr ? ', '.\implode(', ', $arr) : '';
 	}
 
 	private function generateTraits(Specification $spec)
@@ -149,7 +149,7 @@ class DTOGenerator
 		foreach ($spec->getTraits() as $i) {
 			$fullType = $this->fullTypeName($namespace, $i);
 			$className = new ClassName($fullType);
-			$tName = ltrim($className->getShortName(), '\\');
+			$tName = \ltrim($className->getShortName(), '\\');
 			$arr[$tName] = $tName;
 		}
 		return $arr ? ("\t".'use '.implode(";\n\t".'use ', $arr).";\n\n") : '';
@@ -164,7 +164,7 @@ class DTOGenerator
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$ret_hint = '';
-		$support_ret_hint = version_compare($this->targetVersion, '7.1') >= 0;
+		$support_ret_hint = \version_compare($this->targetVersion, '7.1') >= 0;
 		if ($support_ret_hint) {
 			$ret_hint = ' : '.$spec->getClassName()->getShortName().' ';
 		}
@@ -253,8 +253,8 @@ class DTOGenerator
 			}
 		}
 		if ($merge) {
-			$body .= "\t\t".implode("\t\t", $merge)."\n";
-			$body .= "\t\t".'$result = \\array_replace($result, '.implode(', ', array_keys($merge)).");\n";
+			$body .= "\t\t".\implode("\t\t", $merge)."\n";
+			$body .= "\t\t".'$result = \\array_replace($result, '.\implode(', ', \array_keys($merge)).");\n";
 		}
 		$body .= "\t\t"."return \$result;\n";
 		$body .= "\t}\n";
@@ -327,10 +327,10 @@ class DTOGenerator
 			$constructor_params[] = $type_hint.'$'.$property_name.$def;
 			$constructor_body .= "\t\t"."\$this->$property_name = $right_val;\n";
 		}
-		if (count($constructor_params) > 3) {
-			$params_str = "\n\t\t".implode(",\n\t\t", $constructor_params)."\n\t";
+		if (\count($constructor_params) > 3) {
+			$params_str = "\n\t\t".\implode(",\n\t\t", $constructor_params)."\n\t";
 		}else {
-			$params_str = implode(', ', $constructor_params);
+			$params_str = \implode(', ', $constructor_params);
 		}
 		$body .= "\t".'public function __construct('.$params_str."){\n";
 		$body .= $constructor_body;
@@ -347,7 +347,7 @@ class DTOGenerator
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
-		$support_ret_hint = version_compare($this->targetVersion, '7.1') >= 0;
+		$support_ret_hint = \version_compare($this->targetVersion, '7.1') >= 0;
 		foreach ($spec->getFields() as $field) {
 			$type = $this->getType($namespace, $field->getType());
 			$doc_hint = $type->getPhpDocHint();
@@ -378,8 +378,8 @@ class DTOGenerator
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
-		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
-		$hint_nulls = version_compare($this->targetVersion, '7.1') >= 0;
+		$hint_scalars = \version_compare($this->targetVersion, '7.0') >= 0;
+		$hint_nulls = \version_compare($this->targetVersion, '7.1') >= 0;
 		foreach ($spec->getFields() as $field) {
 			$property_name = $field->getName();
 			if ($field->getSetter()) {
@@ -414,9 +414,9 @@ class DTOGenerator
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
-		$hint_scalars = version_compare($this->targetVersion, '7.0') >= 0;
-		$ret_hint = version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
-		$hint_nulls = version_compare($this->targetVersion, '7.1') >= 0;
+		$hint_scalars = \version_compare($this->targetVersion, '7.0') >= 0;
+		$ret_hint = \version_compare($this->targetVersion, '7.1') >= 0 ? ' : self ' : '';
+		$hint_nulls = \version_compare($this->targetVersion, '7.1') >= 0;
 		foreach ($spec->getFields() as $field) {
 			$property_name = $field->getName();
 			if ($field->getWither()) {
@@ -447,15 +447,15 @@ class DTOGenerator
 
 	private function camelCase($property_name)
 	{
-		$camelCase = preg_replace_callback('/_([a-z])/', function ($m) {
-			return strtoupper($m[1]);
+		$camelCase = \preg_replace_callback('/_([a-z])/', function ($m) {
+			return \strtoupper($m[1]);
 		}, $property_name);
-		return strtoupper($camelCase[0]).substr($camelCase, 1);
+		return \strtoupper($camelCase[0]).\substr($camelCase, 1);
 	}
 
 	private function fullTypeName($namespace, $type_name)
 	{
-		return strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
+		return \strposstrpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
 	}
 
 	/**
@@ -469,7 +469,7 @@ class DTOGenerator
 		if ($type_name instanceof TypeDef) {
 			return $type_name;
 		}
-		if (is_array($type_name)) {
+		if (\is_array($type_name)) {
 			$type_name = $type_name[0].'[]';
 		}
 		if (isset($this->predefinedTypes[$type_name])) {
@@ -477,21 +477,21 @@ class DTOGenerator
 		}
 		$full_name = $this->fullTypeName($namespace, $type_name);
 		if (!isset($this->types[$full_name])) {
-			if (substr($type_name, -2) === '[]') {
-				$el_type = substr($type_name, 0, -2);
+			if (\substr($type_name, -2) === '[]') {
+				$el_type = \substr($type_name, 0, -2);
 				if ($el_type === '') {
 					throw new \InvalidArgumentException('Specify element type');
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new ArrayType($inner_type);
-			}elseif (substr($type_name, -2) === '{}') {
-				$el_type = substr($type_name, 0, -2);
+			}elseif (\substr($type_name, -2) === '{}') {
+				$el_type = \substr($type_name, 0, -2);
 				if ($el_type === '') {
 					throw new \InvalidArgumentException('Specify element type');
 				}
 				$inner_type = $this->getType($namespace, $el_type);
 				$this->types[$full_name] = new MapType($inner_type);
-			}elseif (is_a($full_name, TypeDef::class)) {
+			}elseif (\is_a($full_name, TypeDef::class)) {
 				$this->types[$full_name] = new $full_name;
 			}else {
 				$this->types[$full_name] = new DynamicTypeDef(new ClassName($full_name));
@@ -508,7 +508,7 @@ class DTOGenerator
 		if ($var === []) {
 			return '[]';
 		}
-		return var_export($var, true);
+		return \var_export($var, true);
 	}
 
 }

@@ -78,7 +78,7 @@ class FieldDef
 		$this->silent = $silent;
 		$this->null_able = $null_able;
 		$visibilitySet = ['private', 'protected', 'public', null];
-		if (!in_array($field_visibility, $visibilitySet, true)) {
+		if (!\in_array($field_visibility, $visibilitySet, true)) {
 			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
 		}
 		$this->field_visibility = $field_visibility;

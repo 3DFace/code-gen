@@ -46,7 +46,7 @@ $x = new SomeClass(
 
 $s = $x->jsonSerialize();
 
-echo json_encode($s)."\n";
+echo \json_encode($s)."\n";
 
 $x = SomeClass::deserialize($s);
 
