@@ -24,6 +24,7 @@ return [
 			Value::class => 1,
 		]), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
+		'field61' => ['type' => 'DateInterval', 'default' => null],
 		'field7' => ['type' => 'mixed', 'default' => null],
 		'field8' => ['type' => 'DateTime[]', 'default' => null, 'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],

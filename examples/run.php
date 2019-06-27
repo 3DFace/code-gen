@@ -25,6 +25,7 @@ $predefinedTypes = [
 	'mixed' => new MixedType(),
 	'DateTime' => new DateTimeType('Y-m-d H:i:s'),
 	'TimeStamp' => new TimeStampType(),
+	'DateInterval' => new DateIntervalType(),
 	'virtual' => new VirtualType(\JsonSerializable::class, [
 		Virtual1::class => 1,
 		Virtual2::class => 2,
@@ -42,7 +43,8 @@ $x = new SomeClass(
 	new Value('qwe'),
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	new Value(2),
-	[new Virtual1('qaz', 'gaga'), new Virtual2('qaz')]);
+	[new Virtual1('qaz', 'gaga'), new Virtual2('qaz')],
+	new \DateInterval('P1M1DT10H'));
 
 $s = $x->jsonSerialize();
 
