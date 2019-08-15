@@ -17,7 +17,7 @@ return [
 	'SomeClass' => [
 		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true, 'null' => true],
 		'field2' => ['type' => SomeSibling::class],
-		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class))), 'default' => null],
+		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class)), 0 ,0, true), 'default' => null],
 		'field3' => ['type' => Value::class, 'default' => null, 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
