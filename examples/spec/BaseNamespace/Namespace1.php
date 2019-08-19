@@ -17,14 +17,14 @@ return [
 	'SomeClass' => [
 		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true, 'null' => true],
 		'field2' => ['type' => SomeSibling::class],
-		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class)), 0 ,0, true), 'default' => null],
+		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class)), 0 ,0, false), 'default' => null],
 		'field3' => ['type' => Value::class, 'default' => null, 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
 			Value::class => 1,
 		]), 'with' => 1],
 		'field6' => ['type' => 'virtual[]'],
-		'field61' => ['type' => 'DateInterval', 'default' => null],
+		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
 		'field7' => ['type' => 'mixed', 'default' => null],
 		'field8' => ['type' => 'DateTime[]', 'default' => null, 'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],

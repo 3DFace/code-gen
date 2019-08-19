@@ -246,10 +246,22 @@ class DTOGenerator
 				$target = "\$merge_${property_name}";
 				$merge[$target] = $target.' = '.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n";
 			}else {
+				$silent = $field->getSilent();
+				$s_indent = '';
+				if($silent){
+					$s_indent = "\t";
+					$def = $field->getSerializedDefault();
+					$def_exp = $this->varExport($def);
+					$body .= "\t\t"."if($getter !== $def_exp){\n";
+				}
 				foreach ($field->getWriteAs() as $target_name) {
 					$target = "\$result['$target_name']";
-					$body .= "\t\t".$target.' = '.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n\n";
+					$body .= $s_indent."\t\t".$target.' = '.$type->getSerializer($getter, $field->getNullAble(), $s_indent."\t\t").";\n";
 				}
+				if($silent){
+					$body .= "\t\t}\n";
+				}
+				$body .= "\n";
 			}
 		}
 		if ($merge) {
