@@ -50,11 +50,12 @@ class DTOGenerator
 	 */
 	public function generate()
 	{
+		$tool_mtime = filemtime(__DIR__.'/.');
 		/** @var Specification $spec */
 		foreach ($this->specSource as $spec) {
 			$className = $spec->getClassName();
 			$targetModified = $this->classWriter->getTargetMTime($className);
-			if ($targetModified < $spec->getModified()) {
+			if ($targetModified < $tool_mtime || $targetModified < $spec->getModified()) {
 				$code = $this->generateDataClass($spec);
 				$this->classWriter->writeClass($className, $code);
 			}
@@ -291,7 +292,8 @@ class DTOGenerator
 			$property_name = $field->getName();
 			$type = $this->getType($namespace, $field->getType());
 			$type_hint = $type->getPhpDocHint();
-			$body .= "\t/** @var $type_hint */\n";
+			$null_able = $field->getNullAble() ? '|null' : '';
+			$body .= "\t/** @var $type_hint$null_able */\n";
 			$visibility = $field->getFieldVisibility();
 			if ($visibility === null) {
 				$visibility = $this->fieldsVisibility;
@@ -329,16 +331,12 @@ class DTOGenerator
 				$def = ' = '.$this->varExport($field->getConstructorDefault());
 			}
 			$right_val = "\$$property_name";
-			if ($is_scalar) {
-				if (!$hint_scalars || $has_def) {
-					$type_hint = '';
-				}
-				if (!$hint_scalars) {
-					if ($field->getNullAble()) {
-						$right_val = "$right_val === null ? null : (".$type->getArgumentHint().") $right_val";
-					}else {
-						$right_val = '('.$type->getArgumentHint().") $right_val";
-					}
+			if ($is_scalar && !$hint_scalars) {
+				$type_hint = '';
+				if ($field->getNullAble()) {
+					$right_val = "$right_val === null ? null : (".$type->getArgumentHint().") $right_val";
+				}else {
+					$right_val = '('.$type->getArgumentHint().") $right_val";
 				}
 			}
 			$constructor_params[] = $type_hint.'$'.$property_name.$def;
@@ -368,6 +366,8 @@ class DTOGenerator
 		foreach ($spec->getFields() as $field) {
 			$type = $this->getType($namespace, $field->getType());
 			$doc_hint = $type->getPhpDocHint();
+			$null_able = $field->getNullAble() ? '|null' : '';
+			$doc_hint .= $null_able;
 			$body .= "\t/**\n";
 			$body .= "\t * @return $doc_hint\n";
 			$body .= "\t */\n";
