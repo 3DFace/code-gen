@@ -12,4 +12,6 @@ interface ClassWriter {
 	 */
 	public function writeClass($className, $phpCode);
 
+	public function getTargetMTime($className);
+
 }

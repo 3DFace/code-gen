@@ -50,10 +50,14 @@ class DTOGenerator
 	 */
 	public function generate()
 	{
+		/** @var Specification $spec */
 		foreach ($this->specSource as $spec) {
-			/** @var Specification $spec */
-			$code = $this->generateDataClass($spec);
-			$this->classWriter->writeClass($spec->getClassName(), $code);
+			$className = $spec->getClassName();
+			$targetModified = $this->classWriter->getTargetMTime($className);
+			if ($targetModified < $spec->getModified()) {
+				$code = $this->generateDataClass($spec);
+				$this->classWriter->writeClass($className, $code);
+			}
 		}
 	}
 
@@ -248,7 +252,7 @@ class DTOGenerator
 			}else {
 				$silent = $field->getSilent();
 				$s_indent = '';
-				if($silent){
+				if ($silent) {
 					$s_indent = "\t";
 					$def = $field->getSerializedDefault();
 					$def_exp = $this->varExport($def);
@@ -256,9 +260,10 @@ class DTOGenerator
 				}
 				foreach ($field->getWriteAs() as $target_name) {
 					$target = "\$result['$target_name']";
-					$body .= $s_indent."\t\t".$target.' = '.$type->getSerializer($getter, $field->getNullAble(), $s_indent."\t\t").";\n";
+					$body .= $s_indent."\t\t".$target.' = '.$type->getSerializer($getter, $field->getNullAble(),
+							$s_indent."\t\t").";\n";
 				}
-				if($silent){
+				if ($silent) {
 					$body .= "\t\t}\n";
 				}
 				$body .= "\n";

@@ -62,6 +62,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 	 */
 	public function walkFile($relativeFilename){
 		/** @var array[] $definitions */
+		$modified = \filemtime($this->definitionsDir.$relativeFilename);
 		/** @noinspection PhpIncludeInspection */
 		$definitions = include $this->definitionsDir.$relativeFilename;
 		$deprecated = false;
@@ -92,7 +93,7 @@ class PhpFilesSpecSource implements \IteratorAggregate {
 					}
 				}
 			}
-			yield new Specification(new ClassName($className), $fields, $interfaces, $traits, $deprecated);
+			yield new Specification(new ClassName($className), $fields, $interfaces, $traits, $deprecated, $modified);
 		}
 	}
 
