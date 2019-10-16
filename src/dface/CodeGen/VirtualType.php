@@ -40,9 +40,10 @@ class VirtualType implements TypeDef {
 			/** @var ClassName $class */
 			list($class, $id) = $class_and_id;
 			$short = $class->getShortName();
+			$id_ex = \var_export($id, true);
 			$result .=
 				$indent."\t"."if(\$val instanceof $short){\n".
-				$indent."\t\t"."return [$id, \$val->jsonSerialize()];\n".
+				$indent."\t\t"."return [$id_ex, \$val->jsonSerialize()];\n".
 				$indent."\t"."}\n";
 		}
 		$result .=
@@ -60,8 +61,9 @@ class VirtualType implements TypeDef {
 			/** @var ClassName $class */
 			list($class, $id) = $class_and_id;
 			$short = $class->getShortName();
+			$id_ex = \var_export($id, true);
 			$result .=
-				$indent."\t\t\t"."case $id:\n".
+				$indent."\t\t\t"."case $id_ex:\n".
 				$indent."\t\t\t\t"."return $short::deserialize(\$serialized);\n";
 		}
 		$result .=

@@ -27,8 +27,8 @@ $predefinedTypes = [
 	'TimeStamp' => new TimeStampType(),
 	'DateInterval' => new DateIntervalType(),
 	'virtual' => new VirtualType(\JsonSerializable::class, [
-		Virtual1::class => 1,
-		Virtual2::class => 2,
+		Virtual1::class => 'v1',
+		Virtual2::class => 'v2',
 	]),
 ];
 
