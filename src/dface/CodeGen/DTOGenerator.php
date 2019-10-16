@@ -218,7 +218,12 @@ class DTOGenerator
 			$type = $this->getType($namespace, $field->getType());
 			$body .= "\t\t".$type->getDeserializer('$'.$property_name, '$'.$property_name, "\t\t")."\n";
 		}
-		$body .= "\t\t".'return new static('.implode(', ', $constructor_args).");\n";
+		if (\count($constructor_args) > 3) {
+			$args_str = "\n\t\t\t".\implode(",\n\t\t\t", $constructor_args);
+		}else {
+			$args_str = \implode(', ', $constructor_args);
+		}
+		$body .= "\t\t".'return new static('.$args_str.");\n";
 		$body .= "\t}\n";
 		return $body;
 	}
