@@ -14,7 +14,7 @@ class VirtualType implements TypeDef {
 		$this->baseType = new ClassName($baseType);
 		$this->types = [];
 		foreach($typeToIdMap as $className => $id){
-			$this->types[] = [new ClassName($className), (int)$id];
+			$this->types[] = [new ClassName($className), $id];
 		}
 	}
 
@@ -42,7 +42,7 @@ class VirtualType implements TypeDef {
 			$short = $class->getShortName();
 			$result .=
 				$indent."\t"."if(\$val instanceof $short){\n".
-				$indent."\t\t"."return [$id, '$short', \$val->jsonSerialize()];\n".
+				$indent."\t\t"."return [$id, \$val->jsonSerialize()];\n".
 				$indent."\t"."}\n";
 		}
 		$result .=
@@ -54,7 +54,7 @@ class VirtualType implements TypeDef {
 	public function getDeserializer($target, $value_expression, $indent){
 		$result = "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
 			$indent."\t"."if(\\is_array(\$val)){\n".
-			$indent."\t\t"."list(\$type, , \$serialized) = \$val;\n".
+			$indent."\t\t"."list(\$type, \$serialized) = \$val;\n".
 			$indent."\t\t"."switch(\$type){\n";
 		foreach($this->types as $class_and_id){
 			/** @var ClassName $class */
