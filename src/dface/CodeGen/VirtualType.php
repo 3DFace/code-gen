@@ -76,11 +76,20 @@ class VirtualType implements TypeDef {
 	}
 
 	public function getArgumentHint(){
+		if(\count($this->types) === 1){
+			return $this->getPhpDocHint();
+		}
 		return $this->baseType->getShortName();
 	}
 
 	public function getPhpDocHint(){
-		return $this->baseType->getShortName();
+		$shorts = [];
+		foreach ($this->types as $class_and_id){
+			/** @var ClassName $class */
+			list($class) = $class_and_id;
+			$shorts[] = $class->getShortName();
+		}
+		return \implode('|', $shorts);
 	}
 
 }
