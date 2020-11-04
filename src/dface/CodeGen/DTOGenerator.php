@@ -197,7 +197,9 @@ class DTOGenerator
 			}else {
 				$has_def = $field->hasSerializedDefault();
 				if ($has_def) {
-					$body .= "\t\t\$$property_name = ".$this->varExport($field->getSerializedDefault()).";\n";
+					$exported_ser_def = $this->varExport($field->getSerializedDefault());
+					$exported_ser_def = \str_replace("\n", "\n\t\t", $exported_ser_def);
+					$body .= "\t\t\$$property_name = ".$exported_ser_def.";\n";
 				}
 				$first = true;
 				foreach ($field->getReadAs() as $alias) {
@@ -448,11 +450,18 @@ class DTOGenerator
 				if ($type instanceof ScalarType && !$hint_scalars) {
 					$type_hint = '';
 				}
-				if ($hint_nulls && $type_hint && $field->getNullAble()) {
-					$type_hint = '?'.$type_hint;
+				$def_null = '';
+				if($field->getNullAble()){
+					$doc_hint .= '|null';
+					if ($hint_nulls) {
+						if($type_hint) {
+							$type_hint = '?'.$type_hint;
+						}
+					}else{
+						$def_null = ' = null';
+					}
 				}
 				$type_hint .= $type_hint !== '' ? ' ' : '';
-				$def_null = $hint_nulls ? '' : ' = null';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t * @return self\n";

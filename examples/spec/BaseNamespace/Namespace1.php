@@ -30,6 +30,7 @@ return [
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],
 		'field10' => ['type' => TagType::class, 'default' => null],
 		'field11' => ['type' => 'DateTime', 'default' => null],
+		'field12' => ['type' => 'string{}', 'default' => null, 'empty' => ['legacy' => 'asd']],
 	],
 
 	'Value' => [
