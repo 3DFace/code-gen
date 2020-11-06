@@ -6,72 +6,43 @@ namespace dface\CodeGen;
 class FieldDef
 {
 
-	/** @var string */
-	private $name;
+	private string $name;
 	/** @var string|TypeDef */
 	private $type;
-	/** @var bool */
-	private $hasConstructorDefault;
-	/** @var mixed */
-	private $constructorDefault;
-	/** @var bool */
-	private $hasSerializedDefault;
-	/** @var mixed */
-	private $serializedDefault;
-	/** @var bool */
-	private $wither;
-	/** @var bool */
-	private $setter;
+	private ?DefaultDef $constructorDefault;
+	private ?DefaultDef $serializedDefault;
+	private bool $wither;
+	private bool $setter;
 	/** @var string[] */
-	private $read_as;
+	private array $read_as;
 	/** @var string[] */
-	private $write_as;
-	/** @var bool */
-	private $merged;
-	/** @var bool */
-	private $silent;
-	/** @var bool */
-	private $null_able;
-	/** @var string */
-	private $field_visibility;
+	private array $write_as;
+	private bool $merged;
+	private bool $silent;
+	private bool $null_able;
+	private ?string $field_visibility;
 
-	/**
-	 * @param string $name
-	 * @param string|TypeDef $type
-	 * @param array $read_as
-	 * @param array $write_as
-	 * @param array $constructor_default
-	 * @param array $serialized_default
-	 * @param bool $wither
-	 * @param bool $setter
-	 * @param $merged
-	 * @param $silent
-	 * @param $null_able
-	 * @param $field_visibility
-	 * @throws \InvalidArgumentException
-	 */
 	public function __construct(
-		$name,
+		string $name,
 		$type,
 		array $read_as,
 		array $write_as,
-		$constructor_default,
-		array $serialized_default,
-		$wither,
-		$setter,
-		$merged,
-		$silent,
-		$null_able,
-		$field_visibility
+		?DefaultDef $constructor_default,
+		?DefaultDef $serialized_default,
+		bool $wither,
+		bool $setter,
+		bool $merged,
+		bool $silent,
+		bool $null_able,
+		?string $field_visibility
 	) {
 		$this->name = $name;
 		$this->type = $type;
 		$this->read_as = $read_as;
 		$this->write_as = $write_as;
-		$this->hasConstructorDefault = $constructor_default[0];
-		$this->constructorDefault = $constructor_default[1];
-		$this->hasSerializedDefault = $constructor_default[0] || $serialized_default[0];
-		$this->serializedDefault = $serialized_default[0] ? $serialized_default[1] : $constructor_default[1];
+
+		$this->constructorDefault = $constructor_default;
+		$this->serializedDefault = $serialized_default ?? $constructor_default;
 		$this->wither = $wither;
 		$this->setter = $setter;
 		$this->merged = $merged;
@@ -84,7 +55,7 @@ class FieldDef
 		$this->field_visibility = $field_visibility;
 	}
 
-	public function getName()
+	public function getName() : string
 	{
 		return $this->name;
 	}
@@ -94,62 +65,52 @@ class FieldDef
 		return $this->type;
 	}
 
-	public function hasConstructorDefault()
-	{
-		return $this->hasConstructorDefault;
-	}
-
-	public function getConstructorDefault()
+	public function getConstructorDefault() : ?DefaultDef
 	{
 		return $this->constructorDefault;
 	}
 
-	public function hasSerializedDefault()
-	{
-		return $this->hasSerializedDefault;
-	}
-
-	public function getSerializedDefault()
+	public function getSerializedDefault() : ?DefaultDef
 	{
 		return $this->serializedDefault;
 	}
 
-	public function getWither()
+	public function getWither() : bool
 	{
 		return $this->wither;
 	}
 
-	public function getSetter()
+	public function getSetter() : bool
 	{
 		return $this->setter;
 	}
 
-	public function getReadAs()
+	public function getReadAs() : array
 	{
 		return $this->read_as;
 	}
 
-	public function getWriteAs()
+	public function getWriteAs() : array
 	{
 		return $this->write_as;
 	}
 
-	public function getMerged()
+	public function getMerged() : bool
 	{
 		return $this->merged;
 	}
 
-	public function getSilent()
+	public function getSilent() : bool
 	{
 		return $this->silent;
 	}
 
-	public function getNullAble()
+	public function getNullAble() : bool
 	{
 		return $this->null_able;
 	}
 
-	public function getFieldVisibility()
+	public function getFieldVisibility() : ?string
 	{
 		return $this->field_visibility;
 	}

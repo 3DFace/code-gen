@@ -3,39 +3,38 @@
 
 namespace dface\CodeGen;
 
-class ClassName {
+class ClassName
+{
 
-	/** @var string */
-	private $fullName;
-	/** @var string */
-	private $namespace;
-	/** @var string */
-	private $shortName;
+	private string $fullName;
+	private string $namespace;
+	private string $shortName;
 
-	/**
-	 * ClassName constructor.
-	 * @param string $fullName
-	 */
-	public function __construct($fullName){
+	public function __construct(string $fullName)
+	{
 		$parts = \preg_split("|\\\\|", $fullName, -1, PREG_SPLIT_NO_EMPTY);
 		$this->shortName = \array_pop($parts);
 		$this->namespace = \implode("\\", $parts);
 		$this->fullName = $this->namespace.'\\'.$this->shortName;
 	}
 
-	public function getFullName(){
+	public function getFullName() : string
+	{
 		return $this->fullName;
 	}
 
-	public function getNamespace(){
+	public function getNamespace() : string
+	{
 		return $this->namespace;
 	}
 
-	public function getShortName(){
+	public function getShortName() : string
+	{
 		return $this->shortName;
 	}
 
-	public function __toString(){
+	public function __toString() : string
+	{
 		return $this->fullName;
 	}
 

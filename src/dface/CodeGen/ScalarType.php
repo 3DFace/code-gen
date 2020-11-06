@@ -3,36 +3,40 @@
 
 namespace dface\CodeGen;
 
-class ScalarType implements TypeDef {
+class ScalarType implements TypeDef
+{
 
-	/** @var string */
-	private $type;
+	private string $type;
 
-	/**
-	 * ScalarType constructor.
-	 * @param string $type
-	 */
-	public function __construct($type){
+	public function __construct(string $type)
+	{
 		$this->type = $type;
 	}
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		return [];
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
 		return $value_expression;
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		return "$target = $value_expression !== null ? ($this->type)$value_expression : null;\n";
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		return "if($l_value !== null){\n".
+			$indent."\t"."$l_value = ($this->type)$l_value;\n".
+			$indent."}\n";
 	}
 
-	public function getArgumentHint(){
+	public function getArgumentHint() : string
+	{
 		return $this->type;
 	}
 
-	public function getPhpDocHint(){
+	public function getPhpDocHint() : string
+	{
 		return $this->type;
 	}
 

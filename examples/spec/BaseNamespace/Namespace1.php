@@ -18,7 +18,7 @@ return [
 		'field1' => ['type' => new ScalarType('string'), 'alias' => 'old_field1', 'with'=>true, 'null' => true],
 		'field2' => ['type' => SomeSibling::class],
 		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class)), 0 ,0, false), 'default' => null],
-		'field3' => ['type' => Value::class, 'default' => null, 'empty' => [], 'merged' => true],
+		'field3' => ['type' => Value::class, 'default_code' => "new Value('Viva')", 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
 			Value::class => 1,
@@ -30,7 +30,7 @@ return [
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],
 		'field10' => ['type' => TagType::class, 'default' => null],
 		'field11' => ['type' => 'DateTime', 'default' => null],
-		'field12' => ['type' => 'string{}', 'default' => null, 'empty' => ['legacy' => 'asd']],
+		'field12' => ['type' => 'string{}', 'default' => ['default' => 'zxc'], 'empty' => ['legacy' => 'asd']],
 	],
 
 	'Value' => [

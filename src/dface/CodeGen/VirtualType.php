@@ -3,42 +3,43 @@
 
 namespace dface\CodeGen;
 
-class VirtualType implements TypeDef {
+class VirtualType implements TypeDef
+{
 
-	/** @var ClassName */
-	private $baseType;
+	private ClassName $baseType;
 	/** @var array[] */
-	private $types;
+	private array $types;
 
-	public function __construct($baseType, array $typeToIdMap){
+	public function __construct(string $baseType, array $typeToIdMap)
+	{
 		$this->baseType = new ClassName($baseType);
 		$this->types = [];
-		foreach($typeToIdMap as $className => $id){
+		foreach ($typeToIdMap as $className => $id) {
 			$this->types[] = [new ClassName($className), $id];
 		}
 	}
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		$uses = [];
-		if($this->baseType->getNamespace() !== $namespace){
+		if ($this->baseType->getNamespace() !== $namespace) {
 			$uses[$this->baseType->getFullName()] = 1;
 		}
-		foreach($this->types as $class_and_id){
+		foreach ($this->types as [$class]) {
 			/** @var ClassName $class */
-			$class = $class_and_id[0];
-			if($class->getNamespace() !== $namespace){
+			if ($class->getNamespace() !== $namespace) {
 				$uses[$class->getFullName()] = 1;
 			}
 		}
 		return \array_keys($uses);
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
-		$result = ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (\$val){\n";
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
+		$result = ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(static function (\$val){\n";
 
-		foreach($this->types as $class_and_id){
+		foreach ($this->types as [$class, $id]) {
 			/** @var ClassName $class */
-			list($class, $id) = $class_and_id;
 			$short = $class->getShortName();
 			$id_ex = \var_export($id, true);
 			$result .=
@@ -52,43 +53,43 @@ class VirtualType implements TypeDef {
 		return $result;
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		$result = "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
-			$indent."\t"."if(\\is_array(\$val)){\n".
-			$indent."\t\t"."list(\$type, \$serialized) = \$val;\n".
-			$indent."\t\t"."switch(\$type){\n";
-		foreach($this->types as $class_and_id){
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		$result = "if($l_value !== null){\n".
+			$indent."\t"."if(!\\is_array($l_value)){\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize '.\gettype($l_value));\n".
+			$indent."\t"."}\n".
+			$indent."\t"."switch($l_value"."[0]){\n";
+		foreach ($this->types as [$class, $id]) {
 			/** @var ClassName $class */
-			list($class, $id) = $class_and_id;
 			$short = $class->getShortName();
 			$id_ex = \var_export($id, true);
 			$result .=
-				$indent."\t\t\t"."case $id_ex:\n".
-				$indent."\t\t\t\t"."return $short::deserialize(\$serialized);\n";
+				$indent."\t\t"."case $id_ex:\n".
+				$indent."\t\t\t"."$l_value = $short::deserialize($l_value"."[1]);\n".
+				$indent."\t\t\t"."break;\n";
 		}
 		$result .=
-			$indent."\t\t\t"."default:\n".
-			$indent."\t\t\t\t"."throw new \\InvalidArgumentException('Unknown type id: '.\$type);\n".
-			$indent."\t\t"."}\n".
-			$indent."\t"."}else{\n".
-			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize '.\gettype(\$val));\n".
+			$indent."\t\t"."default:\n".
+			$indent."\t\t\t"."throw new \\InvalidArgumentException('Unknown type id: '.$l_value"."[0]);\n".
 			$indent."\t"."}\n".
-			$indent."}, $value_expression) : null;\n";
+			$indent."}\n";
 		return $result;
 	}
 
-	public function getArgumentHint(){
-		if(\count($this->types) === 1){
+	public function getArgumentHint() : string
+	{
+		if (\count($this->types) === 1) {
 			return $this->getPhpDocHint();
 		}
 		return $this->baseType->getShortName();
 	}
 
-	public function getPhpDocHint(){
+	public function getPhpDocHint() : string
+	{
 		$shorts = [];
-		foreach ($this->types as $class_and_id){
+		foreach ($this->types as [$class]) {
 			/** @var ClassName $class */
-			list($class) = $class_and_id;
 			$shorts[] = $class->getShortName();
 		}
 		return \implode('|', $shorts);

@@ -1,6 +1,10 @@
 <?php
-/* author: Ponomarev Denis <ponomarev@gmail.com> */
 
+/**
+ * @noinspection PhpUnhandledExceptionInspection
+ * @noinspection PhpComposerExtensionStubsInspection
+ * @noinspection ForgottenDebugOutputInspection
+ */
 namespace dface\CodeGen;
 
 use BaseNamespace\Namespace1\SomeClass;
@@ -48,11 +52,11 @@ $x = new SomeClass(
 
 $s = $x->jsonSerialize();
 
-echo \json_encode($s)."\n";
+
+echo \json_encode($s, JSON_THROW_ON_ERROR)."\n";
 
 $x = SomeClass::deserialize($s);
 
-/** @noinspection ForgottenDebugOutputInspection */
-var_dump($x);
+\var_dump($x);
 
 // see results in ./examples/classes

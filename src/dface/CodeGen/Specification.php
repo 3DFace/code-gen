@@ -3,38 +3,27 @@
 
 namespace dface\CodeGen;
 
-class Specification {
+class Specification
+{
 
-	/** @var ClassName */
-	private $className;
+	private ClassName$className;
 	/** @var FieldDef[] */
-	private $fields;
+	private array $fields;
 	/** @var string[] */
-	private $interfaces;
+	private array $interfaces;
 	/** @var string[] */
-	private $traits;
-	/** @var bool */
-	private $deprecated;
-	/** @var int */
-	private $modified;
+	private array $traits;
+	private bool $deprecated;
+	private int $modified;
 
-	/**
-	 * Specification constructor.
-	 * @param ClassName $className
-	 * @param FieldDef[] $fields
-	 * @param string[] $interfaces
-	 * @param string[] $traits
-	 * @param bool $deprecated
-	 * @param $modified
-	 */
 	public function __construct(
 		ClassName $className,
 		array $fields,
 		array $interfaces,
 		array $traits,
-		$deprecated,
-		$modified
-	){
+		bool $deprecated,
+		int $modified
+	) {
 		$this->className = $className;
 		$this->fields = $fields;
 		$this->interfaces = $interfaces;
@@ -43,27 +32,33 @@ class Specification {
 		$this->modified = $modified;
 	}
 
-	public function getClassName(){
+	public function getClassName() : ClassName
+	{
 		return $this->className;
 	}
 
-	public function getFields(){
+	public function getFields() : array
+	{
 		return $this->fields;
 	}
 
-	public function getInterfaces(){
+	public function getInterfaces() : array
+	{
 		return $this->interfaces;
 	}
 
-	public function getTraits(){
+	public function getTraits() : array
+	{
 		return $this->traits;
 	}
 
-    public function getDeprecated(){
-        return $this->deprecated;
-    }
+	public function getDeprecated() : bool
+	{
+		return $this->deprecated;
+	}
 
-	public function getModified(){
+	public function getModified() : int
+	{
 		return $this->modified;
 	}
 

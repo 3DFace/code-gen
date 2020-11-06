@@ -3,25 +3,28 @@
 
 namespace dface\CodeGen;
 
-class MapType implements TypeDef {
+class MapType implements TypeDef
+{
 
-	/** @var TypeDef */
-	private $innerType;
+	private TypeDef $innerType;
 
-	public function __construct(TypeDef $innerType){
+	public function __construct(TypeDef $innerType)
+	{
 		$this->innerType = $innerType;
 	}
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		return $this->innerType->getUses($namespace);
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
-		if(\is_a($this->innerType, ScalarType::class)){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
+		if (\is_a($this->innerType, ScalarType::class)) {
 			return $value_expression;
 		}
 		$inner_hint = $this->innerType->getPhpDocHint();
-		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (array \$map){\n".
+		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(static function (array \$map){\n".
 			$indent."\t"."\$x = [];\n".
 			$indent."\t"."foreach(\$map as \$k => \$v){\n".
 			$indent."\t\t/** @var $inner_hint \$v */\n".
@@ -31,22 +34,27 @@ class MapType implements TypeDef {
 			$indent."}, $value_expression)";
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		$exp = $this->innerType->getDeserializer('$x[$k]', '$v', $indent."\t\t");
-		return "$target = $value_expression !== null ? \call_user_func(function (array \$map){\n".
-			$indent."\t"."\$x = [];\n".
-			$indent."\t"."foreach(\$map as \$k => \$v){\n".
-			$indent."\t\t".$exp.
-			$indent."\t"."}\n".
-			$indent."\t"."return \$x;\n".
-			$indent."}, $value_expression) : null;\n";
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		return "if($l_value !== null){\n".
+			$indent."\t"."$l_value = (static function (array \$map){\n".
+			$indent."\t\t"."\$x = [];\n".
+			$indent."\t\t"."foreach(\$map as \$k => \$v){\n".
+			$indent."\t\t\t".$this->innerType->getDeserializer('$v', $indent."\t\t\t").
+			$indent."\t\t\t\$x[\$k] = \$v;\n".
+			$indent."\t\t"."}\n".
+			$indent."\t\t"."return \$x;\n".
+			$indent."\t})($l_value);\n".
+			$indent."}\n";
 	}
 
-	public function getArgumentHint(){
+	public function getArgumentHint() : string
+	{
 		return 'array';
 	}
 
-	public function getPhpDocHint(){
+	public function getPhpDocHint() : string
+	{
 		return $this->innerType->getPhpDocHint().'[]';
 	}
 

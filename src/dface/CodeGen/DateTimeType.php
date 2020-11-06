@@ -3,37 +3,44 @@
 
 namespace dface\CodeGen;
 
-class DateTimeType implements TypeDef {
+class DateTimeType implements TypeDef
+{
 
-	/** @var string */
-	private $serializeFormat;
+	private string $serializeFormat;
 
-	public function __construct($serializeFormat){
+	public function __construct(string $serializeFormat)
+	{
 		$this->serializeFormat = $serializeFormat;
 	}
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		return [\DateTimeImmutable::class];
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
 		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression."->format('$this->serializeFormat')";
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		$body = "try {\n";
-		$body .= $indent."\t"."$target = $value_expression !== null ? new DateTimeImmutable($value_expression) : null;\n";
-		$body .= $indent."}catch (\Exception \$e){\n";
-		$body .= $indent."\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n";
-		$body .= $indent."}\n";
-		return $body;
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		return "if($l_value !== null){\n".
+			$indent."\t"."try {\n".
+			$indent."\t\t"."$l_value = new DateTimeImmutable($l_value);\n".
+			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
+			$indent."\t}\n".
+			$indent."}\n";
 	}
 
-	public function getArgumentHint(){
+	public function getArgumentHint() : string
+	{
 		return 'DateTimeImmutable';
 	}
 
-	public function getPhpDocHint(){
+	public function getPhpDocHint() : string
+	{
 		return 'DateTimeImmutable';
 	}
 

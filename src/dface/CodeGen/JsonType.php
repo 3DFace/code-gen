@@ -3,59 +3,68 @@
 
 namespace dface\CodeGen;
 
-class JsonType implements TypeDef {
+class JsonType implements TypeDef
+{
 
-	/** @var TypeDef */
-	private $innerType;
-	/** @var int */
-	private $encode_options;
-	/** @var int */
-	private $decode_options;
-	/** @var bool */
-	private $serialize_plain;
+	private TypeDef $innerType;
+	private int $encode_options;
+	private int $decode_options;
+	private bool $serialize_plain;
 
-	/**
-	 * JsonType constructor.
-	 * @param TypeDef $innerType
-	 * @param int $encode_options
-	 * @param int $decode_options
-	 */
-	public function __construct(TypeDef $innerType, $encode_options = 0, $decode_options = 0, $serialize_plain = false) {
+	public function __construct(
+		TypeDef $innerType,
+		int $encode_options = 0,
+		int $decode_options = 0,
+		$serialize_plain = false
+	) {
 		$this->innerType = $innerType;
 		$this->encode_options = $encode_options;
 		$this->decode_options = $decode_options;
 		$this->serialize_plain = $serialize_plain;
 	}
 
-	public function getUses($namespace) {
-		return $this->innerType->getUses($namespace);
+	public function getUses(string $namespace) : array
+	{
+		$uses = $this->innerType->getUses($namespace);
+		$uses[] = 'JsonSerializable';
+		return $uses;
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent) {
-		if($this->serialize_plain){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
+		if ($this->serialize_plain) {
 			return $this->innerType->getSerializer($value_expression, $null_able, $indent);
 		}
 		$exp = $this->innerType->getSerializer('$val', false, $indent."\t");
-		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(function (\JsonSerializable \$val){\n".
-			$indent."\t"."\$x = $exp;\n".
-			$indent."\t"."return \\json_encode(\$x, $this->encode_options);\n".
+		return ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(static function (JsonSerializable \$val){\n".
+			$indent."\t"."try {\n".
+			$indent."\t\t"."\$x = $exp;\n".
+			$indent."\t\t"."return \\json_encode(\$x, $this->encode_options | JSON_THROW_ON_ERROR);\n".
+			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
+			$indent."\t}\n".
 			$indent."}, $value_expression)";
 	}
 
-	public function getDeserializer($target, $value_expression, $indent) {
-		$exp = $this->innerType->getDeserializer('$x', '$x', $indent."\t");
-		return "$target = $value_expression !== null ? \call_user_func(function (\$val){\n".
-			$indent."\t"."\$x = \\json_decode(\$val, true, 512, $this->decode_options);\n".
-			$indent."\t".$exp.
-			$indent."\t"."return \$x;\n".
-			$indent."}, $value_expression) : null;\n";
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		return "if($l_value !== null){\n".
+			$indent."\t"."try {\n".
+			$indent."\t\t"."$l_value = \\json_decode($l_value, true, 512, $this->decode_options | JSON_THROW_ON_ERROR);\n".
+			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
+			$indent."\t}\n".
+			$indent."\t".$this->innerType->getDeserializer($l_value, $indent."\t").
+			$indent."}\n";
 	}
 
-	public function getArgumentHint() {
+	public function getArgumentHint() : string
+	{
 		return $this->innerType->getArgumentHint();
 	}
 
-	public function getPhpDocHint() {
+	public function getPhpDocHint() : string
+	{
 		return $this->innerType->getPhpDocHint();
 	}
 

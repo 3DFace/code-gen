@@ -3,15 +3,16 @@
 
 namespace dface\CodeGen;
 
-interface ClassWriter {
+interface ClassWriter
+{
 
 	/**
 	 * @param string $className
 	 * @param string $phpCode
 	 * @return void
 	 */
-	public function writeClass($className, $phpCode);
+	public function writeClass(string $className, string $phpCode) : void;
 
-	public function getTargetMTime($className);
+	public function getTargetMTime(string $className) : int;
 
 }

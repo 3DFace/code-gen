@@ -3,28 +3,31 @@
 
 namespace dface\CodeGen;
 
-class MixedType implements TypeDef {
+class MixedType implements TypeDef
+{
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		return [];
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
 		return $value_expression;
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		if($target === $value_expression){
-			return '';
-		}
-		return "$target = $value_expression;\n";
-	}
-
-	public function getArgumentHint(){
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
 		return '';
 	}
 
-	public function getPhpDocHint(){
+	public function getArgumentHint() : string
+	{
+		return '';
+	}
+
+	public function getPhpDocHint() : string
+	{
 		return 'mixed';
 	}
 

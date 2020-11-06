@@ -3,38 +3,44 @@
 
 namespace dface\CodeGen;
 
-class DynamicTypeDef implements TypeDef {
+class DynamicTypeDef implements TypeDef
+{
 
-	/** @var string */
-	private $className;
+	private ClassName $className;
 
-	public function __construct(ClassName $dataClassName){
+	public function __construct(ClassName $dataClassName)
+	{
 		$this->className = $dataClassName;
 	}
 
-	public function getUses($namespace){
+	public function getUses(string $namespace) : array
+	{
 		return $namespace !== $this->className->getNamespace() ? [$this->className->getFullName()] : [];
 	}
 
-	public function getSerializer($value_expression, $null_able, $indent){
+	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	{
 		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression.'->jsonSerialize()';
 	}
 
-	public function getDeserializer($target, $value_expression, $indent){
-		$deserializer = "$target = $value_expression !== null ? ".$this->className->getShortName()."::deserialize($value_expression) : null";
-		$body = "try {\n";
-		$body .= $indent."\t$deserializer;\n";
-		$body .= $indent."}catch (\Exception \$e){\n";
-		$body .= $indent."\t"."throw new \InvalidArgumentException('Deserialization error: '.\$e->getMessage(), 0, \$e);\n";
-		$body .= $indent."}\n";
-		return $body;
+	public function getDeserializer(string $l_value, string $indent) : string
+	{
+		return "if($l_value !== null){\n".
+			$indent."\t"."try {\n".
+			$indent."\t\t$l_value = ".$this->className->getShortName()."::deserialize($l_value);\n".
+			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t\t"."throw new \InvalidArgumentException('Deserialization error: '.\$e->getMessage(), 0, \$e);\n".
+			$indent."\t}\n".
+			$indent."}\n";
 	}
 
-	public function getArgumentHint(){
-		return$this->className->getShortName();
+	public function getArgumentHint() : string
+	{
+		return $this->className->getShortName();
 	}
 
-	public function getPhpDocHint(){
+	public function getPhpDocHint() : string
+	{
 		return $this->className->getShortName();
 	}
 
