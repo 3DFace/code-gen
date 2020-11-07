@@ -39,15 +39,7 @@ class DefaultDef
 
 	private static function isScalarStruct($var) : bool
 	{
-		if (\is_array($var)) {
-			foreach ($var as $x) {
-				if (!self::isScalarStruct($x)) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return $var === null || \is_scalar($var);
+		return $var === null || $var === [] || \is_scalar($var);
 	}
 
 	private static function varExport($var) : string

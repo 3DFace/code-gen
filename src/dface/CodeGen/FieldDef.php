@@ -13,6 +13,7 @@ class FieldDef
 	private ?DefaultDef $serializedDefault;
 	private bool $wither;
 	private bool $setter;
+	private bool $getter;
 	/** @var string[] */
 	private array $read_as;
 	/** @var string[] */
@@ -31,6 +32,7 @@ class FieldDef
 		?DefaultDef $serialized_default,
 		bool $wither,
 		bool $setter,
+		bool $getter,
 		bool $merged,
 		bool $silent,
 		bool $null_able,
@@ -45,6 +47,7 @@ class FieldDef
 		$this->serializedDefault = $serialized_default ?? $constructor_default;
 		$this->wither = $wither;
 		$this->setter = $setter;
+		$this->getter = $getter;
 		$this->merged = $merged;
 		$this->silent = $silent;
 		$this->null_able = $null_able;
@@ -83,6 +86,11 @@ class FieldDef
 	public function getSetter() : bool
 	{
 		return $this->setter;
+	}
+
+	public function getGetter() : bool
+	{
+		return $this->getter;
 	}
 
 	public function getReadAs() : array

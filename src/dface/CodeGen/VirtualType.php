@@ -36,7 +36,7 @@ class VirtualType implements TypeDef
 
 	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
 	{
-		$result = ($null_able ? "$value_expression === null ? null : " : '')."\call_user_func(static function (\$val){\n";
+		$result = ($null_able ? "$value_expression === null ? null : " : '')."(static function (\$val){\n";
 
 		foreach ($this->types as [$class, $id]) {
 			/** @var ClassName $class */
@@ -49,7 +49,7 @@ class VirtualType implements TypeDef
 		}
 		$result .=
 			$indent."\t"."throw new \\RuntimeException('Unsupported virtual type '.\gettype(\$val));\n".
-			$indent."}, $value_expression)";
+			$indent."})($value_expression)";
 		return $result;
 	}
 
@@ -58,21 +58,34 @@ class VirtualType implements TypeDef
 		$result = "if($l_value !== null){\n".
 			$indent."\t"."if(!\\is_array($l_value)){\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize '.\gettype($l_value));\n".
-			$indent."\t"."}\n".
-			$indent."\t"."switch($l_value"."[0]){\n";
-		foreach ($this->types as [$class, $id]) {
+			$indent."\t"."}\n";
+		if (\count($this->types) === 1) {
+			[$class, $id] = $this->types[0];
 			/** @var ClassName $class */
 			$short = $class->getShortName();
 			$id_ex = \var_export($id, true);
+			$result .= $indent."\t"."if($l_value"."[0] === $id_ex){\n".
+				$indent."\t\t"."$l_value = $short::deserialize($l_value"."[1]);\n".
+				$indent."\t"."} else {\n".
+				$indent."\t\t"."throw new \\InvalidArgumentException('Unknown type id: '.$l_value"."[0]);\n".
+				$indent."\t"."}\n";
+		} else {
+			$result .= $indent."\t"."switch($l_value"."[0]){\n";
+			foreach ($this->types as [$class, $id]) {
+				/** @var ClassName $class */
+				$short = $class->getShortName();
+				$id_ex = \var_export($id, true);
+				$result .=
+					$indent."\t\t"."case $id_ex:\n".
+					$indent."\t\t\t"."$l_value = $short::deserialize($l_value"."[1]);\n".
+					$indent."\t\t\t"."break;\n";
+			}
 			$result .=
-				$indent."\t\t"."case $id_ex:\n".
-				$indent."\t\t\t"."$l_value = $short::deserialize($l_value"."[1]);\n".
-				$indent."\t\t\t"."break;\n";
+				$indent."\t\t"."default:\n".
+				$indent."\t\t\t"."throw new \\InvalidArgumentException('Unknown type id: '.$l_value"."[0]);\n".
+				$indent."\t"."}\n";
 		}
 		$result .=
-			$indent."\t\t"."default:\n".
-			$indent."\t\t\t"."throw new \\InvalidArgumentException('Unknown type id: '.$l_value"."[0]);\n".
-			$indent."\t"."}\n".
 			$indent."}\n";
 		return $result;
 	}

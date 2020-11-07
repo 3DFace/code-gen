@@ -20,6 +20,7 @@ return [
 		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class)), 0 ,0, false), 'default' => null],
 		'field3' => ['type' => Value::class, 'default_code' => "new Value('Viva')", 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
+		'field41' => ['type' => 'Value{}'],
 		'field5' => ['type' => new VirtualType(\JsonSerializable::class, [
 			Value::class => 1,
 		]), 'with' => 1],
@@ -34,7 +35,7 @@ return [
 	],
 
 	'Value' => [
-		'val' => ['type' => 'string', 'set' => true, 'null' => true, 'empty' => null],
+		'val' => ['type' => 'string', 'get' => false, 'null' => true, 'empty' => null, 'field_visibility' => 'public'],
 	],
 
 	'TagType' => [

@@ -137,6 +137,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			$empty,
 			$arr['with'] ?? false,
 			$arr['set'] ?? false,
+			$arr['get'] ?? true,
 			$arr['merged'] ?? false,
 			$arr['silent'] ?? false,
 			$arr['null'] ?? ($default && ($default->getCode() === 'null')),

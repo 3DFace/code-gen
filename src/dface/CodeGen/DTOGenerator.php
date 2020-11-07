@@ -60,19 +60,19 @@ class DTOGenerator
 		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : '');
 		$imp = $this->generateImplements($spec);
 		if ($spec->getDeprecated()) {
-			$body .= "\t/**\n";
-			$body .= "\t * @deprecated\n";
-			$body .= "\t */\n";
+			$body .= "/**\n";
+			$body .= " * @deprecated\n";
+			$body .= " */\n";
 		}
+		$type_hints = $this->prepareFieldsTypeHints($spec);
 		$body .= 'class '.$spec->getClassName()->getShortName()." implements JsonSerializable$imp {\n\n";
 		$body .= $this->generateTraits($spec);
-		$body .= $this->generateFields($spec);
-		$body .= "\n";
+		$body .= $this->generateFields($spec, $type_hints);
 		$body .= $this->generateConstructor($spec);
 		$body .= "\n";
-		$body .= $this->generateGetters($spec);
-		$body .= $this->generateSetters($spec);
-		$body .= $this->generateWithers($spec);
+		$body .= $this->generateGetters($spec, $type_hints);
+		$body .= $this->generateSetters($spec, $type_hints);
+		$body .= $this->generateWithers($spec, $type_hints);
 		$body .= $this->generateSerializerMethod($spec);
 		$body .= "\n";
 		$body .= $this->generateDeserializerMethod($spec);
@@ -146,22 +146,22 @@ class DTOGenerator
 	private function generateDeserializerMethod(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
-		$ret_hint = ' : '.$spec->getClassName()->getShortName().' ';
+		$fields = $spec->getFields();
 		$body = "\t/**\n";
-		$body .= "\t * @param array \$arr\n";
+		$body .= "\t * @param object|array \$data\n";
 		$body .= "\t * @return self\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."public static function deserialize(array \$arr)$ret_hint{\n";
-		$fields = $spec->getFields();
-		if (empty($fields)) {
-			$body .= "\t\t"."if(\$arr !== []){\n";
-			$body .= "\t\t\t"."throw new \InvalidArgumentException('Empty array expected');\n";
+		$body .= "\t"."public static function deserialize(\$data) : self {\n";
+		if (!$fields) {
+			$body .= "\t\t"."if(!\is_array(\$data) && !\is_object(\$data)){\n";
+			$body .= "\t\t\t"."throw new \InvalidArgumentException('Array or object expected');\n";
 			$body .= "\t\t"."}\n";
 			$body .= "\t\t"."return new static();\n";
 			$body .= "\t}\n";
 			return $body;
 		}
+		$body .= "\t\t"."\$arr = (array)\$data;\n";
 		$constructor_args = [];
 		foreach ($fields as $field) {
 			$property_name = $field->getName();
@@ -171,10 +171,10 @@ class DTOGenerator
 			} else {
 				$default = $field->getSerializedDefault();
 				$read_as = $field->getReadAs();
-				if($default !== null && $default->getCode() === 'null' && \count($read_as) === 1){
+				if ($default !== null && $default->getCode() === 'null' && \count($read_as) === 1) {
 					$alias = $read_as[0];
 					$body .= "\t\t\$$property_name = \$arr['$alias'] ?? null;\n";
-				}else {
+				} else {
 					if ($default !== null) {
 						$exported_ser_def = \str_replace("\n", "\n\t\t", $default->getCode());
 						$body .= "\t\t\$$property_name = ".$exported_ser_def.";\n";
@@ -223,7 +223,7 @@ class DTOGenerator
 		$body .= "\t"."public function jsonSerialize(){\n";
 		$fields = $spec->getFields();
 		if (empty($fields)) {
-			$body .= "\t\t"."return [];\n";
+			$body .= "\t\t"."return new \stdClass();\n";
 			$body .= "\t}\n";
 			return $body;
 		}
@@ -235,7 +235,7 @@ class DTOGenerator
 			$type = $this->getType($namespace, $field->getType());
 			if ($field->getMerged()) {
 				$target = "\$merge_${property_name}";
-				$merge[$target] = $target.' = '.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n";
+				$merge[$target] = $target.' = (array)'.$type->getSerializer($getter, $field->getNullAble(), "\t\t").";\n";
 			} else {
 				$silent = $field->getSilent();
 				$s_indent = '';
@@ -268,75 +268,90 @@ class DTOGenerator
 		return $body;
 	}
 
-	/**
-	 * @param Specification $spec
-	 * @return string
-	 * @throws \InvalidArgumentException
-	 */
-	private function generateFields(Specification $spec)
+	private function generateFields(Specification $spec, array $type_hints) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		foreach ($spec->getFields() as $field) {
 			$property_name = $field->getName();
-			$type = $this->getType($namespace, $field->getType());
-			$null_able = $field->getNullAble() ? '|null' : '';
-			$type_hint = $type->getArgumentHint();
+			[$doc_hint, $type_hint] = $type_hints[$property_name];
 			if ($type_hint) {
-				if ($null_able) {
-					$type_hint = '?'.$type_hint;
-				}
 				$type_hint .= ' ';
-			}else{
-				$doc_hint = $type->getPhpDocHint();
-				$body .= "\t/** @var $doc_hint$null_able */\n";
 			}
 			$visibility = $field->getFieldVisibility();
 			if ($visibility === null) {
 				$visibility = $this->fieldsVisibility;
 			}
+			if ($doc_hint && ($visibility === 'public')) {
+				$body .= "\t/** @var $doc_hint */\n";
+			}
 			$body .= "\t"."$visibility $type_hint\$$property_name;\n";
 		}
-		return $body;
+		return $body ? $body . "\n" : '';
 	}
 
 	private function generateConstructor(Specification $spec) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		$constructor_params = [];
 		$constructor_body = '';
-		foreach ($spec->getFields() as $field) {
+		$constructor_doc = "\t/**\n";
+		$fields_arr = $spec->getFields();
+		$allow_default_from = PHP_INT_MAX;
+		foreach ($fields_arr as $i => $field) {
+			if ($field->getConstructorDefault() !== null) {
+				$allow_default_from = \min($allow_default_from, $i);
+			} else {
+				$allow_default_from = PHP_INT_MAX;
+			}
+		}
+		$namespace = $spec->getClassName()->getNamespace();
+		foreach ($fields_arr as $i => $field) {
 			$property_name = $field->getName();
 			$type = $this->getType($namespace, $field->getType());
+			$doc_hint = $type->getPhpDocHint();
 			$type_hint = $type->getArgumentHint();
-			if ($type_hint) {
-				if ($field->getNullAble()) {
-					$type_hint = '?'.$type_hint;
-				}
-				$type_hint .= ' ';
-			}
+			$nullable = $field->getNullAble();
+
+			$property_info = '';
 			$default = $field->getConstructorDefault();
 			$inline_def = '';
 			$right_val = "\$$property_name";
 			if ($default !== null) {
-				if($default->isEmbeddable()){
+				if ($default->isEmbeddable()) {
 					$def_code = \str_replace("\n", "\n\t\t", $default->getCode());
 					$inline_def = ' = '.$def_code;
-				}else {
+				} else {
+					$nullable = true;
 					$inline_def = ' = '.'null';
-					$def_code = \str_replace("\n", "\n\t\t", $default->getCode());
-					$right_val = "$right_val ?? ".$def_code;
+					$def_code = $default->getCode();
+					$property_info = ' <code>?? '.\str_replace("\n", " ", $def_code).'</code>';
+					$right_val = "$right_val ?? ".\str_replace("\n", "\n\t\t", $def_code);
 				}
 			}
-
+			if ($i < $allow_default_from) {
+				$inline_def = '';
+			}
+			if ($nullable) {
+				$doc_hint .= '|null';
+				if ($type_hint) {
+					$type_hint = '?'.$type_hint;
+				}
+			}
+			if ($type_hint) {
+				$type_hint .= ' ';
+			}
+			$constructor_doc .= "\t * @param $doc_hint \$$property_name$property_info\n";
 			$constructor_params[] = $type_hint.'$'.$property_name.$inline_def;
 			$constructor_body .= "\t\t"."\$this->$property_name = $right_val;\n";
 		}
+		$constructor_doc .= "\t */\n";
 		if (\count($constructor_params) > 3) {
 			$params_str = "\n\t\t".\implode(",\n\t\t", $constructor_params)."\n\t";
 		} else {
 			$params_str = \implode(', ', $constructor_params);
+		}
+		if($constructor_params) {
+			$body .= $constructor_doc;
 		}
 		$body .= "\t".'public function __construct('.$params_str."){\n";
 		$body .= $constructor_body;
@@ -344,52 +359,61 @@ class DTOGenerator
 		return $body;
 	}
 
-	private function generateGetters(Specification $spec) : string
+	private function prepareFieldsTypeHints(Specification $spec) : array
 	{
 		$namespace = $spec->getClassName()->getNamespace();
+		$map = [];
+		foreach ($spec->getFields() as $field) {
+			$map[$field->getName()] = $this->getFieldTypeHints($namespace, $field);
+		}
+		return $map;
+	}
+
+	private function getFieldTypeHints(string $namespace, FieldDef $field) : array
+	{
+		$type = $this->getType($namespace, $field->getType());
+		$doc_hint = $type->getPhpDocHint();
+		$type_hint = $type->getArgumentHint();
+		if ($field->getNullAble()) {
+			$doc_hint .= '|null';
+			if ($type_hint) {
+				$type_hint = '?'.$type_hint;
+			}
+		}
+		return [$doc_hint, $type_hint];
+	}
+
+	private function generateGetters(Specification $spec, array $type_hints) : string
+	{
 		$body = '';
 		foreach ($spec->getFields() as $field) {
-			$type = $this->getType($namespace, $field->getType());
-			$doc_hint = $type->getPhpDocHint();
-			$null_able = $field->getNullAble() ? '|null' : '';
-			$doc_hint .= $null_able;
-			$body .= "\t/**\n";
-			$body .= "\t * @return $doc_hint\n";
-			$body .= "\t */\n";
 			$property_name = $field->getName();
-			$ret_hint = '';
-			if ($arg_hint = $type->getArgumentHint()) {
-				if ($field->getNullAble()) {
-					$arg_hint = '?'.$arg_hint;
-				}
-				$ret_hint = ' : '.$arg_hint.' ';
+			if ($field->getGetter()) {
+				[$doc_hint, $type_hint] = $type_hints[$property_name];
+				$body .= "\t/**\n";
+				$body .= "\t * @return $doc_hint\n";
+				$body .= "\t */\n";
+				$ret_hint = $type_hint ? (' : '.$type_hint.' ') : '';
+				$body .= "\t".'public function get'.self::camelCase($property_name)."()$ret_hint{\n";
+				$body .= "\t\t"."return \$this->$property_name;\n";
+				$body .= "\t}\n\n";
 			}
-			$body .= "\t".'public function get'.self::camelCase($property_name)."()$ret_hint{\n";
-			$body .= "\t\t"."return \$this->$property_name;\n";
-			$body .= "\t}\n\n";
 		}
 		return $body;
 	}
 
-	private function generateSetters(Specification $spec) : string
+	private function generateSetters(Specification $spec, array $type_hints) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		foreach ($spec->getFields() as $field) {
 			$property_name = $field->getName();
 			if ($field->getSetter()) {
-				$type = $this->getType($namespace, $field->getType());
-				$doc_hint = $type->getPhpDocHint();
-				$type_hint = $type->getArgumentHint();
-
-				if ($type_hint && $field->getNullAble()) {
-					$type_hint = '?'.$type_hint;
-				}
+				[$doc_hint, $type_hint] = $type_hints[$property_name];
 				$type_hint .= $type_hint !== '' ? ' ' : '';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t */\n";
-				$body .= "\t".'public function set'.self::camelCase($property_name)."($type_hint\$val){\n";
+				$body .= "\t".'public function set'.self::camelCase($property_name)."($type_hint\$val) : void {\n";
 				$body .= "\t\t\$this->$property_name = \$val;\n";
 				$body .= "\t}\n\n";
 			}
@@ -397,29 +421,19 @@ class DTOGenerator
 		return $body;
 	}
 
-	private function generateWithers(Specification $spec) : string
+	private function generateWithers(Specification $spec, array $type_hints) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$body = '';
 		foreach ($spec->getFields() as $field) {
 			$property_name = $field->getName();
 			if ($field->getWither()) {
-				$type = $this->getType($namespace, $field->getType());
-				$doc_hint = $type->getPhpDocHint();
-				$type_hint = $type->getArgumentHint();
-				$def_null = '';
-				if ($field->getNullAble()) {
-					$doc_hint .= '|null';
-					if ($type_hint) {
-						$type_hint = '?'.$type_hint;
-					}
-				}
+				[$doc_hint, $type_hint] = $type_hints[$property_name];
 				$type_hint .= $type_hint !== '' ? ' ' : '';
 				$body .= "\t/**\n";
 				$body .= "\t * @param $doc_hint \$val\n";
 				$body .= "\t * @return self\n";
 				$body .= "\t */\n";
-				$body .= "\t".'public function with'.self::camelCase($property_name)."($type_hint\$val$def_null) : self {\n";
+				$body .= "\t".'public function with'.self::camelCase($property_name)."($type_hint\$val) : self {\n";
 				$body .= "\t\t\$clone = clone \$this;\n";
 				$body .= "\t\t\$clone->$property_name = \$val;\n";
 				$body .= "\t\t"."return \$clone;\n";

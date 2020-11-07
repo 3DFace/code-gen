@@ -40,23 +40,28 @@ $gen = new DTOGenerator($specSrc, $writer, $predefinedTypes);
 
 $gen->generate();
 
-$x = new SomeClass(
+$x1 = new SomeClass(
 	'asd',
 	new SomeSibling('zxc'),
 	new SomeSibling('asd'),
 	new Value('qwe'),
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
+	[],
 	new Value(2),
 	[new Virtual1('qaz', 'gaga'), new Virtual2('qaz')],
 	new \DateInterval('P1M1DT10H'));
 
-$s = $x->jsonSerialize();
+$s1 = \json_encode($x1->jsonSerialize(), JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES);
+echo $s1."\n";
 
+$x2 = SomeClass::deserialize(\json_decode($s1, false, 512, JSON_THROW_ON_ERROR));
+$s2 = \json_encode($x2->jsonSerialize(), JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES);
+echo  $s2."\n";
 
-echo \json_encode($s, JSON_THROW_ON_ERROR)."\n";
+\var_dump($x2);
 
-$x = SomeClass::deserialize($s);
-
-\var_dump($x);
+if($s2 !== $s1){
+	echo "\n\nmismatch!\n";
+}
 
 // see results in ./examples/classes
