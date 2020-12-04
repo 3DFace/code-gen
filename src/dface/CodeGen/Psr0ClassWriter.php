@@ -23,7 +23,7 @@ class Psr0ClassWriter implements ClassWriter
 		if (\is_readable($class_filename)) {
 			$present = \file_get_contents($class_filename);
 			if ($present === $phpCode) {
-				touch($class_filename);
+				\touch($class_filename);
 				return;
 			}
 		}
@@ -39,7 +39,7 @@ class Psr0ClassWriter implements ClassWriter
 		return 0;
 	}
 
-	private static function classNameToPsr0Name(string $className)
+	private static function classNameToPsr0Name(string $className) : string
 	{
 		return \str_replace('\\', DIRECTORY_SEPARATOR, $className).'.php';
 	}

@@ -49,7 +49,7 @@ class DTOGenerator
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	private function generateDataClass(Specification $spec)
+	private function generateDataClass(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = '<?php'."\n\n";
@@ -86,7 +86,7 @@ class DTOGenerator
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	private function generateUses(Specification $spec)
+	private function generateUses(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$uses = ['JsonSerializable' => "use JsonSerializable;\n"];
@@ -117,7 +117,7 @@ class DTOGenerator
 		return \implode($uses);
 	}
 
-	private function generateImplements(Specification $spec)
+	private function generateImplements(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
@@ -130,7 +130,7 @@ class DTOGenerator
 		return $arr ? ', '.\implode(', ', $arr) : '';
 	}
 
-	private function generateTraits(Specification $spec)
+	private function generateTraits(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
@@ -214,7 +214,7 @@ class DTOGenerator
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	private function generateSerializerMethod(Specification $spec)
+	private function generateSerializerMethod(Specification $spec) : string
 	{
 		$namespace = $spec->getClassName()->getNamespace();
 		$body = "\t/**\n";

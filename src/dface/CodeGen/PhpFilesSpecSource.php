@@ -17,7 +17,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		$this->relativeName = $relativeName;
 	}
 
-	public function getIterator()
+	public function getIterator() : \Generator
 	{
 		foreach ($this->walkDir($this->relativeName) as $name) {
 			yield $name;
@@ -83,7 +83,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		}
 	}
 
-	private function createFieldDef(string $name, $arr, string $defPath)
+	private function createFieldDef(string $name, $arr, string $defPath) : FieldDef
 	{
 		if (!\is_array($arr)) {
 			if (\is_string($arr) || $arr instanceof TypeDef) {
