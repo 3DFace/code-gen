@@ -13,7 +13,7 @@ class DateIntervalType implements TypeDef
 	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
 	{
 		return ($null_able ? "$value_expression === null ? null : " : '')."(static function (DateInterval \$x){\n".
-			$indent."\t\$str = 'P';\n".
+			$indent."\t\$str = '';\n".
 			$indent."\tif (\$x->y) {\n".
 			$indent."\t\t\$str .= \$x->y.'Y';\n".
 			$indent."\t}\n".
@@ -35,7 +35,7 @@ class DateIntervalType implements TypeDef
 			$indent."\t\t\t\$str .= \$x->s.'S';\n".
 			$indent."\t\t}\n".
 			$indent."\t}\n".
-			$indent."\treturn \$str;\n".
+			$indent."\treturn 'P'.(\$str ?: 'T0S');\n".
 			$indent."})($value_expression)";
 	}
 
