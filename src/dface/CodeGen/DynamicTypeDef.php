@@ -7,10 +7,17 @@ class DynamicTypeDef implements TypeDef
 {
 
 	private ClassName $className;
+	private bool $nullable;
 
-	public function __construct(ClassName $dataClassName)
+	public function __construct(ClassName $dataClassName, bool $nullable)
 	{
 		$this->className = $dataClassName;
+		$this->nullable = $nullable;
+	}
+
+	public function getClassName() : ClassName
+	{
+		return $this->className;
 	}
 
 	public function getUses(string $namespace) : array
@@ -18,30 +25,37 @@ class DynamicTypeDef implements TypeDef
 		return $namespace !== $this->className->getNamespace() ? [$this->className->getFullName()] : [];
 	}
 
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($null_able ? "$value_expression === null ? null : " : '').$value_expression.'->jsonSerialize()';
+		return ($this->nullable ? "$value_expression === null ? null : " : '').$value_expression.'->jsonSerialize()';
 	}
 
-	public function getDeserializer(string $l_value, string $indent) : string
+	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "if($l_value !== null){\n".
-			$indent."\t"."try {\n".
-			$indent."\t\t$l_value = ".$this->className->getShortName()."::deserialize($l_value);\n".
-			$indent."\t}catch (\Exception \$e){\n".
-			$indent."\t\t"."throw new \InvalidArgumentException('Deserialization error: '.\$e->getMessage(), 0, \$e);\n".
-			$indent."\t}\n".
-			$indent."}\n";
+		return "$value_expression === null ? null : ".$this->className->getShortName()."::deserialize($value_expression)";
+	}
+
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
+	{
+		if(\method_exists($this->className->getFullName(), 'equals')) {
+			$not_null = $exp1.'->equals('.$exp2.')';
+		}else{
+			$not_null = $exp1.' == '.$exp2;
+		}
+		if (!$this->nullable) {
+			return $not_null;
+		}
+		return "(($exp1 === null && $exp2 === null)\n$indent|| ($exp1 !== null && $exp2 !== null\n$indent\t&& $not_null))";
 	}
 
 	public function getArgumentHint() : string
 	{
-		return $this->className->getShortName();
+		return ($this->nullable ? '?' : '').$this->className->getShortName();
 	}
 
 	public function getPhpDocHint() : string
 	{
-		return $this->className->getShortName();
+		return $this->className->getShortName().($this->nullable ? '|null' : '');
 	}
 
 }

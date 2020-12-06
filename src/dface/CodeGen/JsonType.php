@@ -30,13 +30,13 @@ class JsonType implements TypeDef
 		return $uses;
 	}
 
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	public function getSerializer(string $value_expression, string $indent) : string
 	{
 		if ($this->serialize_plain) {
-			return $this->innerType->getSerializer($value_expression, $null_able, $indent);
+			return $this->innerType->getSerializer($value_expression, $indent);
 		}
-		$exp = $this->innerType->getSerializer('$val', false, $indent."\t");
-		return ($null_able ? "$value_expression === null ? null : " : '')."(static function (JsonSerializable \$val){\n".
+		$exp = $this->innerType->getSerializer('$val', $indent."\t");
+		return "(static function (\$val){\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."\$x = $exp;\n".
 			$indent."\t\t"."return \\json_encode(\$x, $this->encode_options | JSON_THROW_ON_ERROR);\n".
@@ -46,16 +46,21 @@ class JsonType implements TypeDef
 			$indent."})($value_expression)";
 	}
 
-	public function getDeserializer(string $l_value, string $indent) : string
+	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "if($l_value !== null){\n".
+		return "$value_expression === null ? null : (static function(\$x){\n".
 			$indent."\t"."try {\n".
-			$indent."\t\t"."$l_value = \\json_decode($l_value, true, 512, $this->decode_options | JSON_THROW_ON_ERROR);\n".
+			$indent."\t\t"."\$decoded = \\json_decode(\$x, true, 512, $this->decode_options | JSON_THROW_ON_ERROR);\n".
 			$indent."\t}catch (\Exception \$e){\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
-			$indent."\t".$this->innerType->getDeserializer($l_value, $indent."\t").
-			$indent."}\n";
+			$indent."\t".'return '.$this->innerType->getDeserializer('$decoded', $indent."\t").";\n".
+			$indent."})($value_expression)";
+	}
+
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
+	{
+		return $this->innerType->getEqualizer($exp1, $exp2, $indent);
 	}
 
 	public function getArgumentHint() : string

@@ -8,35 +8,34 @@
 namespace dface\CodeGen;
 
 use BaseNamespace\Namespace1\SomeClass;
+use BaseNamespace\Namespace1\Union1;
 use BaseNamespace\Namespace1\Value;
-use BaseNamespace\Namespace1\Virtual1;
-use BaseNamespace\Namespace1\Virtual2;
+use BaseNamespace\Namespace1\Union2;
 use BaseNamespace\Namespace2\SomeSibling;
 
 include_once __DIR__.'/../vendor/autoload.php';
 
-// source
-$specSrc = new PhpFilesSpecSource('', __DIR__.'/spec');
-
-// destination - examples/classes
-$writer = new Psr0ClassWriter(__DIR__.'/classes');
-
 $predefinedTypes = [
-	'string' => new ScalarType('string'),
-	'int' => new ScalarType('int'),
-	'float' => new ScalarType('float'),
-	'bool' => new ScalarType('bool'),
+	'string' => ScalarType::getFactory('string'),
+	'int' => ScalarType::getFactory('int'),
+	'float' => ScalarType::getFactory('float'),
+	'bool' => ScalarType::getFactory('bool'),
 	'mixed' => new MixedType(),
-	'DateTime' => new DateTimeType('Y-m-d H:i:s'),
-	'TimeStamp' => new TimeStampType(),
-	'DateInterval' => new DateIntervalType(),
-	'virtual' => new VirtualType(\JsonSerializable::class, [
-		Virtual1::class => 'v1',
-		Virtual2::class => 'v2',
+	'DateTime' => DateTimeType::getFactory('Y-m-d H:i:s'),
+	'TimeStamp' => TimeStampType::getFactory(),
+	'DateInterval' => DateIntervalType::getFactory(),
+	'union' => new UnionType(\JsonSerializable::class, [
+		Union1::class => 'v1',
+		Union2::class => 'v2',
 	]),
 ];
 
-$gen = new DTOGenerator($specSrc, $writer, $predefinedTypes);
+// source
+$specSrc = new PhpFilesSpecSource($predefinedTypes, '', __DIR__.'/spec');
+// destination - examples/classes
+$writer = new Psr0ClassWriter(__DIR__.'/classes');
+
+$gen = new DTOGenerator($specSrc, $writer);
 
 $gen->generate();
 
@@ -48,7 +47,7 @@ $x1 = new SomeClass(
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	[],
 	new Value(2),
-	[new Virtual1('qaz', 'gaga'), new Virtual2('qaz')],
+	[new Union1('qaz', 'gaga'), new Union2('qaz')],
 	new \DateInterval('P1M1DT10H'));
 
 $s1 = \json_encode($x1->jsonSerialize(), JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES);
@@ -60,8 +59,11 @@ echo  $s2."\n";
 
 \var_dump($x2);
 
+if(!$x1->equals($x2)){
+	echo "\n\n obj mismatch!\n";
+}
 if($s2 !== $s1){
-	echo "\n\nmismatch!\n";
+	echo "\n\n str mismatch!\n";
 }
 
 // see results in ./examples/classes

@@ -16,19 +16,27 @@ interface TypeDef
 	/**
 	 * Makes PHP-code that serializes values of target type.
 	 * @param string $value_expression - PHP-expression that represents a value being serialized
-	 * @param bool $null_able
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string;
+	public function getSerializer(string $value_expression, string $indent) : string;
 
 	/**
 	 * Makes PHP-code that deserializes values returned from 'serialize'-method to target type.
-	 * @param string $l_value - PHP-expression that represents a value being deserialized
+	 * @param string $value_expression - PHP-expression that represents a value being deserialized
 	 * @param string $indent for code formatting
 	 * @return string PHP-code
 	 */
-	public function getDeserializer(string $l_value, string $indent) : string;
+	public function getDeserializer(string $value_expression, string $indent) : string;
+
+	/**
+	 * Builds PHP-code that makes values equality check.
+	 * @param string $exp1
+	 * @param string $exp2
+	 * @param string $indent
+	 * @return string
+	 */
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string;
 
 	/**
 	 * Returns PHP-lang type hinting

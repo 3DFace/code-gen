@@ -8,7 +8,7 @@ use dface\CodeGen\ScalarType;
 return [
 
 	'Stranger1' => [
-		'val' => ['type' => new ScalarType('int')],
+		'val' => ['type' => new ScalarType('int', false)],
         '@deprecated' => true,
 	],
 

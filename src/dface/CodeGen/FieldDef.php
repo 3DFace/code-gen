@@ -7,8 +7,7 @@ class FieldDef
 {
 
 	private string $name;
-	/** @var string|TypeDef */
-	private $type;
+	private TypeDef $type;
 	private ?DefaultDef $constructorDefault;
 	private ?DefaultDef $serializedDefault;
 	private bool $wither;
@@ -20,12 +19,11 @@ class FieldDef
 	private array $write_as;
 	private bool $merged;
 	private bool $silent;
-	private bool $null_able;
 	private ?string $field_visibility;
 
 	public function __construct(
 		string $name,
-		$type,
+		TypeDef $type,
 		array $read_as,
 		array $write_as,
 		?DefaultDef $constructor_default,
@@ -35,7 +33,6 @@ class FieldDef
 		bool $getter,
 		bool $merged,
 		bool $silent,
-		bool $null_able,
 		?string $field_visibility
 	) {
 		$this->name = $name;
@@ -50,7 +47,6 @@ class FieldDef
 		$this->getter = $getter;
 		$this->merged = $merged;
 		$this->silent = $silent;
-		$this->null_able = $null_able;
 		$visibilitySet = ['private', 'protected', 'public', null];
 		if (!\in_array($field_visibility, $visibilitySet, true)) {
 			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
@@ -63,7 +59,7 @@ class FieldDef
 		return $this->name;
 	}
 
-	public function getType()
+	public function getType() : TypeDef
 	{
 		return $this->type;
 	}
@@ -111,11 +107,6 @@ class FieldDef
 	public function getSilent() : bool
 	{
 		return $this->silent;
-	}
-
-	public function getNullAble() : bool
-	{
-		return $this->null_able;
 	}
 
 	public function getFieldVisibility() : ?string

@@ -6,11 +6,19 @@ namespace dface\CodeGen;
 class ScalarType implements TypeDef
 {
 
-	private string $type;
+	public static function getFactory($type) : callable{
+		return static function ($nullable) use ($type){
+			return new self($type, $nullable);
+		};
+	}
 
-	public function __construct(string $type)
+	private string $type;
+	private bool $nullable;
+
+	public function __construct(string $type, bool $nullable)
 	{
 		$this->type = $type;
+		$this->nullable = $nullable;
 	}
 
 	public function getUses(string $namespace) : array
@@ -18,26 +26,29 @@ class ScalarType implements TypeDef
 		return [];
 	}
 
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	public function getSerializer(string $value_expression, string $indent) : string
 	{
 		return $value_expression;
 	}
 
-	public function getDeserializer(string $l_value, string $indent) : string
+	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "if($l_value !== null){\n".
-			$indent."\t"."$l_value = ($this->type)$l_value;\n".
-			$indent."}\n";
+		return "$value_expression === null ? null : ($this->type)$value_expression";
+	}
+
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
+	{
+		return "$exp1 === $exp2";
 	}
 
 	public function getArgumentHint() : string
 	{
-		return $this->type;
+		return ($this->nullable ? '?' : '').$this->type;
 	}
 
 	public function getPhpDocHint() : string
 	{
-		return $this->type;
+		return $this->type.($this->nullable ? '|null' : '');
 	}
 
 }

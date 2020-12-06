@@ -11,14 +11,19 @@ class MixedType implements TypeDef
 		return [];
 	}
 
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	public function getSerializer(string $value_expression, string $indent) : string
 	{
 		return $value_expression;
 	}
 
-	public function getDeserializer(string $l_value, string $indent) : string
+	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return '';
+		return $value_expression;
+	}
+
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
+	{
+		return "$exp1 === $exp2";
 	}
 
 	public function getArgumentHint() : string

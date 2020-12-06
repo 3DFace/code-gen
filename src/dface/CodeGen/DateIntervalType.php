@@ -5,14 +5,27 @@ namespace dface\CodeGen;
 class DateIntervalType implements TypeDef
 {
 
+	public static function getFactory() : callable{
+		return static function ($nullable) {
+			return new self($nullable);
+		};
+	}
+
+	private bool $nullable;
+
+	public function __construct(bool $nullable)
+	{
+		$this->nullable = $nullable;
+	}
+
 	public function getUses(string $namespace) : array
 	{
 		return [\DateInterval::class];
 	}
 
-	public function getSerializer(string $value_expression, bool $null_able, string $indent) : string
+	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($null_able ? "$value_expression === null ? null : " : '')."(static function (DateInterval \$x){\n".
+		return ($this->nullable ? "$value_expression === null ? null : " : '')."(static function (DateInterval \$x){\n".
 			$indent."\t\$str = '';\n".
 			$indent."\tif (\$x->y) {\n".
 			$indent."\t\t\$str .= \$x->y.'Y';\n".
@@ -39,25 +52,38 @@ class DateIntervalType implements TypeDef
 			$indent."})($value_expression)";
 	}
 
-	public function getDeserializer(string $l_value, string $indent) : string
+	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "if($l_value !== null){\n".
+		return "$value_expression === null ? null : (static function(\$x){\n".
 			$indent."\t"."try {\n".
-			$indent."\t\t"."$l_value = new DateInterval($l_value);\n".
+			$indent."\t\t"."return new DateInterval(\$x);\n".
 			$indent."\t}catch (\Exception \$e){\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
-			$indent."}\n";
+			$indent."})($value_expression)";
+	}
+
+	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
+	{
+		$pairs = [];
+		foreach (['y', 'm', 'd', 'h', 'i', 's'] as $k){
+			$pairs[] = '('.$exp1."->$k === ".$exp2."->$k".')';
+		}
+		$not_null = \implode("\n$indent && ", $pairs);
+		if(!$this->nullable){
+			return $not_null;
+		}
+		return "(($exp1 === null && $exp2 === null) || ($exp1 !== null && $exp2 !== null && $not_null))";
 	}
 
 	public function getArgumentHint() : string
 	{
-		return 'DateInterval';
+		return ($this->nullable ? '?' : '').'DateInterval';
 	}
 
 	public function getPhpDocHint() : string
 	{
-		return 'DateInterval';
+		return 'DateInterval'.($this->nullable ? '|null' : '');
 	}
 
 }
