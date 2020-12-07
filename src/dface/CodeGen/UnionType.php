@@ -6,17 +6,15 @@ namespace dface\CodeGen;
 class UnionType implements TypeDef
 {
 
-	private ClassName $baseType;
 	/** @var array[] */
 	private array $types;
 	private bool $nullable;
 
-	public function __construct(string $baseType, array $type_to_id_map, bool $nullable = false)
+	public function __construct(array $type_to_id_map, bool $nullable = false)
 	{
-		$this->baseType = new ClassName($baseType);
 		$this->types = [];
 		foreach ($type_to_id_map as $className => $id) {
-			$this->types[] = [new DynamicTypeDef(new ClassName($className), $nullable) , $id];
+			$this->types[] = [new DynamicTypeDef(new ClassName($className), false) , $id];
 		}
 		$this->nullable = $nullable;
 	}
@@ -24,9 +22,6 @@ class UnionType implements TypeDef
 	public function getUses(string $namespace) : array
 	{
 		$uses = [];
-		if ($this->baseType->getNamespace() !== $namespace) {
-			$uses[$this->baseType->getFullName()] = 1;
-		}
 		foreach ($this->types as [$type_def]) {
 			/** @var TypeDef $type_def */
 			foreach ($type_def->getUses($namespace) as $use){
@@ -104,9 +99,9 @@ class UnionType implements TypeDef
 		if (\count($this->types) === 1) {
 			/** @var DynamicTypeDef $type_def */
 			[$type_def] = $this->types[0];
-			return $type_def->getArgumentHint();
+			return ($this->nullable ? '?' : '').$type_def->getArgumentHint();
 		}
-		return $this->baseType->getShortName();
+		return '';
 	}
 
 	public function getPhpDocHint() : string
@@ -116,7 +111,7 @@ class UnionType implements TypeDef
 			/** @var DynamicTypeDef $type_def */
 			$hints[] = $type_def->getPhpDocHint();
 		}
-		return \implode('|', $hints);
+		return \implode('|', $hints).($this->nullable ? '|null' : '');
 	}
 
 }

@@ -24,10 +24,10 @@ $predefinedTypes = [
 	'DateTime' => DateTimeType::getFactory('Y-m-d H:i:s'),
 	'TimeStamp' => TimeStampType::getFactory(),
 	'DateInterval' => DateIntervalType::getFactory(),
-	'union' => new UnionType(\JsonSerializable::class, [
+	'union' => new UnionType([
 		Union1::class => 'v1',
 		Union2::class => 'v2',
-	]),
+	], true),
 ];
 
 // source
@@ -47,6 +47,7 @@ $x1 = new SomeClass(
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	[],
 	new Value(2),
+	null,
 	[new Union1('qaz', 'gaga'), new Union2('qaz')],
 	new \DateInterval('P1M1DT10H'));
 

@@ -20,9 +20,10 @@ return [
 		'field3' => ['type' => Value::class, 'default_code' => "new Value('Viva')", 'empty' => [], 'merged' => true],
 		'field4' => ['type' => 'Value{}'],
 		'field41' => ['type' => 'Value{}'],
-		'field5' => ['type' => new UnionType(\JsonSerializable::class, [
+		'field5' => ['type' => new UnionType([
 			Value::class => 1,
 		]), 'with' => 1],
+		'field51' => ['type' => 'union', 'with' => true],
 		'field6' => ['type' => 'union[]'],
 		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
 		'field7' => ['type' => 'mixed', 'default' => null],
