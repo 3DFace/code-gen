@@ -255,7 +255,7 @@ class DTOGenerator
 		}
 		if ($constructor_doc) {
 			$body .= "\t/**\n";
-			$body .= "\t * ".\implode("\n\t * ", $constructor_doc);
+			$body .= "\t * ".\implode("\n\t * ", $constructor_doc)."\n";
 			$body .= "\t */\n";
 		}
 		$body .= "\t".'public function __construct('.$params_str.") {\n";
