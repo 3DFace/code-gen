@@ -9,8 +9,8 @@ namespace dface\CodeGen;
 
 use BaseNamespace\Namespace1\SomeClass;
 use BaseNamespace\Namespace1\Union1;
-use BaseNamespace\Namespace1\Value;
 use BaseNamespace\Namespace1\Union2;
+use BaseNamespace\Namespace1\Value;
 use BaseNamespace\Namespace2\SomeSibling;
 
 include_once __DIR__.'/../vendor/autoload.php';
