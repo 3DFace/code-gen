@@ -76,6 +76,7 @@ class DTOGenerator
 		$body .= $this->generateDeserializerMethod($spec);
 		$body .= $this->generateEqualizerMethod($spec);
 		$body .= $this->generateIsDirty();
+		$body .= $this->generateWashed();
 		$body .= "}\n";
 		return $body;
 	}
@@ -196,6 +197,16 @@ class DTOGenerator
 	{
 		$body = "\t"."public function isDirty() : bool {\n";
 		$body .= "\t\t".'return $this->_dirty;'."\n";
+		$body .= "\t}\n\n";
+		return $body;
+	}
+
+	private function generateWashed() : string
+	{
+		$body = "\t"."public function washed() : self {\n";
+		$body .= "\t\t".'$x = clone $this;'."\n";
+		$body .= "\t\t".'$x->_dirty = false;'."\n";
+		$body .= "\t\t".'return $x;'."\n";
 		$body .= "\t}\n\n";
 		return $body;
 	}
