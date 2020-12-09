@@ -16,14 +16,14 @@ use BaseNamespace\Namespace2\SomeSibling;
 include_once __DIR__.'/../vendor/autoload.php';
 
 $predefinedTypes = [
-	'string' => ScalarType::getFactory('string'),
-	'int' => ScalarType::getFactory('int'),
-	'float' => ScalarType::getFactory('float'),
-	'bool' => ScalarType::getFactory('bool'),
+	'string' => new ScalarType('string'),
+	'int' => new ScalarType('int'),
+	'float' => new ScalarType('float'),
+	'bool' => new ScalarType('bool'),
 	'mixed' => new MixedType(),
-	'DateTime' => DateTimeType::getFactory('Y-m-d H:i:s'),
-	'TimeStamp' => TimeStampType::getFactory(),
-	'DateInterval' => DateIntervalType::getFactory(),
+	'DateTime' => new DateTimeType('Y-m-d H:i:s'),
+	'TimeStamp' => new TimeStampType(),
+	'DateInterval' => new DateIntervalType(),
 	'union' => new UnionType([
 		Union1::class => 'v1',
 		Union2::class => 'v2',
@@ -45,7 +45,7 @@ $x1 = new SomeClass(
 	new SomeSibling('asd'),
 	new Value('qwe'),
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
-	[],
+	new Value('x'),
 	new Value(2),
 	null,
 	[new Union1('qaz', 'gaga'), new Union2('qaz')],

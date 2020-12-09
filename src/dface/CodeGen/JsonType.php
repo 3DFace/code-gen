@@ -23,11 +23,9 @@ class JsonType implements TypeDef
 		$this->serialize_plain = $serialize_plain;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses(string $namespace) : iterable
 	{
-		$uses = $this->innerType->getUses($namespace);
-		$uses[] = 'JsonSerializable';
-		return $uses;
+		return $this->innerType->getUses($namespace);
 	}
 
 	public function getSerializer(string $value_expression, string $indent) : string
@@ -36,11 +34,11 @@ class JsonType implements TypeDef
 			return $this->innerType->getSerializer($value_expression, $indent);
 		}
 		$exp = $this->innerType->getSerializer('$val', $indent."\t");
-		return "(static function (\$val){\n".
+		return "(static function (\$val) {\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."\$x = $exp;\n".
 			$indent."\t\t"."return \\json_encode(\$x, $this->encode_options | JSON_THROW_ON_ERROR);\n".
-			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t} catch (\Exception \$e) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
 			$indent."})($value_expression)";
@@ -48,10 +46,10 @@ class JsonType implements TypeDef
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "$value_expression === null ? null : (static function(\$x){\n".
+		return "$value_expression === null ? null : (static function (\$x) {\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."\$decoded = \\json_decode(\$x, true, 512, $this->decode_options | JSON_THROW_ON_ERROR);\n".
-			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t} catch (\Exception \$e) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
 			$indent."\t".'return '.$this->innerType->getDeserializer('$decoded', $indent."\t").";\n".
@@ -71,6 +69,11 @@ class JsonType implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		return $this->innerType->getPhpDocHint();
+	}
+
+	public function createNullable() : TypeDef
+	{
+		throw new \LogicException(self::class.' can not be nullable');
 	}
 
 }

@@ -36,4 +36,9 @@ class MixedType implements TypeDef
 		return 'mixed';
 	}
 
+	public function createNullable() : TypeDef
+	{
+		return $this;
+	}
+
 }

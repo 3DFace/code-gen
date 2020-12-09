@@ -9,9 +9,9 @@ interface TypeDef
 	/**
 	 * TypeDef can specify classes to import (for 'use' section).
 	 * @param string $namespace - generated class's namespace
-	 * @return string[] class names
+	 * @return string[]|iterable class names
 	 */
-	public function getUses(string $namespace) : array;
+	public function getUses(string $namespace) : iterable;
 
 	/**
 	 * Makes PHP-code that serializes values of target type.
@@ -49,5 +49,7 @@ interface TypeDef
 	 * @return string
 	 */
 	public function getPhpDocHint() : string;
+
+	public function createNullable() : self;
 
 }

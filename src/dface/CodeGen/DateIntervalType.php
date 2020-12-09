@@ -5,7 +5,8 @@ namespace dface\CodeGen;
 class DateIntervalType implements TypeDef
 {
 
-	public static function getFactory() : callable{
+	public static function getFactory() : callable
+	{
 		return static function ($nullable) {
 			return new self($nullable);
 		};
@@ -13,7 +14,7 @@ class DateIntervalType implements TypeDef
 
 	private bool $nullable;
 
-	public function __construct(bool $nullable)
+	public function __construct(bool $nullable = false)
 	{
 		$this->nullable = $nullable;
 	}
@@ -25,7 +26,7 @@ class DateIntervalType implements TypeDef
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($this->nullable ? "$value_expression === null ? null : " : '')."(static function (DateInterval \$x){\n".
+		return ($this->nullable ? "$value_expression === null ? null : " : '')."(static function (DateInterval \$x) {\n".
 			$indent."\t\$str = '';\n".
 			$indent."\tif (\$x->y) {\n".
 			$indent."\t\t\$str .= \$x->y.'Y';\n".
@@ -54,10 +55,10 @@ class DateIntervalType implements TypeDef
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "$value_expression === null ? null : (static function(\$x){\n".
+		return "$value_expression === null ? null : (static function (\$x) {\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."return new DateInterval(\$x);\n".
-			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t} catch (\Exception \$e) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
 			$indent."})($value_expression)";
@@ -66,14 +67,14 @@ class DateIntervalType implements TypeDef
 	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
 	{
 		$pairs = [];
-		foreach (['y', 'm', 'd', 'h', 'i', 's'] as $k){
+		foreach (['y', 'm', 'd', 'h', 'i', 's'] as $k) {
 			$pairs[] = '('.$exp1."->$k === ".$exp2."->$k".')';
 		}
-		$not_null = \implode("\n$indent && ", $pairs);
-		if(!$this->nullable){
-			return $not_null;
+		if (!$this->nullable) {
+			return \implode("\n$indent && ", $pairs);
 		}
-		return "(($exp1 === null && $exp2 === null) || ($exp1 !== null && $exp2 !== null && $not_null))";
+		$not_null_str = \implode("\n\t\t$indent&& ", $pairs);
+		return "(($exp1 === null && $exp2 === null)\n$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null_str))";
 	}
 
 	public function getArgumentHint() : string
@@ -84,6 +85,13 @@ class DateIntervalType implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		return 'DateInterval'.($this->nullable ? '|null' : '');
+	}
+
+	public function createNullable() : TypeDef
+	{
+		$x = clone $this;
+		$x->nullable = true;
+		return $x;
 	}
 
 }

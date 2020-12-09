@@ -6,19 +6,15 @@ namespace dface\CodeGen;
 class PhpFilesSpecSource implements \IteratorAggregate
 {
 
-	/** @var callable[] */
-	private array $predefinedTypesFactories;
-	/** @var TypeDef[] */
-	private array $predefinedTypes;
 	private string $baseNamespace;
 	private string $definitionsDir;
 	private string $relativeName;
 	/** @var TypeDef[] */
-	private array $types = [];
+	private array $types;
 
-	public function __construct(array $predefinedTypesFactories, string $baseNamespace, string $definitionsDir, string $relativeName = '')
+	public function __construct(array $predefinedTypes, string $baseNamespace, string $definitionsDir, string $relativeName = '')
 	{
-		$this->predefinedTypesFactories = $predefinedTypesFactories;
+		$this->types = $predefinedTypes;
 		$this->baseNamespace = $baseNamespace;
 		$this->definitionsDir = $definitionsDir;
 		$this->relativeName = $relativeName;
@@ -68,7 +64,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			$traits = [];
 			foreach ($definition as $name => $arr) {
 				if ($name[0] !== '@') {
-					$fields[] = $this->createFieldDef($className, $name, $arr, $defPath);
+					$fields[] = $this->createFieldDef($name, $arr, $defPath);
 				} else {
 					$optName = \substr($name, 1);
 					switch ($optName) {
@@ -90,69 +86,62 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		}
 	}
 
-	private static function fullTypeName(string $namespace, string $type_name) : string
-	{
-		return \strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
-	}
-
 	/**
-	 * @param string $namespace
 	 * @param $type_name
 	 * @param bool $nullable
 	 * @return TypeDef
 	 */
-	private function getType(string $namespace, $type_name, bool $nullable) : TypeDef
+	private function getType(string $type_name, bool $nullable) : TypeDef
 	{
-		if ($type_name instanceof TypeDef) {
-			return $type_name;
-		}
-		if (\is_array($type_name)) {
-			$type_name = $type_name[0].'[]';
-		}
-		if (isset($this->predefinedTypesFactories[$type_name])) {
-			$factory = $this->predefinedTypesFactories[$type_name];
-			if(\is_callable($factory)) {
-				if ($nullable) {
-					$type_name .= '_nullable';
-				}
-				if (!isset($this->predefinedTypes[$type_name])) {
-					$this->predefinedTypes[$type_name] = $factory($nullable);
-				}
-			}else{
-				$this->predefinedTypes[$type_name] = $factory;
-			}
-			return $this->predefinedTypes[$type_name];
-		}
-		$full_name = self::fullTypeName($namespace, $type_name);
-		$key_name = $full_name;
-		if($nullable){
+		$key_name = $type_name;
+		if ($nullable) {
 			$key_name .= '_nullable';
 		}
-		if (!isset($this->types[$key_name])) {
-			if (\substr($type_name, -2) === '[]') {
-				$el_type = \substr($type_name, 0, -2);
-				if ($el_type === '') {
-					throw new \InvalidArgumentException('Specify element type');
-				}
-				$inner_type = $this->getType($namespace, $el_type, false);
-				$this->types[$key_name] = new ArrayType($inner_type, $nullable);
-			} elseif (\substr($type_name, -2) === '{}') {
-				$el_type = \substr($type_name, 0, -2);
-				if ($el_type === '') {
-					throw new \InvalidArgumentException('Specify element type');
-				}
-				$inner_type = $this->getType($namespace, $el_type, false);
-				$this->types[$key_name] = new MapType($inner_type, $nullable);
-			} elseif (\is_a($full_name, TypeDef::class)) {
-				$this->types[$key_name] = new $full_name;
-			} else {
-				$this->types[$key_name] = new DynamicTypeDef(new ClassName($full_name), $nullable);
-			}
+
+		if (isset($this->types[$key_name])) {
+			return $this->types[$key_name];
 		}
-		return $this->types[$key_name];
+
+		if ($nullable) {
+			$new_type = $this->getType($type_name, false)->createNullable();
+		} elseif (\substr($type_name, -2) === '[]') {
+			$el_type = \substr($type_name, 0, -2);
+			if ($el_type === '') {
+				throw new \InvalidArgumentException('Specify element type');
+			}
+			$inner_type = $this->getType($el_type, false);
+			$new_type = new ArrayType($inner_type);
+		} elseif (\substr($type_name, -3) === '[?]') {
+			$el_type = \substr($type_name, 0, -3);
+			if ($el_type === '') {
+				throw new \InvalidArgumentException('Specify element type');
+			}
+			$inner_type = $this->getType($el_type, true);
+			$new_type = new ArrayType($inner_type);
+		} elseif (\substr($type_name, -2) === '{}') {
+			$el_type = \substr($type_name, 0, -2);
+			if ($el_type === '') {
+				throw new \InvalidArgumentException('Specify element type');
+			}
+			$inner_type = $this->getType($el_type, false);
+			$new_type = new MapType($inner_type);
+		} elseif (\substr($type_name, -3) === '{?}') {
+			$el_type = \substr($type_name, 0, -3);
+			if ($el_type === '') {
+				throw new \InvalidArgumentException('Specify element type');
+			}
+			$inner_type = $this->getType($el_type, true);
+			$new_type = new MapType($inner_type);
+		} elseif (\is_a($type_name, TypeDef::class)) {
+			$new_type = new $type_name;
+		} else {
+			$new_type = new DynamicTypeDef(new ClassName($type_name));
+		}
+		$this->types[$key_name] = $new_type;
+		return $new_type;
 	}
 
-	private function createFieldDef(ClassName $class_name, string $field_name, $arr, string $defPath) : FieldDef
+	private function createFieldDef(string $field_name, $arr, string $defPath) : FieldDef
 	{
 		if (!\is_array($arr)) {
 			if (\is_string($arr) || $arr instanceof TypeDef) {
@@ -198,7 +187,10 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		}
 
 		$nullable = $arr['null'] ?? ($default && ($default->getCode() === 'null'));
-		$type = $this->getType($class_name->getNamespace(), $arr['type'], $nullable);
+		$type = $arr['type'];
+		if (!$type instanceof TypeDef) {
+			$type = $this->getType($type, $nullable);
+		}
 
 		return new FieldDef(
 			$field_name,

@@ -6,8 +6,9 @@ namespace dface\CodeGen;
 class DateTimeType implements TypeDef
 {
 
-	public static function getFactory(string $serialize_format) : callable{
-		return static function ($nullable) use ($serialize_format){
+	public static function getFactory(string $serialize_format) : callable
+	{
+		return static function ($nullable) use ($serialize_format) {
 			return new self($serialize_format, $nullable);
 		};
 	}
@@ -15,7 +16,7 @@ class DateTimeType implements TypeDef
 	private string $serialize_format;
 	private bool $nullable;
 
-	public function __construct(string $serialize_format, bool $nullable)
+	public function __construct(string $serialize_format, bool $nullable = false)
 	{
 		$this->serialize_format = $serialize_format;
 		$this->nullable = $nullable;
@@ -33,10 +34,10 @@ class DateTimeType implements TypeDef
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "$value_expression === null ? null : (static function(\$x){\n".
+		return "$value_expression === null ? null : (static function (\$x) {\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."return new DateTimeImmutable(\$x);\n".
-			$indent."\t}catch (\Exception \$e){\n".
+			$indent."\t} catch (\Exception \$e) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
 			$indent."})($value_expression)";
@@ -49,7 +50,7 @@ class DateTimeType implements TypeDef
 			return $not_null;
 		}
 		return "(($exp1 === null && $exp2 === null)\n".
-			"$indent|| ($exp1 !== null && $exp2 !== null\n$indent\t&& $not_null))";
+			"$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null))";
 	}
 
 	public function getArgumentHint() : string
@@ -60,6 +61,13 @@ class DateTimeType implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		return 'DateTimeImmutable'.($this->nullable ? '|null' : '');
+	}
+
+	public function createNullable() : TypeDef
+	{
+		$x = clone $this;
+		$x->nullable = true;
+		return $x;
 	}
 
 }

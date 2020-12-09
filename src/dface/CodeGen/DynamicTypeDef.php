@@ -9,7 +9,7 @@ class DynamicTypeDef implements TypeDef
 	private ClassName $className;
 	private bool $nullable;
 
-	public function __construct(ClassName $dataClassName, bool $nullable)
+	public function __construct(ClassName $dataClassName, bool $nullable = false)
 	{
 		$this->className = $dataClassName;
 		$this->nullable = $nullable;
@@ -37,15 +37,15 @@ class DynamicTypeDef implements TypeDef
 
 	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
 	{
-		if(\method_exists($this->className->getFullName(), 'equals')) {
+		if (\method_exists($this->className->getFullName(), 'equals')) {
 			$not_null = $exp1.'->equals('.$exp2.')';
-		}else{
+		} else {
 			$not_null = $exp1.' == '.$exp2;
 		}
 		if (!$this->nullable) {
 			return $not_null;
 		}
-		return "(($exp1 === null && $exp2 === null)\n$indent|| ($exp1 !== null && $exp2 !== null\n$indent\t&& $not_null))";
+		return "(($exp1 === null && $exp2 === null)\n$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null))";
 	}
 
 	public function getArgumentHint() : string
@@ -56,6 +56,13 @@ class DynamicTypeDef implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		return $this->className->getShortName().($this->nullable ? '|null' : '');
+	}
+
+	public function createNullable() : TypeDef
+	{
+		$x = clone $this;
+		$x->nullable = true;
+		return $x;
 	}
 
 }

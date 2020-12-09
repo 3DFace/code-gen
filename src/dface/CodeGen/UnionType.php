@@ -14,26 +14,22 @@ class UnionType implements TypeDef
 	{
 		$this->types = [];
 		foreach ($type_to_id_map as $className => $id) {
-			$this->types[] = [new DynamicTypeDef(new ClassName($className), false) , $id];
+			$this->types[] = [new DynamicTypeDef(new ClassName($className), false), $id];
 		}
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses(string $namespace) : \Generator
 	{
-		$uses = [];
 		foreach ($this->types as [$type_def]) {
 			/** @var TypeDef $type_def */
-			foreach ($type_def->getUses($namespace) as $use){
-				$uses[$use] = 1;
-			}
+			yield from $type_def->getUses($namespace);
 		}
-		return \array_keys($uses);
 	}
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		$result = ($this->nullable ? "$value_expression === null ? null : " : '')."(static function (\$val){\n";
+		$result = ($this->nullable ? "$value_expression === null ? null : " : '')."(static function (\$val) {\n";
 
 		foreach ($this->types as [$type_def, $id]) {
 			/** @var DynamicTypeDef $type_def */
@@ -41,7 +37,7 @@ class UnionType implements TypeDef
 			$id_ex = \var_export($id, true);
 			$inner_serializer = $type_def->getSerializer('$val', $indent."\t\t\t");
 			$result .=
-				$indent."\t"."if(\$val instanceof $short){\n".
+				$indent."\t"."if (\$val instanceof $short) {\n".
 				$indent."\t\t"."return [$id_ex, $inner_serializer];\n".
 				$indent."\t"."}\n";
 		}
@@ -53,8 +49,8 @@ class UnionType implements TypeDef
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		$result = "$value_expression === null ? null : (static function(\$x){\n".
-			$indent."\t"."if(!\\is_array(\$x)){\n".
+		$result = "$value_expression === null ? null : (static function (\$x) {\n".
+			$indent."\t"."if (!\\is_array(\$x)) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException('Cant deserialize '.\gettype(\$x));\n".
 			$indent."\t"."}\n";
 		if (\count($this->types) === 1) {
@@ -67,7 +63,7 @@ class UnionType implements TypeDef
 				$indent."\t"."}\n".
 				$indent."\t"."throw new \\InvalidArgumentException('Unknown type id: '.\$x"."[0]);\n";
 		} else {
-			$result .= $indent."\t"."switch(\$x"."[0]){\n";
+			$result .= $indent."\t"."switch (\$x"."[0]) {\n";
 			foreach ($this->types as [$type_def, $id]) {
 				/** @var DynamicTypeDef $type_def */
 				$inner_deserializer = $type_def->getDeserializer('$x[1]', $indent."\t\t\t");
@@ -91,7 +87,7 @@ class UnionType implements TypeDef
 		if (!$this->nullable) {
 			return $not_null;
 		}
-		return "(($exp1 === null && $exp2 === null)\n$indent|| ($exp1 !== null && $exp2 !== null\n$indent\t&& $not_null))";
+		return "(($exp1 === null && $exp2 === null)\n$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null))";
 	}
 
 	public function getArgumentHint() : string
@@ -112,6 +108,13 @@ class UnionType implements TypeDef
 			$hints[] = $type_def->getPhpDocHint();
 		}
 		return \implode('|', $hints).($this->nullable ? '|null' : '');
+	}
+
+	public function createNullable() : TypeDef
+	{
+		$x = clone $this;
+		$x->nullable = true;
+		return $x;
 	}
 
 }

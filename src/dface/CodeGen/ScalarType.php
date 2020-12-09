@@ -6,8 +6,9 @@ namespace dface\CodeGen;
 class ScalarType implements TypeDef
 {
 
-	public static function getFactory($type) : callable{
-		return static function ($nullable) use ($type){
+	public static function getFactory($type) : callable
+	{
+		return static function ($nullable) use ($type) {
 			return new self($type, $nullable);
 		};
 	}
@@ -15,7 +16,7 @@ class ScalarType implements TypeDef
 	private string $type;
 	private bool $nullable;
 
-	public function __construct(string $type, bool $nullable)
+	public function __construct(string $type, bool $nullable = false)
 	{
 		$this->type = $type;
 		$this->nullable = $nullable;
@@ -49,6 +50,13 @@ class ScalarType implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		return $this->type.($this->nullable ? '|null' : '');
+	}
+
+	public function createNullable() : TypeDef
+	{
+		$x = clone $this;
+		$x->nullable = true;
+		return $x;
 	}
 
 }
