@@ -6,7 +6,7 @@ namespace dface\CodeGen;
 class MixedType implements TypeDef
 {
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
 		return [];
 	}

@@ -6,7 +6,7 @@ namespace dface\CodeGen;
 class Specification
 {
 
-	private ClassName$className;
+	private ClassName $class_name;
 	/** @var FieldDef[] */
 	private array $fields;
 	/** @var string[] */
@@ -17,14 +17,14 @@ class Specification
 	private int $modified;
 
 	public function __construct(
-		ClassName $className,
+		ClassName $class_name,
 		array $fields,
 		array $interfaces,
 		array $traits,
 		bool $deprecated,
 		int $modified
 	) {
-		$this->className = $className;
+		$this->class_name = $class_name;
 		$this->fields = $fields;
 		$this->interfaces = $interfaces;
 		$this->traits = $traits;
@@ -34,19 +34,28 @@ class Specification
 
 	public function getClassName() : ClassName
 	{
-		return $this->className;
+		return $this->class_name;
 	}
 
+	/**
+	 * @return FieldDef[]
+	 */
 	public function getFields() : array
 	{
 		return $this->fields;
 	}
 
+	/**
+	 * @return string[]
+	 */
 	public function getInterfaces() : array
 	{
 		return $this->interfaces;
 	}
 
+	/**
+	 * @return string[]
+	 */
 	public function getTraits() : array
 	{
 		return $this->traits;

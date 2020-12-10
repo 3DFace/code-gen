@@ -8,20 +8,20 @@ class DTOGenerator
 
 	private \IteratorAggregate $specSource;
 	private ClassWriter $classWriter;
-	private string $fieldsVisibility;
+	private string $fields_visibility;
 
 	public function __construct(
 		\IteratorAggregate $specSource,
 		ClassWriter $classWriter,
-		string $fieldsVisibility = 'private'
+		string $fields_visibility = 'private'
 	) {
 		$this->specSource = $specSource;
 		$this->classWriter = $classWriter;
-		$visibilitySet = ['private', 'protected', 'public'];
-		if (!\in_array($fieldsVisibility, $visibilitySet, true)) {
-			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibilitySet).']');
+		$visibility_set = ['private', 'protected', 'public'];
+		if (!\in_array($fields_visibility, $visibility_set, true)) {
+			throw new \InvalidArgumentException('Fields visibility must be one of ['.implode(', ', $visibility_set).']');
 		}
-		$this->fieldsVisibility = $fieldsVisibility;
+		$this->fields_visibility = $fields_visibility;
 	}
 
 	public function generate($force = false)
@@ -32,14 +32,14 @@ class DTOGenerator
 		}, 0);
 		/** @var Specification $spec */
 		foreach ($this->specSource as $spec) {
-			$className = $spec->getClassName();
-			$targetModified = $this->classWriter->getTargetMTime($className);
-			if ($force || $targetModified < $tool_mtime || $targetModified < $spec->getModified()) {
+			$class_name = $spec->getClassName();
+			$target_modified = $this->classWriter->getTargetMTime($class_name);
+			if ($force || $target_modified < $tool_mtime || $target_modified < $spec->getModified()) {
 				try {
 					$code = $this->generateDataClass($spec);
-					$this->classWriter->writeClass($className, $code);
+					$this->classWriter->writeClass($class_name, $code);
 				} catch (\Exception $e) {
-					throw new \RuntimeException($className->getFullName().' code-gen error: '.$e->getMessage(), 0, $e);
+					throw new \RuntimeException($class_name->getFullName().' code-gen error: '.$e->getMessage(), 0, $e);
 				}
 			}
 		}
@@ -91,24 +91,25 @@ class DTOGenerator
 		$namespace = $spec->getClassName()->getNamespace();
 		$uses = ['JsonSerializable' => "use JsonSerializable;\n"];
 		foreach ($spec->getFields() as $field) {
-			foreach ($field->makeUses($namespace) as $u) {
-				$u = \ltrim($u, '\\');
-				$uses[$u] = "use $u;\n";
+			foreach ($field->makeUses() as $u) {
+				$class_name = new ClassName($u);
+				if ($class_name->getNamespace() !== $namespace) {
+					$u = \ltrim($class_name->getFullName(), '\\');
+					$uses[$u] = "use $u;\n";
+				}
 			}
 		}
 		foreach ($spec->getInterfaces() as $i) {
-			$fullType = self::fullTypeName($namespace, $i);
-			$className = new ClassName($fullType);
-			if ($className->getNamespace() !== $namespace) {
-				$u = \ltrim($className->getFullName(), '\\');
+			$class_name = new ClassName($i);
+			if ($class_name->getNamespace() !== $namespace) {
+				$u = \ltrim($class_name->getFullName(), '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
-		foreach ($spec->getTraits() as $i) {
-			$fullType = self::fullTypeName($namespace, $i);
-			$className = new ClassName($fullType);
-			if ($className->getNamespace() !== $namespace) {
-				$u = \ltrim($className->getFullName(), '\\');
+		foreach ($spec->getTraits() as $t) {
+			$class_name = new ClassName($t);
+			if ($class_name->getNamespace() !== $namespace) {
+				$u = \ltrim($class_name->getFullName(), '\\');
 				$uses[$u] = "use $u;\n";
 			}
 		}
@@ -121,10 +122,10 @@ class DTOGenerator
 		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
 		foreach ($spec->getInterfaces() as $i) {
-			$fullType = self::fullTypeName($namespace, $i);
-			$className = new ClassName($fullType);
-			$iName = \ltrim($className->getShortName(), '\\');
-			$arr[$iName] = $iName;
+			$full_type = self::fullTypeName($namespace, $i);
+			$class_name = new ClassName($full_type);
+			$i_name = \ltrim($class_name->getShortName(), '\\');
+			$arr[$i_name] = $i_name;
 		}
 		return $arr ? ', '.\implode(', ', $arr) : '';
 	}
@@ -134,10 +135,10 @@ class DTOGenerator
 		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
 		foreach ($spec->getTraits() as $i) {
-			$fullType = self::fullTypeName($namespace, $i);
-			$className = new ClassName($fullType);
-			$tName = \ltrim($className->getShortName(), '\\');
-			$arr[$tName] = $tName;
+			$full_type = self::fullTypeName($namespace, $i);
+			$class_name = new ClassName($full_type);
+			$t_name = \ltrim($class_name->getShortName(), '\\');
+			$arr[$t_name] = $t_name;
 		}
 		return $arr ? ("\t".'use '.implode(";\n\t".'use ', $arr).";\n\n") : '';
 	}
@@ -243,9 +244,9 @@ class DTOGenerator
 	{
 		$body = '';
 		foreach ($spec->getFields() as $field) {
-			$body .= $field->makeField("\t", $this->fieldsVisibility);
+			$body .= $field->makeField("\t", $this->fields_visibility);
 		}
-		$body .= "\t".$this->fieldsVisibility." bool \$_dirty = false;\n";
+		$body .= "\t".$this->fields_visibility." bool \$_dirty = false;\n";
 		return $body ? $body."\n" : '';
 	}
 

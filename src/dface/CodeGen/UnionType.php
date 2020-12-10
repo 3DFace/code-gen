@@ -13,17 +13,17 @@ class UnionType implements TypeDef
 	public function __construct(array $type_to_id_map, bool $nullable = false)
 	{
 		$this->types = [];
-		foreach ($type_to_id_map as $className => $id) {
-			$this->types[] = [new DynamicTypeDef(new ClassName($className), false), $id];
+		foreach ($type_to_id_map as $class_name => $id) {
+			$this->types[] = [new DynamicTypeDef(new ClassName($class_name), false), $id];
 		}
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : \Generator
+	public function getUses() : \Generator
 	{
 		foreach ($this->types as [$type_def]) {
 			/** @var TypeDef $type_def */
-			yield from $type_def->getUses($namespace);
+			yield from $type_def->getUses();
 		}
 	}
 

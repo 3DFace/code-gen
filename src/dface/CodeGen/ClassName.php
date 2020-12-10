@@ -6,21 +6,21 @@ namespace dface\CodeGen;
 class ClassName
 {
 
-	private string $fullName;
+	private string $full_name;
 	private string $namespace;
-	private string $shortName;
+	private string $short_name;
 
 	public function __construct(string $fullName)
 	{
 		$parts = \preg_split("|\\\\|", $fullName, -1, PREG_SPLIT_NO_EMPTY);
-		$this->shortName = \array_pop($parts);
+		$this->short_name = \array_pop($parts);
 		$this->namespace = \implode("\\", $parts);
-		$this->fullName = $this->namespace.'\\'.$this->shortName;
+		$this->full_name = $this->namespace.'\\'.$this->short_name;
 	}
 
 	public function getFullName() : string
 	{
-		return $this->fullName;
+		return $this->full_name;
 	}
 
 	public function getNamespace() : string
@@ -30,12 +30,12 @@ class ClassName
 
 	public function getShortName() : string
 	{
-		return $this->shortName;
+		return $this->short_name;
 	}
 
 	public function __toString() : string
 	{
-		return $this->fullName;
+		return $this->full_name;
 	}
 
 }

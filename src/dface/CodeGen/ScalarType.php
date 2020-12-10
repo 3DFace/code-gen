@@ -6,13 +6,6 @@ namespace dface\CodeGen;
 class ScalarType implements TypeDef
 {
 
-	public static function getFactory($type) : callable
-	{
-		return static function ($nullable) use ($type) {
-			return new self($type, $nullable);
-		};
-	}
-
 	private string $type;
 	private bool $nullable;
 
@@ -22,7 +15,7 @@ class ScalarType implements TypeDef
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
 		return [];
 	}

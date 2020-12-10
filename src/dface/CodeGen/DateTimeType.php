@@ -6,13 +6,6 @@ namespace dface\CodeGen;
 class DateTimeType implements TypeDef
 {
 
-	public static function getFactory(string $serialize_format) : callable
-	{
-		return static function ($nullable) use ($serialize_format) {
-			return new self($serialize_format, $nullable);
-		};
-	}
-
 	private string $serialize_format;
 	private bool $nullable;
 
@@ -22,7 +15,7 @@ class DateTimeType implements TypeDef
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
 		return [\DateTimeImmutable::class];
 	}

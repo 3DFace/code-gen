@@ -6,13 +6,6 @@ namespace dface\CodeGen;
 class TimeStampType implements TypeDef
 {
 
-	public static function getFactory() : callable
-	{
-		return static function ($nullable) {
-			return new self($nullable);
-		};
-	}
-
 	private bool $nullable;
 
 	public function __construct(bool $nullable = false)
@@ -20,7 +13,7 @@ class TimeStampType implements TypeDef
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
 		return [\DateTimeImmutable::class];
 	}

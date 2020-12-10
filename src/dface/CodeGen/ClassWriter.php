@@ -7,12 +7,12 @@ interface ClassWriter
 {
 
 	/**
-	 * @param string $className
-	 * @param string $phpCode
+	 * @param string $class_name
+	 * @param string $php_code
 	 * @return void
 	 */
-	public function writeClass(string $className, string $phpCode) : void;
+	public function writeClass(string $class_name, string $php_code) : void;
 
-	public function getTargetMTime(string $className) : int;
+	public function getTargetMTime(string $class_name) : int;
 
 }

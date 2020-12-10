@@ -6,23 +6,23 @@ namespace dface\CodeGen;
 class DynamicTypeDef implements TypeDef
 {
 
-	private ClassName $className;
+	private ClassName $class_name;
 	private bool $nullable;
 
-	public function __construct(ClassName $dataClassName, bool $nullable = false)
+	public function __construct(ClassName $data_class_name, bool $nullable = false)
 	{
-		$this->className = $dataClassName;
+		$this->class_name = $data_class_name;
 		$this->nullable = $nullable;
 	}
 
 	public function getClassName() : ClassName
 	{
-		return $this->className;
+		return $this->class_name;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
-		return $namespace !== $this->className->getNamespace() ? [$this->className->getFullName()] : [];
+		return [$this->class_name->getFullName()];
 	}
 
 	public function getSerializer(string $value_expression, string $indent) : string
@@ -32,12 +32,12 @@ class DynamicTypeDef implements TypeDef
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
-		return "$value_expression === null ? null : ".$this->className->getShortName()."::deserialize($value_expression)";
+		return "$value_expression === null ? null : ".$this->class_name->getShortName()."::deserialize($value_expression)";
 	}
 
 	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
 	{
-		if (\method_exists($this->className->getFullName(), 'equals')) {
+		if (\method_exists($this->class_name->getFullName(), 'equals')) {
 			$not_null = $exp1.'->equals('.$exp2.')';
 		} else {
 			$not_null = $exp1.' == '.$exp2;
@@ -50,12 +50,12 @@ class DynamicTypeDef implements TypeDef
 
 	public function getArgumentHint() : string
 	{
-		return ($this->nullable ? '?' : '').$this->className->getShortName();
+		return ($this->nullable ? '?' : '').$this->class_name->getShortName();
 	}
 
 	public function getPhpDocHint() : string
 	{
-		return $this->className->getShortName().($this->nullable ? '|null' : '');
+		return $this->class_name->getShortName().($this->nullable ? '|null' : '');
 	}
 
 	public function createNullable() : TypeDef

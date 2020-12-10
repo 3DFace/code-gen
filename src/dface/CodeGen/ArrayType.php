@@ -6,38 +6,38 @@ namespace dface\CodeGen;
 class ArrayType implements TypeDef
 {
 
-	private TypeDef $innerType;
+	private TypeDef $inner_type;
 	private bool $nullable;
 
-	public function __construct(TypeDef $innerType, bool $nullable = false)
+	public function __construct(TypeDef $inner_type, bool $nullable = false)
 	{
-		$this->innerType = $innerType;
+		$this->inner_type = $inner_type;
 		$this->nullable = $nullable;
 	}
 
-	public function getUses($namespace) : iterable
+	public function getUses() : iterable
 	{
-		return $this->innerType->getUses($namespace);
+		return $this->inner_type->getUses();
 	}
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		if (\is_a($this->innerType, ScalarType::class)) {
+		if (\is_a($this->inner_type, ScalarType::class)) {
 			return $value_expression;
 		}
-		$type_hint = $this->innerType->getArgumentHint();
+		$type_hint = $this->inner_type->getArgumentHint();
 		if ($type_hint) {
 			$type_hint .= ' ';
 		}
 		return ($this->nullable ? "$value_expression === null ? null : " : '')."\\array_map(static function ($type_hint\$x) {\n".
-			$indent."\t".'return '.$this->innerType->getSerializer('$x', $indent."\t").";\n".
+			$indent."\t".'return '.$this->inner_type->getSerializer('$x', $indent."\t").";\n".
 			$indent."}, $value_expression)";
 	}
 
 	public function getDeserializer(string $value_expression, string $indent) : string
 	{
 		return "$value_expression === null ? null : \\array_map(static function (\$x) {\n".
-			$indent."\t".'return '.$this->innerType->getDeserializer('$x', $indent."\t").";\n".
+			$indent."\t".'return '.$this->inner_type->getDeserializer('$x', $indent."\t").";\n".
 			$indent."}, $value_expression)";
 	}
 
@@ -49,7 +49,7 @@ class ArrayType implements TypeDef
 			$indent."\t\t\t"."return false;\n".
 			$indent."\t\t"."}\n".
 			$indent."\t\t"."\$v2 = \$arr2[\$i];\n".
-			$indent."\t\t"."\$v_eq = ".$this->innerType->getEqualizer('$v1', '$v2', $indent."\t\t").";\n".
+			$indent."\t\t"."\$v_eq = ".$this->inner_type->getEqualizer('$v1', '$v2', $indent."\t\t").";\n".
 			$indent."\t\t"."if (!\$v_eq) {\n".
 			$indent."\t\t\t"."return false;\n".
 			$indent."\t\t"."}\n".
@@ -74,7 +74,7 @@ class ArrayType implements TypeDef
 
 	public function getPhpDocHint() : string
 	{
-		$inner = $this->innerType->getPhpDocHint();
+		$inner = $this->inner_type->getPhpDocHint();
 		return \str_replace('|', '[]|', $inner).'[]'.($this->nullable ? '|null' : '');
 	}
 

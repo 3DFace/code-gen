@@ -6,39 +6,39 @@ namespace dface\CodeGen;
 class PhpFilesSpecSource implements \IteratorAggregate
 {
 
-	private string $baseNamespace;
-	private string $definitionsDir;
-	private string $relativeName;
+	private string $base_name_space;
+	private string $definitions_dir;
+	private string $relative_name;
 	/** @var TypeDef[] */
 	private array $types;
 
-	public function __construct(array $predefinedTypes, string $baseNamespace, string $definitionsDir, string $relativeName = '')
+	public function __construct(array $predefined_types, string $base_namespace, string $definitions_dir, string $relative_name = '')
 	{
-		$this->types = $predefinedTypes;
-		$this->baseNamespace = $baseNamespace;
-		$this->definitionsDir = $definitionsDir;
-		$this->relativeName = $relativeName;
+		$this->types = $predefined_types;
+		$this->base_name_space = $base_namespace;
+		$this->definitions_dir = $definitions_dir;
+		$this->relative_name = $relative_name;
 	}
 
 	public function getIterator() : \Generator
 	{
-		foreach ($this->walkDir($this->relativeName) as $name) {
+		foreach ($this->walkDir($this->relative_name) as $name) {
 			yield $name;
 		}
 	}
 
-	private function walkDir(string $relativeName) : iterable
+	private function walkDir(string $relative_name) : iterable
 	{
-		$d = \dir($this->definitionsDir.$relativeName);
+		$d = \dir($this->definitions_dir.$relative_name);
 		while (false !== ($entry = $d->read())) {
 			if (!\in_array($entry, ['.', '..'], true)) {
-				$fullName = $this->definitionsDir.$relativeName.'/'.$entry;
+				$fullName = $this->definitions_dir.$relative_name.'/'.$entry;
 				if (\is_dir($fullName)) {
-					foreach ($this->walkDir($relativeName.'/'.$entry) as $name) {
+					foreach ($this->walkDir($relative_name.'/'.$entry) as $name) {
 						yield $name;
 					}
 				} else {
-					foreach ($this->walkFile($relativeName.'/'.$entry) as $name) {
+					foreach ($this->walkFile($relative_name.'/'.$entry) as $name) {
 						yield $name;
 					}
 				}
@@ -48,41 +48,41 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		$d->close();
 	}
 
-	private function walkFile($relativeFilename) : iterable
+	private function walkFile($relative_file_name) : iterable
 	{
 		/** @var array[] $definitions */
-		$modified = \filemtime($this->definitionsDir.$relativeFilename);
+		$modified = \filemtime($this->definitions_dir.$relative_file_name);
 		/** @noinspection PhpIncludeInspection */
-		$definitions = include $this->definitionsDir.$relativeFilename;
+		$definitions = include $this->definitions_dir.$relative_file_name;
 		$deprecated = false;
-		$namespace = \trim($this->baseNamespace.\str_replace('/', '\\', \substr($relativeFilename, 0, -4)), '\\');
-		foreach ($definitions as $defName => $definition) {
-			$defPath = $relativeFilename.'/'.$defName;
-			$className = new ClassName($namespace.'\\'.$defName);
+		$namespace = \trim($this->base_name_space.\str_replace('/', '\\', \substr($relative_file_name, 0, -4)), '\\');
+		foreach ($definitions as $def_name => $definition_items) {
+			$defPath = $relative_file_name.'/'.$def_name;
+			$class_name = new ClassName($namespace.'\\'.$def_name);
 			$fields = [];
 			$interfaces = [];
 			$traits = [];
-			foreach ($definition as $name => $arr) {
+			foreach ($definition_items as $name => $dev_value) {
 				if ($name[0] !== '@') {
-					$fields[] = $this->createFieldDef($name, $arr, $defPath);
+					$fields[] = $this->createFieldDef($name, $dev_value, $defPath);
 				} else {
 					$optName = \substr($name, 1);
 					switch ($optName) {
 						case 'implements':
-							$interfaces = \is_array($arr) ? $arr : [$arr];
+							$interfaces = \is_array($dev_value) ? $dev_value : [$dev_value];
 							break;
 						case 'traits':
-							$traits = \is_array($arr) ? $arr : [$arr];
+							$traits = \is_array($dev_value) ? $dev_value : [$dev_value];
 							break;
 						case 'deprecated':
-							$deprecated = (bool)$arr;
+							$deprecated = (bool)$dev_value;
 							break;
 						default:
 							throw new \InvalidArgumentException("Unsupported option $optName");
 					}
 				}
 			}
-			yield new Specification($className, $fields, $interfaces, $traits, $deprecated, $modified);
+			yield new Specification($class_name, $fields, $interfaces, $traits, $deprecated, $modified);
 		}
 	}
 
@@ -141,14 +141,20 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		return $new_type;
 	}
 
-	private function createFieldDef(string $field_name, $arr, string $defPath) : FieldDef
+	private function createFieldDef(string $field_name, $def_value, string $def_path) : FieldDef
 	{
-		if (!\is_array($arr)) {
-			if (\is_string($arr) || $arr instanceof TypeDef) {
-				$arr = ['type' => $arr];
+		if($def_value instanceof FieldDef){
+			return $def_value;
+		}
+
+		if (!\is_array($def_value)) {
+			if (\is_string($def_value) || $def_value instanceof TypeDef) {
+				$arr = ['type' => $def_value];
 			} else {
-				throw new \InvalidArgumentException("Bad field definition type at $defPath->{$field_name}");
+				throw new \InvalidArgumentException("Bad field definition type at $def_path->{$field_name}");
 			}
+		}else{
+			$arr = $def_value;
 		}
 
 		$read_as = [$field_name];
@@ -192,7 +198,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			$type = $this->getType($type, $nullable);
 		}
 
-		return new FieldDef(
+		return new DefaultFieldDef(
 			$field_name,
 			$type,
 			$read_as,

@@ -6,7 +6,7 @@ namespace dface\CodeGen;
 class JsonType implements TypeDef
 {
 
-	private TypeDef $innerType;
+	private TypeDef $inner_type;
 	private int $encode_options;
 	private int $decode_options;
 	private bool $serialize_plain;
@@ -17,23 +17,23 @@ class JsonType implements TypeDef
 		int $decode_options = 0,
 		$serialize_plain = false
 	) {
-		$this->innerType = $innerType;
+		$this->inner_type = $innerType;
 		$this->encode_options = $encode_options;
 		$this->decode_options = $decode_options;
 		$this->serialize_plain = $serialize_plain;
 	}
 
-	public function getUses(string $namespace) : iterable
+	public function getUses() : iterable
 	{
-		return $this->innerType->getUses($namespace);
+		return $this->inner_type->getUses();
 	}
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
 		if ($this->serialize_plain) {
-			return $this->innerType->getSerializer($value_expression, $indent);
+			return $this->inner_type->getSerializer($value_expression, $indent);
 		}
-		$exp = $this->innerType->getSerializer('$val', $indent."\t");
+		$exp = $this->inner_type->getSerializer('$val', $indent."\t");
 		return "(static function (\$val) {\n".
 			$indent."\t"."try {\n".
 			$indent."\t\t"."\$x = $exp;\n".
@@ -52,23 +52,23 @@ class JsonType implements TypeDef
 			$indent."\t} catch (\Exception \$e) {\n".
 			$indent."\t\t"."throw new \\InvalidArgumentException(\$e->getMessage(), 0, \$e);\n".
 			$indent."\t}\n".
-			$indent."\t".'return '.$this->innerType->getDeserializer('$decoded', $indent."\t").";\n".
+			$indent."\t".'return '.$this->inner_type->getDeserializer('$decoded', $indent."\t").";\n".
 			$indent."})($value_expression)";
 	}
 
 	public function getEqualizer(string $exp1, string $exp2, string $indent) : string
 	{
-		return $this->innerType->getEqualizer($exp1, $exp2, $indent);
+		return $this->inner_type->getEqualizer($exp1, $exp2, $indent);
 	}
 
 	public function getArgumentHint() : string
 	{
-		return $this->innerType->getArgumentHint();
+		return $this->inner_type->getArgumentHint();
 	}
 
 	public function getPhpDocHint() : string
 	{
-		return $this->innerType->getPhpDocHint();
+		return $this->inner_type->getPhpDocHint();
 	}
 
 	public function createNullable() : TypeDef

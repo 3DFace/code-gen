@@ -5,13 +5,6 @@ namespace dface\CodeGen;
 class DateIntervalType implements TypeDef
 {
 
-	public static function getFactory() : callable
-	{
-		return static function ($nullable) {
-			return new self($nullable);
-		};
-	}
-
 	private bool $nullable;
 
 	public function __construct(bool $nullable = false)
@@ -19,7 +12,7 @@ class DateIntervalType implements TypeDef
 		$this->nullable = $nullable;
 	}
 
-	public function getUses(string $namespace) : array
+	public function getUses() : array
 	{
 		return [\DateInterval::class];
 	}
