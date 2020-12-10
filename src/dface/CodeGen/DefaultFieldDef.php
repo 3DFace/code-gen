@@ -115,7 +115,7 @@ class DefaultFieldDef implements FieldDef
 			$type_hint .= $type_hint !== '' ? ' ' : '';
 			$body .= $indent."/**\n";
 			$body .= $indent." * @param $doc_hint \$val\n";
-			$body .= $indent." * @return self\n";
+			$body .= $indent." * @return static\n";
 			$body .= $indent." */\n";
 			$body .= $indent.'public function set'.Utils::camelCase($property_name)."($type_hint\$val) : self {\n";
 			$body .= $indent."\t\$this->$property_name = \$val;\n";
@@ -136,7 +136,7 @@ class DefaultFieldDef implements FieldDef
 			$type_hint .= $type_hint !== '' ? ' ' : '';
 			$body .= $indent."/**\n";
 			$body .= $indent." * @param $doc_hint \$val\n";
-			$body .= $indent." * @return self\n";
+			$body .= $indent." * @return static\n";
 			$body .= $indent." */\n";
 			$body .= $indent.'public function with'.Utils::camelCase($property_name)."($type_hint\$val) : self {\n";
 			$body .= $indent."\t\$clone = clone \$this;\n";

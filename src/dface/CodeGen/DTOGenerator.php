@@ -119,11 +119,9 @@ class DTOGenerator
 
 	private function generateImplements(Specification $spec) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
 		foreach ($spec->getInterfaces() as $i) {
-			$full_type = self::fullTypeName($namespace, $i);
-			$class_name = new ClassName($full_type);
+			$class_name = new ClassName($i);
 			$i_name = \ltrim($class_name->getShortName(), '\\');
 			$arr[$i_name] = $i_name;
 		}
@@ -132,11 +130,9 @@ class DTOGenerator
 
 	private function generateTraits(Specification $spec) : string
 	{
-		$namespace = $spec->getClassName()->getNamespace();
 		$arr = [];
 		foreach ($spec->getTraits() as $i) {
-			$full_type = self::fullTypeName($namespace, $i);
-			$class_name = new ClassName($full_type);
+			$class_name = new ClassName($i);
 			$t_name = \ltrim($class_name->getShortName(), '\\');
 			$arr[$t_name] = $t_name;
 		}
@@ -148,7 +144,7 @@ class DTOGenerator
 		$fields = $spec->getFields();
 		$body = "\t/**\n";
 		$body .= "\t * @param object|array \$data\n";
-		$body .= "\t * @return self\n";
+		$body .= "\t * @return static\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
 		$body .= "\t"."public static function deserialize(\$data) : self {\n";
@@ -179,11 +175,11 @@ class DTOGenerator
 	{
 		$fields = $spec->getFields();
 		$body = "\t/**\n";
-		$body .= "\t * @param mixed \$x\n";
+		$body .= "\t * @param self|null \$x\n";
 		$body .= "\t * @return bool\n";
 		$body .= "\t */\n";
-		$body .= "\t"."public function equals(\$x) : bool {\n\n";
-		$body .= "\t\t".'return $x instanceof static';
+		$body .= "\t"."public function equals(?self \$x) : bool {\n\n";
+		$body .= "\t\t".'return $x !== null';
 
 		foreach ($fields as $field) {
 			$body .= "\n\n\t\t\t&& ".$field->makeEqualsFragment('$x', "\t\t\t");
@@ -204,7 +200,10 @@ class DTOGenerator
 
 	private function generateWashed() : string
 	{
-		$body = "\t"."public function washed() : self {\n";
+		$body = "\t/**\n";
+		$body .= "\t * @return static\n";
+		$body .= "\t */\n";
+		$body .= "\t"."public function washed() : self {\n";
 		$body .= "\t\t".'$x = clone $this;'."\n";
 		$body .= "\t\t".'$x->_dirty = false;'."\n";
 		$body .= "\t\t".'return $x;'."\n";
@@ -301,11 +300,6 @@ class DTOGenerator
 			$body .= $field->makeWither("\t");
 		}
 		return $body;
-	}
-
-	private static function fullTypeName(string $namespace, string $type_name) : string
-	{
-		return \strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
 	}
 
 }
