@@ -1,5 +1,4 @@
 <?php
-/* author: Ponomarev Denis <ponomarev@gmail.com> */
 
 namespace BaseNamespace\Namespace1;
 
