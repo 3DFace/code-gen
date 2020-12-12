@@ -54,6 +54,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		/** @noinspection PhpIncludeInspection */
 		$definitions = include $this->definitions_dir.$relative_file_name;
 		$deprecated = false;
+		$final = true;
 		$namespace = \trim($this->base_name_space.\str_replace('/', '\\', \substr($relative_file_name, 0, -4)), '\\');
 		foreach ($definitions as $def_name => $definition_items) {
 			$defPath = $relative_file_name.'/'.$def_name;
@@ -76,12 +77,15 @@ class PhpFilesSpecSource implements \IteratorAggregate
 						case 'deprecated':
 							$deprecated = (bool)$dev_value;
 							break;
+						case 'final':
+							$final = (bool)$dev_value;
+							break;
 						default:
 							throw new \InvalidArgumentException("Unsupported option $optName");
 					}
 				}
 			}
-			yield new Specification($class_name, $fields, $interfaces, $traits, $deprecated, $modified);
+			yield new Specification($class_name, $fields, $interfaces, $traits, $deprecated, $final, $modified);
 		}
 	}
 
@@ -142,7 +146,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 
 	private function createFieldDef(string $field_name, $def_value, string $def_path) : FieldDef
 	{
-		if($def_value instanceof FieldDef){
+		if ($def_value instanceof FieldDef) {
 			return $def_value;
 		}
 
@@ -152,7 +156,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			} else {
 				throw new \InvalidArgumentException("Bad field definition type at $def_path->{$field_name}");
 			}
-		}else{
+		} else {
 			$arr = $def_value;
 		}
 

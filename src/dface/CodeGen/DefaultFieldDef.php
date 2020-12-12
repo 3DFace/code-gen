@@ -104,9 +104,10 @@ class DefaultFieldDef implements FieldDef
 		return $body;
 	}
 
-	public function makeSetter(string $indent) : string
+	public function makeSetter(string $indent, bool $is_final) : string
 	{
 		$property_name = $this->name;
+		$return = $is_final ? 'self' : 'static';
 		$body = '';
 		if ($this->setter) {
 			$type_hint = $this->type->getArgumentHint();
@@ -114,7 +115,7 @@ class DefaultFieldDef implements FieldDef
 			$type_hint .= $type_hint !== '' ? ' ' : '';
 			$body .= $indent."/**\n";
 			$body .= $indent." * @param $doc_hint \$val\n";
-			$body .= $indent." * @return static\n";
+			$body .= $indent." * @return $return\n";
 			$body .= $indent." */\n";
 			$body .= $indent.'public function set'.Utils::camelCase($property_name)."($type_hint\$val) : self {\n";
 			$body .= $indent."\t\$this->$property_name = \$val;\n";
@@ -125,9 +126,10 @@ class DefaultFieldDef implements FieldDef
 		return $body;
 	}
 
-	public function makeWither(string $indent) : string
+	public function makeWither(string $indent, bool $is_final) : string
 	{
 		$property_name = $this->name;
+		$return = $is_final ? 'self' : 'static';
 		$body = '';
 		if ($this->wither) {
 			$doc_hint = $this->type->getPhpDocHint();
@@ -135,7 +137,7 @@ class DefaultFieldDef implements FieldDef
 			$type_hint .= $type_hint !== '' ? ' ' : '';
 			$body .= $indent."/**\n";
 			$body .= $indent." * @param $doc_hint \$val\n";
-			$body .= $indent." * @return static\n";
+			$body .= $indent." * @return $return\n";
 			$body .= $indent." */\n";
 			$body .= $indent.'public function with'.Utils::camelCase($property_name)."($type_hint\$val) : self {\n";
 			$body .= $indent."\t\$clone = clone \$this;\n";

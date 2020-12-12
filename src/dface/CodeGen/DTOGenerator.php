@@ -59,10 +59,13 @@ class DTOGenerator
 		}
 		$body .= ($uses = $this->generateUses($spec)).($uses ? "\n" : '');
 		$imp = $this->generateImplements($spec);
-		if ($spec->getDeprecated()) {
+		if ($spec->isDeprecated()) {
 			$body .= "/**\n";
 			$body .= " * @deprecated\n";
 			$body .= " */\n";
+		}
+		if ($spec->isFinal()) {
+			$body .= 'final ';
 		}
 		$body .= 'class '.$spec->getClassName()->getShortName()." implements JsonSerializable$imp {\n\n";
 		$body .= $this->generateTraits($spec);
@@ -75,7 +78,7 @@ class DTOGenerator
 		$body .= $this->generateDeserializerMethod($spec);
 		$body .= $this->generateEqualizerMethod($spec);
 		$body .= $this->generateIsDirty();
-		$body .= $this->generateWashed();
+		$body .= $this->generateWashed($spec);
 		$body .= "}\n";
 		return $body;
 	}
@@ -140,10 +143,11 @@ class DTOGenerator
 
 	private function generateDeserializerMethod(Specification $spec) : string
 	{
+		$return = $spec->isFinal() ? 'self' : 'static';
 		$fields = $spec->getFields();
 		$body = "\t/**\n";
 		$body .= "\t * @param object|array \$data\n";
-		$body .= "\t * @return static\n";
+		$body .= "\t * @return $return\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
 		$body .= "\t"."public static function deserialize(\$data) : self {\n";
@@ -151,7 +155,7 @@ class DTOGenerator
 			$body .= "\t\t"."if (!\is_array(\$data) && !\is_object(\$data)) {\n";
 			$body .= "\t\t\t"."throw new \InvalidArgumentException('Array or object expected');\n";
 			$body .= "\t\t"."}\n";
-			$body .= "\t\t"."return new static();\n";
+			$body .= "\t\t"."return new $return();\n";
 			$body .= "\t}\n";
 			return $body;
 		}
@@ -165,7 +169,7 @@ class DTOGenerator
 		} else {
 			$args_str = \implode(', ', $constructor_args);
 		}
-		$body .= "\t\t".'return new static('.$args_str.");\n";
+		$body .= "\t\t".'return new '.$return.'('.$args_str.");\n";
 		$body .= "\t}\n\n";
 		return $body;
 	}
@@ -197,10 +201,11 @@ class DTOGenerator
 		return $body;
 	}
 
-	private function generateWashed() : string
+	private function generateWashed(Specification $spec) : string
 	{
+		$return = $spec->isFinal() ? 'self' : 'static';
 		$body = "\t/**\n";
-		$body .= "\t * @return static\n";
+		$body .= "\t * @return $return\n";
 		$body .= "\t */\n";
 		$body .= "\t"."public function washed() : self {\n";
 		$body .= "\t\t".'$x = clone $this;'."\n";
@@ -287,7 +292,7 @@ class DTOGenerator
 	{
 		$body = '';
 		foreach ($spec->getFields() as $field) {
-			$body .= $field->makeSetter("\t");
+			$body .= $field->makeSetter("\t", $spec->isFinal());
 		}
 		return $body;
 	}
@@ -296,7 +301,7 @@ class DTOGenerator
 	{
 		$body = '';
 		foreach ($spec->getFields() as $field) {
-			$body .= $field->makeWither("\t");
+			$body .= $field->makeWither("\t", $spec->isFinal());
 		}
 		return $body;
 	}

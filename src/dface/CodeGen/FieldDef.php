@@ -13,9 +13,9 @@ interface FieldDef
 
 	public function makeGetter(string $indent) : string;
 
-	public function makeSetter(string $indent) : string;
+	public function makeSetter(string $indent, bool $is_final) : string;
 
-	public function makeWither(string $indent) : string;
+	public function makeWither(string $indent, bool $is_final) : string;
 
 	public function makeSerializerFragment(
 		string $array_l_value,
