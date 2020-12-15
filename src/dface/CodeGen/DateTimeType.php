@@ -41,7 +41,7 @@ class DateTimeType implements TypeDef
 		if (!$this->nullable) {
 			return $not_null;
 		}
-		return "(($exp1 === null && $exp2 === null)\n".
+		return "(($exp1 === $exp2)\n".
 			"$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null))";
 	}
 

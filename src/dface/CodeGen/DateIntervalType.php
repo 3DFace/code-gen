@@ -67,7 +67,7 @@ class DateIntervalType implements TypeDef
 			return \implode("\n$indent && ", $pairs);
 		}
 		$not_null_str = \implode("\n\t\t$indent&& ", $pairs);
-		return "(($exp1 === null && $exp2 === null)\n$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null_str))";
+		return "(($exp1 === $exp2)\n$indent\t|| ($exp1 !== null && $exp2 !== null\n$indent\t\t&& $not_null_str))";
 	}
 
 	public function getArgumentHint() : string
