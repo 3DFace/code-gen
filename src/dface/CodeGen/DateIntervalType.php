@@ -82,6 +82,9 @@ class DateIntervalType implements TypeDef
 
 	public function createNullable() : TypeDef
 	{
+		if ($this->nullable) {
+			return $this;
+		}
 		$x = clone $this;
 		$x->nullable = true;
 		return $x;

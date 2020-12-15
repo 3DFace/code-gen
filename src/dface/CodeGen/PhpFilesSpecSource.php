@@ -197,7 +197,11 @@ class PhpFilesSpecSource implements \IteratorAggregate
 
 		$nullable = $arr['null'] ?? ($default && ($default->getCode() === 'null'));
 		$type = $arr['type'];
-		if (!$type instanceof TypeDef) {
+		if ($type instanceof TypeDef) {
+			if ($nullable) {
+				$type = $type->createNullable();
+			}
+		} else {
 			$type = $this->getType($type, $nullable);
 		}
 

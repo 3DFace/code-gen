@@ -72,7 +72,10 @@ class JsonType implements TypeDef
 
 	public function createNullable() : TypeDef
 	{
-		throw new \LogicException(self::class.' can not be nullable');
+		$inner = $this->inner_type->createNullable();
+		$x = clone $this;
+		$x->inner_type = $inner;
+		return $x;
 	}
 
 }
