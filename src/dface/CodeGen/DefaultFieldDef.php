@@ -140,6 +140,9 @@ class DefaultFieldDef implements FieldDef
 			$body .= $indent." * @return $return\n";
 			$body .= $indent." */\n";
 			$body .= $indent.'public function with'.Utils::camelCase($property_name)."($type_hint\$val) : self {\n";
+			$body .= $indent."\tif (\$this->$property_name === \$val) {\n";
+			$body .= $indent."\t\t"."return \$this;\n";
+			$body .= $indent."\t}\n";
 			$body .= $indent."\t\$clone = clone \$this;\n";
 			$body .= $indent."\t\$clone->$property_name = \$val;\n";
 			$body .= $indent."\t\$clone->_dirty = true;\n";
