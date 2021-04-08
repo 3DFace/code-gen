@@ -77,7 +77,7 @@ class DTOGenerator
 		$body .= $this->generateSerializerMethod($spec);
 		$body .= $this->generateDeserializerMethod($spec);
 		$body .= $this->generateEqualizerMethod($spec);
-		$body .= $this->generateIsDirty();
+		$body .= $this->generateIsDirty($spec);
 		$body .= $this->generateWashed($spec);
 		$body .= "}\n";
 		return $body;
@@ -193,8 +193,11 @@ class DTOGenerator
 		return $body;
 	}
 
-	private function generateIsDirty() : string
+	private function generateIsDirty(Specification $spec) : string
 	{
+		if(!$spec->getFields()){
+			return '';
+		}
 		$body = "\t"."public function isDirty() : bool {\n";
 		$body .= "\t\t".'return $this->_dirty;'."\n";
 		$body .= "\t}\n\n";
@@ -203,11 +206,17 @@ class DTOGenerator
 
 	private function generateWashed(Specification $spec) : string
 	{
+		if(!$spec->getFields()){
+			return '';
+		}
 		$return = $spec->isFinal() ? 'self' : 'static';
 		$body = "\t/**\n";
 		$body .= "\t * @return $return\n";
 		$body .= "\t */\n";
 		$body .= "\t"."public function washed() : self {\n";
+		$body .= "\t\t".'if (!$this->_dirty) {'."\n";
+		$body .= "\t\t\t".'return $this;'."\n";
+		$body .= "\t\t}\n";
 		$body .= "\t\t".'$x = clone $this;'."\n";
 		$body .= "\t\t".'$x->_dirty = false;'."\n";
 		$body .= "\t\t".'return $x;'."\n";
@@ -249,7 +258,9 @@ class DTOGenerator
 		foreach ($spec->getFields() as $field) {
 			$body .= $field->makeField("\t", $this->fields_visibility);
 		}
-		$body .= "\t".$this->fields_visibility." bool \$_dirty = false;\n";
+		if($body) {
+			$body .= "\t".$this->fields_visibility." bool \$_dirty = false;\n";
+		}
 		return $body ? $body."\n" : '';
 	}
 
