@@ -47,6 +47,7 @@ $x1 = new SomeClass(
 	['a' => new Value('1'), 'b' => new Value('2'), 's' => new Value('3')],
 	new Value('x'),
 	new Value(2),
+	'nullable',
 	null,
 	[new Union1('qaz', 'gaga'), new Union2('qaz')],
 	new \DateInterval('P1M1DT10H'));

@@ -195,13 +195,28 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			$empty = new DefaultDef($arr['empty_code'], false);
 		}
 
-		$nullable = $arr['null'] ?? ($default && ($default->getCode() === 'null'));
+
 		$type = $arr['type'];
 		if ($type instanceof TypeDef) {
+			$nullable = $arr['null'] ?? ($default && ($default->getCode() === 'null'));
 			if ($nullable) {
 				$type = $type->createNullable();
 			}
 		} else {
+			$nullable = null;
+			if(\strpos($type, '?') === 0){
+				$nullable = true;
+				$type = \substr($type, 1);
+			}
+			if(isset($arr['null'])){
+				if($nullable !== null && $arr['null'] !== $nullable){
+					throw new \InvalidArgumentException("Nullability of '$field_name' is ambiguous");
+				}
+				$nullable = $arr['null'];
+			}
+			if($nullable === null){
+				$nullable = $default && ($default->getCode() === 'null');
+			}
 			$type = $this->getType($type, $nullable);
 		}
 

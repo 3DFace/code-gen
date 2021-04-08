@@ -22,6 +22,7 @@ return [
 		'field5' => ['type' => new UnionType([
 			Value::class => 1,
 		]), 'with' => 1],
+		'field50' => '?string',
 		'field51' => ['type' => 'union', 'with' => true],
 		'field6' => ['type' => 'union[]', 'default' => []],
 		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
@@ -34,7 +35,7 @@ return [
 	],
 
 	'Value' => [
-		'val' => ['type' => 'string', 'get' => false, 'null' => true, 'empty' => null, 'field_visibility' => 'public'],
+		'val' => ['type' => '?string', 'get' => false, 'empty' => null, 'field_visibility' => 'public'],
 	],
 
 	'TagType' => [
