@@ -232,7 +232,7 @@ class DTOGenerator
 	private function generateSerializerMethod(Specification $spec) : string
 	{
 		$body = "\t/**\n";
-		$body .= "\t * @return mixed\n";
+		$body .= "\t * @return array|\stdClass\n";
 		$body .= "\t */\n";
 		$body .= "\t"."public function jsonSerialize()";
 		$fields = $spec->getFields();
@@ -242,7 +242,7 @@ class DTOGenerator
 			$body .= "\t}\n";
 			return $body;
 		}
-		$body .= " : array {\n";
+		$body .= " {\n";
 		$body .= "\n\t\t"."\$result = [];\n\n";
 		foreach ($fields as $field) {
 			$body .= $field->makeSerializerFragment('$result', "\t\t");
