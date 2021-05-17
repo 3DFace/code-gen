@@ -89,11 +89,6 @@ class PhpFilesSpecSource implements \IteratorAggregate
 		}
 	}
 
-	/**
-	 * @param $type_name
-	 * @param bool $nullable
-	 * @return TypeDef
-	 */
 	private function getType(string $type_name, bool $nullable) : TypeDef
 	{
 		$key_name = $type_name;
@@ -154,7 +149,7 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			if (\is_string($def_value) || $def_value instanceof TypeDef) {
 				$arr = ['type' => $def_value];
 			} else {
-				throw new \InvalidArgumentException("Bad field definition type at $def_path->{$field_name}");
+				throw new \InvalidArgumentException("Bad field definition type at $def_path->$field_name");
 			}
 		} else {
 			$arr = $def_value;

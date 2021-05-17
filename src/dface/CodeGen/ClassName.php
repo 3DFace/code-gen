@@ -12,7 +12,7 @@ class ClassName
 	public function __construct(string $fullName)
 	{
 		$parts = \preg_split("|\\\\|", $fullName, -1, PREG_SPLIT_NO_EMPTY);
-		$this->short_name = \array_pop($parts);
+		$this->short_name = (string)\array_pop($parts);
 		$this->namespace = \implode("\\", $parts);
 		$this->full_name = $this->namespace.'\\'.$this->short_name;
 	}

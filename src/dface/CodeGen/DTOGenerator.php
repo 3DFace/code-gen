@@ -247,7 +247,7 @@ class DTOGenerator
 		foreach ($fields as $field) {
 			$body .= $field->makeSerializerFragment('$result', "\t\t");
 		}
-		$body .= "\t\t"."return \$result;\n";
+		$body .= "\t\t"."return \$result ?: new \stdClass();\n";
 		$body .= "\t}\n\n";
 		return $body;
 	}
@@ -271,7 +271,7 @@ class DTOGenerator
 		$constructor_body = '';
 		$constructor_doc = [];
 		$fields_arr = $spec->getFields();
-		foreach ($fields_arr as $i => $field) {
+		foreach ($fields_arr as $field) {
 			$constructor_body .= $field->makeConstructorFragment("\t\t", $constructor_doc, $constructor_params);
 		}
 		if (\count($constructor_params) > 3) {
