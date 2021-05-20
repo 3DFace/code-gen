@@ -176,24 +176,17 @@ class PhpFilesSpecSource implements \IteratorAggregate
 
 		$default = null;
 		if (\array_key_exists('default', $arr)) {
-			$default = DefaultDef::fromValue($arr['default']);
-		}
-		if (\array_key_exists('default_code', $arr)) {
-			$default = new DefaultDef($arr['default_code'], false);
+			$default = new DefaultDef($arr['default']);
 		}
 
 		$empty = null;
 		if (\array_key_exists('empty', $arr)) {
-			$empty = DefaultDef::fromValue($arr['empty']);
+			$empty = new DefaultDef($arr['empty']);
 		}
-		if (\array_key_exists('empty_code', $arr)) {
-			$empty = new DefaultDef($arr['empty_code'], false);
-		}
-
 
 		$type = $arr['type'];
 		if ($type instanceof TypeDef) {
-			$nullable = $arr['null'] ?? ($default && ($default->getCode() === 'null'));
+			$nullable = $arr['null'] ?? ($default && ($default->getValue() === null));
 			if ($nullable) {
 				$type = $type->createNullable();
 			}
@@ -209,8 +202,8 @@ class PhpFilesSpecSource implements \IteratorAggregate
 				}
 				$nullable = $arr['null'];
 			}
-			if($nullable === null){
-				$nullable = $default && ($default->getCode() === 'null');
+			if($nullable === null) {
+				$nullable = $default && ($default->getValue() === null);
 			}
 			$type = $this->getType($type, $nullable);
 		}

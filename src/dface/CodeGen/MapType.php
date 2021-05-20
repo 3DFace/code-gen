@@ -93,4 +93,53 @@ class MapType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		/** @var array $value */
+		if ($value === null) {
+			return 'null';
+		}
+		if ($value === []) {
+			return Utils::varExport($value, $indent);
+		}
+		$pairs = [];
+		foreach ($value as $k => $v) {
+			$pairs[] = Utils::varExport($k).' => '.$this->inner_type->varExport($v, $indent."\t");
+		}
+		return "[\n$indent\t".\implode(",\n$indent\t", $pairs).",\n$indent]";
+	}
+
+	/**
+	 * @param array|null $value
+	 * @return bool
+	 */
+	public function isDefaultInlineable($value) : bool
+	{
+		if ($value === null) {
+			return true;
+		}
+		foreach ($value as $item) {
+			if (!$this->inner_type->isDefaultInlineable($item)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @param null|array $value
+	 * @return null|array
+	 */
+	public function serialize($value) : ?array
+	{
+		if ($value === null) {
+			return null;
+		}
+		$map = [];
+		foreach ($value as $k => $v) {
+			$map[$k] = $this->inner_type->serialize($v);
+		}
+		return $map;
+	}
+
 }

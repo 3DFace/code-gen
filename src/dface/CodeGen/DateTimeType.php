@@ -65,4 +65,32 @@ class DateTimeType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		if ($value === null) {
+			return 'null';
+		}
+		/** @var $value \DateTimeImmutable */
+		$str = $value->format($this->serialize_format);
+		$exported = Utils::varExport($str, $indent);
+		return "new DateTimeImmutable($exported)";
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $value === null;
+	}
+
+	/**
+	 * @param null|\DateTimeImmutable $value
+	 * @return null|string
+	 */
+	public function serialize($value) : ?string
+	{
+		if ($value === null) {
+			return null;
+		}
+		return $value->format($this->serialize_format);
+	}
+
 }

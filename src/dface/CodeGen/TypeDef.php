@@ -50,4 +50,14 @@ interface TypeDef
 
 	public function createNullable() : self;
 
+	public function varExport($value, string $indent) : string;
+
+	public function isDefaultInlineable($value) : bool;
+
+	/**
+	 * @param mixed $value typed value
+	 * @return mixed plain value
+	 */
+	public function serialize($value);
+
 }

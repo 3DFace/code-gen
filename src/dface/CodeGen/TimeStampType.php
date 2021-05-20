@@ -63,4 +63,31 @@ class TimeStampType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		if ($value === null) {
+			return 'null';
+		}
+		/** @var $value \DateTimeImmutable */
+		$ts = $value->getTimestamp();
+		return "(new DateTimeImmutable())->setTimestamp($ts)";
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $value === null;
+	}
+
+	/**
+	 * @param null|\DateTimeImmutable $value
+	 * @return null|string
+	 */
+	public function serialize($value) : ?string
+	{
+		if ($value === null) {
+			return null;
+		}
+		return $value->getTimestamp();
+	}
+
 }

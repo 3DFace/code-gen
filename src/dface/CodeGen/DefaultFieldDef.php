@@ -39,7 +39,10 @@ class DefaultFieldDef implements FieldDef
 		$this->read_as = $read_as;
 		$this->write_as = $write_as;
 		$this->constructor_default = $constructor_default;
-		$this->serialized_default = $serialized_default ?? $constructor_default;
+		$this->serialized_default = $serialized_default;
+		if ($serialized_default === null && $constructor_default !== null) {
+			$this->serialized_default = new DefaultDef($this->type->serialize($constructor_default->getValue()));
+		}
 		$this->wither = $wither;
 		$this->setter = $setter;
 		$this->getter = $getter;
@@ -65,15 +68,15 @@ class DefaultFieldDef implements FieldDef
 		$inline_def = '';
 		$right_val = "\$$property_name";
 		if ($default !== null) {
-			if ($default->isEmbeddable()) {
-				$def_code = \str_replace("\n", "\n".$indent, $default->getCode());
+			$def_val = $default->getValue();
+			$def_code = $this->type->varExport($def_val, $indent);
+			if ($this->type->isDefaultInlineable($def_val)) {
 				$inline_def = ' = '.$def_code;
 			} else {
 				$inline_def = ' = '.'null';
 				$arg_type = $arg_type->createNullable();
-				$def_code = $default->getCode();
 				$property_info = ' <code>?? '.\str_replace("\n", " ", $def_code).'</code>';
-				$right_val = "$right_val ?? ".\str_replace("\n", "\n".$indent, $def_code);
+				$right_val = "$right_val ?? ".$def_code;
 			}
 		}
 		$doc_hint = $arg_type->getPhpDocHint();
@@ -156,7 +159,7 @@ class DefaultFieldDef implements FieldDef
 	{
 		$property_name = $this->name;
 		$prop = '$this->'.$property_name;
-		$s_indent = '';
+
 		$body = '';
 		if ($this->silent) {
 			$s_indent = "\t";
@@ -164,21 +167,38 @@ class DefaultFieldDef implements FieldDef
 			if ($def === null) {
 				throw new \InvalidArgumentException("Field '$property_name' need 'empty' or 'default' definition to be 'silent'");
 			}
-			$def_exp = $def->getCode();
-			$body .= $indent."if ($prop !== $def_exp) {\n";
+			$serializer = $this->type->getSerializer($prop, $indent.$s_indent);
+			$ser_var = '$_ser_'.$property_name;
+			$body .= $indent.$ser_var.' = '.$serializer.";\n";
+			$def_exp = Utils::varExport($def->getValue(), $indent);
+			$body .= $indent."if ($ser_var !== $def_exp) {\n";
+			$serializer = $ser_var;
+		} else {
+			$s_indent = '';
+			$serializer = $this->type->getSerializer($prop, $indent);
 		}
+
 		if ($this->merged) {
 			$merge_name = '$merge_'.$property_name;
-			$body .= $indent.$s_indent."$merge_name = ".$this->type->getSerializer($prop, $indent.$s_indent).";\n";
+			$body .= $indent.$s_indent."$merge_name = ".$serializer.";\n";
 			$body .= $indent.$s_indent."if ($merge_name) {\n";
 			$body .= $indent.$s_indent."\t"."foreach ($merge_name as \$k => \$v) {\n";
 			$body .= $indent.$s_indent."\t\t".$array_l_value.'[$k] = $v;'."\n";
 			$body .= $indent.$s_indent."\t}\n";
 			$body .= $indent.$s_indent."}\n";
+		} elseif (\count($this->write_as) === 1) {
+			$target_name = $this->write_as[0];
+			$target = $array_l_value."['$target_name']";
+			$body .= $indent.$s_indent.$target.' = '.$serializer.";\n";
 		} else {
+			if (!$this->silent) {
+				$ser_var = '$_ser_'.$property_name;
+				$body .= $indent.$ser_var.' = '.$serializer.";\n";
+				$serializer = $ser_var;
+			}
 			foreach ($this->write_as as $target_name) {
 				$target = $array_l_value."['$target_name']";
-				$body .= $indent.$s_indent.$target.' = '.$this->type->getSerializer($prop, $indent.$s_indent).";\n";
+				$body .= $indent.$s_indent.$target.' = '.$serializer.";\n";
 			}
 		}
 		if ($this->silent) {
@@ -198,13 +218,14 @@ class DefaultFieldDef implements FieldDef
 		} else {
 			$default = $this->serialized_default;
 			$read_as = $this->read_as;
-			if ($default !== null && $default->getCode() === 'null' && \count($read_as) === 1) {
+			if ($default !== null && $default->getValue() === null && \count($read_as) === 1) {
 				$alias = $read_as[0];
 				$body .= $indent."\$$property_name = \$arr['$alias'] ?? null;\n";
 			} else {
 				if ($default !== null) {
-					$exported_ser_def = \str_replace("\n", "\n".$indent, $default->getCode());
-					$body .= $indent."\$$property_name = ".$exported_ser_def.";\n";
+					$def_val = $default->getValue();
+					$def_code = Utils::varExport($def_val, $indent);
+					$body .= $indent."\$$property_name = ".$def_code.";\n";
 				}
 				$first = true;
 				foreach ($read_as as $alias) {

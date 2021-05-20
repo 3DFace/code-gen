@@ -67,4 +67,31 @@ class DynamicTypeDef implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		if ($value === null) {
+			return 'null';
+		}
+		$arr = $value->jsonSerialize();
+		$exported = Utils::varExport($arr, $indent);
+		return $this->class_name->getShortName()."::deserialize($exported)";
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $value === null;
+	}
+
+	/**
+	 * @param null|object $value
+	 * @return null|string
+	 */
+	public function serialize($value) : ?string
+	{
+		if ($value === null) {
+			return null;
+		}
+		return $value->jsonSerialize();
+	}
+
 }

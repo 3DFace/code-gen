@@ -87,4 +87,50 @@ class ArrayType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		/** @var array $value */
+		if ($value === null) {
+			return 'null';
+		}
+		if ($value === []) {
+			return Utils::varExport($value, $indent);
+		}
+		$exported = \array_map(function ($val) use ($indent) {
+			return $this->inner_type->varExport($val, $indent."\t");
+		}, $value);
+		return "[\n$indent\t".\implode(",\n$indent\t", $exported).",\n$indent]";
+	}
+
+	/**
+	 * @param array|null $value
+	 * @return bool
+	 */
+	public function isDefaultInlineable($value) : bool
+	{
+		if ($value === null) {
+			return true;
+		}
+		foreach ($value as $item) {
+			if (!$this->inner_type->isDefaultInlineable($item)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @param null|array $value
+	 * @return null|array
+	 */
+	public function serialize($value) : ?array
+	{
+		if ($value === null) {
+			return null;
+		}
+		return \array_map(function ($x) {
+			return $this->inner_type->serialize($x);
+		}, $value);
+	}
+
 }

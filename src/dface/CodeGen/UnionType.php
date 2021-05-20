@@ -119,4 +119,37 @@ class UnionType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		if ($value === null) {
+			return 'null';
+		}
+		foreach ($this->types as [$type_def]) {
+			/** @var DynamicTypeDef $type_def */
+			if (\is_a($value, $type_def->getClassName()->getFullName())) {
+				return $type_def->varExport($value, $indent);
+			}
+		}
+		throw new \InvalidArgumentException('Bad union type instance');
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $value === null;
+	}
+
+	public function serialize($value)
+	{
+		if ($value === null) {
+			return null;
+		}
+		foreach ($this->types as [$type_def]) {
+			/** @var DynamicTypeDef $type_def */
+			if (\is_a($value, $type_def->getClassName()->getFullName())) {
+				return $type_def->serialize($value);
+			}
+		}
+		throw new \InvalidArgumentException('Bad union type instance');
+	}
+
 }

@@ -5,52 +5,17 @@ namespace dface\CodeGen;
 class DefaultDef
 {
 
-	private string $code;
-	private bool $embeddable;
+	/** @var mixed */
+	private $value;
 
-	public function __construct(string $code, bool $embeddable)
+	public function __construct($value)
 	{
-		$this->code = $code;
-		$this->embeddable = $embeddable;
-	}
-
-	public function getCode() : string
-	{
-		return $this->code;
+		$this->value = $value;
 	}
 
 	public function getValue()
 	{
-		/** @noinspection PhpUnreachableStatementInspection */
-		return eval("return $this->code;");
-	}
-
-	public function isEmbeddable() : bool
-	{
-		return $this->embeddable;
-	}
-
-	public static function fromValue($value) : self
-	{
-		$code = self::varExport($value);
-		$embeddable = self::isScalarStruct($value);
-		return new self($code, $embeddable);
-	}
-
-	private static function isScalarStruct($var) : bool
-	{
-		return $var === null || $var === [] || \is_scalar($var);
-	}
-
-	private static function varExport($var) : string
-	{
-		if ($var === null) {
-			return 'null';
-		}
-		if ($var === []) {
-			return '[]';
-		}
-		return \var_export($var, true);
+		return $this->value;
 	}
 
 }

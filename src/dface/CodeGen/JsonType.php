@@ -78,4 +78,19 @@ class JsonType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		return $this->inner_type->varExport($value, $indent);
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $this->inner_type->isDefaultInlineable($value);
+	}
+
+	public function serialize($value)
+	{
+		return $this->inner_type->serialize($value);
+	}
+
 }

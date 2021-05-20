@@ -54,4 +54,19 @@ class ScalarType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		return Utils::varExport($value, $indent);
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return true;
+	}
+
+	public function serialize($value)
+	{
+		return $value;
+	}
+
 }

@@ -18,4 +18,19 @@ class Utils
 		return \strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
 	}
 
+	public static function varExport($var, $indent = '') : string
+	{
+		if ($var === null) {
+			return 'null';
+		}
+		if ($var === []) {
+			return '[]';
+		}
+		$exported = \var_export($var, true);
+		if (\is_scalar($var)) {
+			return $exported;
+		}
+		return \str_replace("\n", "\n".$indent, $exported);
+	}
+
 }

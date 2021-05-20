@@ -40,4 +40,19 @@ class MixedType implements TypeDef
 		return $this;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		return Utils::varExport($value, $indent);
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return \is_scalar($value) || $value === null || $value === [];
+	}
+
+	public function serialize($value)
+	{
+		return $value;
+	}
+
 }

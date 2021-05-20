@@ -90,4 +90,59 @@ class DateIntervalType implements TypeDef
 		return $x;
 	}
 
+	public function varExport($value, string $indent) : string
+	{
+		if ($value === null) {
+			return 'null';
+		}
+		/** @var $value \DateInterval */
+		$str = self::intervalToString($value);
+		$exported = Utils::varExport($str, $indent);
+		return "new DateInterval($exported)";
+	}
+
+	private static function intervalToString(\DateInterval $x) : string
+	{
+		$str = '';
+		if ($x->y) {
+			$str .= $x->y.'Y';
+		}
+		if ($x->m) {
+			$str .= $x->m.'M';
+		}
+		if ($x->d) {
+			$str .= $x->d.'D';
+		}
+		if ($x->h || $x->i || $x->s) {
+			$str .= 'T';
+			if ($x->h) {
+				$str .= $x->h.'H';
+			}
+			if ($x->i) {
+				$str .= $x->i.'M';
+			}
+			if ($x->s) {
+				$str .= $x->s.'S';
+			}
+		}
+		return 'P'.($str ?: 'T0S');
+	}
+
+	public function isDefaultInlineable($value) : bool
+	{
+		return $value === null;
+	}
+
+	/**
+	 * @param null|\DateInterval $value
+	 * @return null|string
+	 */
+	public function serialize($value) : ?string
+	{
+		if ($value === null) {
+			return null;
+		}
+		return self::intervalToString($value);
+	}
+
 }
