@@ -74,7 +74,11 @@ class ArrayType implements TypeDef
 	public function getPhpDocHint() : string
 	{
 		$inner = $this->inner_type->getPhpDocHint();
-		return \str_replace('|', '[]|', $inner).'[]'.($this->nullable ? '|null' : '');
+		$hint = \str_replace('|', '[]|', $inner).'[]';
+		if($hint === 'mixed[]'){
+			$hint = 'array';
+		}
+		return $hint.($this->nullable ? '|null' : '');
 	}
 
 	public function createNullable() : TypeDef

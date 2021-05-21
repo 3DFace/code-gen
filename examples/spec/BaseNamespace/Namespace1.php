@@ -26,7 +26,7 @@ return [
 		'field51' => ['type' => 'union', 'with' => true],
 		'field6' => ['type' => 'union[]', 'default' => []],
 		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
-		'field7' => ['type' => 'mixed', 'default' => null],
+		'field7' => ['type' => 'mixed[]', 'default' => null],
 		'field8' => ['type' => 'DateTime[]', 'default' => [new \DateTimeImmutable('2021-01-01')],
 			'silent' => true,
 			'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
