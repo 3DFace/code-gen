@@ -100,11 +100,11 @@ class MapType implements TypeDef
 			return 'null';
 		}
 		if ($value === []) {
-			return Utils::varExport($value, $indent);
+			return Utils::plainVarExport($value, $indent);
 		}
 		$pairs = [];
 		foreach ($value as $k => $v) {
-			$pairs[] = Utils::varExport($k).' => '.$this->inner_type->varExport($v, $indent."\t");
+			$pairs[] = Utils::plainVarExport($k).' => '.$this->inner_type->varExport($v, $indent."\t");
 		}
 		return "[\n$indent\t".\implode(",\n$indent\t", $pairs).",\n$indent]";
 	}

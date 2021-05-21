@@ -18,7 +18,7 @@ class Utils
 		return \strpos($type_name, '\\') === false ? $namespace.'\\'.$type_name : $type_name;
 	}
 
-	public static function varExport($var, $indent = '') : string
+	public static function plainVarExport($var, $indent = '') : string
 	{
 		if ($var === null) {
 			return 'null';
@@ -26,11 +26,28 @@ class Utils
 		if ($var === []) {
 			return '[]';
 		}
-		$exported = \var_export($var, true);
+
 		if (\is_scalar($var)) {
-			return $exported;
+			return \var_export($var, true);
 		}
-		return \str_replace("\n", "\n".$indent, $exported);
+
+		if (\is_array($var)) {
+			$pairs = [];
+			$values = [];
+			$i = 0;
+			$is_map = false;
+			$sub_indent = $indent."\t";
+			foreach ($var as $k => $v) {
+				$is_map = $is_map || $k !== $i;
+				$k_exp = self::plainVarExport($k, $sub_indent);
+				$v_exp = self::plainVarExport($v, $sub_indent);
+				$pairs[] = $k_exp.' => '.$v_exp;
+				$values[] = $v_exp;
+				$i++;
+			}
+			return "[\n$sub_indent".\implode(",\n$sub_indent", $is_map ? $pairs : $values).",\n$indent]";
+		}
+		throw new \InvalidArgumentException('Can not export value of type '.\gettype($var));
 	}
 
 }

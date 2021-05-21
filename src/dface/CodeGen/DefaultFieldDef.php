@@ -167,10 +167,10 @@ class DefaultFieldDef implements FieldDef
 			if ($def === null) {
 				throw new \InvalidArgumentException("Field '$property_name' need 'empty' or 'default' definition to be 'silent'");
 			}
-			$serializer = $this->type->getSerializer($prop, $indent.$s_indent);
+			$serializer = $this->type->getSerializer($prop, $indent);
 			$ser_var = '$_ser_'.$property_name;
 			$body .= $indent.$ser_var.' = '.$serializer.";\n";
-			$def_exp = Utils::varExport($def->getValue(), $indent);
+			$def_exp = Utils::plainVarExport($def->getValue(), $indent);
 			$body .= $indent."if ($ser_var !== $def_exp) {\n";
 			$serializer = $ser_var;
 		} else {
@@ -224,7 +224,7 @@ class DefaultFieldDef implements FieldDef
 			} else {
 				if ($default !== null) {
 					$def_val = $default->getValue();
-					$def_code = Utils::varExport($def_val, $indent);
+					$def_code = Utils::plainVarExport($def_val, $indent);
 					$body .= $indent."\$$property_name = ".$def_code.";\n";
 				}
 				$first = true;

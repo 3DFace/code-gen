@@ -18,7 +18,7 @@ return [
 		'field2json' => ['type' => new JsonType(new DynamicTypeDef(new ClassName(SomeSibling::class), true), 0 ,0, false), 'default' => null],
 		'field3' => ['type' => Value::class, 'default' => new Value('Viva'), 'empty' => 'none', 'silent' => true, 'null' => true],
 		'field4' => ['type' => Value::class.'{}', 'set' => true],
-		'field41' => ['type' => Value::class, 'merged' => true],
+		'field41' => ['type' => Value::class, 'merged' => true, 'default' => new Value('mer'), 'silent' => true],
 		'field5' => ['type' => new UnionType([
 			Value::class => 1,
 		]), 'with' => 1],
@@ -27,7 +27,7 @@ return [
 		'field6' => ['type' => 'union[]', 'default' => []],
 		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
 		'field7' => ['type' => 'mixed', 'default' => null],
-		'field8' => ['type' => 'DateTime[]', 'default' => null,
+		'field8' => ['type' => 'DateTime[]', 'default' => [new \DateTimeImmutable('2021-01-01')],
 			'silent' => true,
 			'write_as' => ['__field8', '_field8'], 'read_as' => ['__field8', '_field8']],
 		'field9' => ['type' => 'TimeStamp{}', 'default' => null],

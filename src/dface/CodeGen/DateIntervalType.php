@@ -97,7 +97,7 @@ class DateIntervalType implements TypeDef
 		}
 		/** @var $value \DateInterval */
 		$str = self::intervalToString($value);
-		$exported = Utils::varExport($str, $indent);
+		$exported = Utils::plainVarExport($str, $indent);
 		return "new DateInterval($exported)";
 	}
 

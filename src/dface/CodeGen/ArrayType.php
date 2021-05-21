@@ -94,7 +94,7 @@ class ArrayType implements TypeDef
 			return 'null';
 		}
 		if ($value === []) {
-			return Utils::varExport($value, $indent);
+			return Utils::plainVarExport($value, $indent);
 		}
 		$exported = \array_map(function ($val) use ($indent) {
 			return $this->inner_type->varExport($val, $indent."\t");

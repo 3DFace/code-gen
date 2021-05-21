@@ -72,7 +72,7 @@ class DateTimeType implements TypeDef
 		}
 		/** @var $value \DateTimeImmutable */
 		$str = $value->format($this->serialize_format);
-		$exported = Utils::varExport($str, $indent);
+		$exported = Utils::plainVarExport($str, $indent);
 		return "new DateTimeImmutable($exported)";
 	}
 

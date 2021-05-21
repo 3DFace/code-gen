@@ -73,7 +73,7 @@ class DynamicTypeDef implements TypeDef
 			return 'null';
 		}
 		$arr = $value->jsonSerialize();
-		$exported = Utils::varExport($arr, $indent);
+		$exported = Utils::plainVarExport($arr, $indent);
 		return $this->class_name->getShortName()."::deserialize($exported)";
 	}
 
@@ -84,9 +84,9 @@ class DynamicTypeDef implements TypeDef
 
 	/**
 	 * @param null|object $value
-	 * @return null|string
+	 * @return mixed
 	 */
-	public function serialize($value) : ?string
+	public function serialize($value)
 	{
 		if ($value === null) {
 			return null;
