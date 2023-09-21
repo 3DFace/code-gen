@@ -234,6 +234,7 @@ class DTOGenerator
 		$body = "\t/**\n";
 		$body .= "\t * @return array|\stdClass\n";
 		$body .= "\t */\n";
+		$body .= "\t#[\ReturnTypeWillChange]\n";
 		$body .= "\t"."public function jsonSerialize()";
 		$fields = $spec->getFields();
 		if (empty($fields)) {
