@@ -78,7 +78,10 @@ class BackedEnumTypeDef implements TypeDef
 	 */
 	public function serialize($value)
 	{
-		return $value->value;
+		if ($value === null) {
+			return null;
+		}
+		return  $value->value;
 	}
 
 }
