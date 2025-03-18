@@ -49,6 +49,7 @@ $x1 = new SomeClass(
 	new Value(2),
 	'nullable',
 	null,
+	TestEnum::second,
 	[new Union1('qaz', 'gaga'), new Union2('qaz')],
 	new \DateInterval('P1M1DT10H'));
 

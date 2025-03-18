@@ -7,6 +7,7 @@ use dface\CodeGen\ClassName;
 use dface\CodeGen\DynamicTypeDef;
 use dface\CodeGen\JsonType;
 use dface\CodeGen\ScalarType;
+use dface\CodeGen\TestEnum;
 use dface\CodeGen\TestInterface;
 use dface\CodeGen\UnionType;
 
@@ -41,6 +42,7 @@ return [
 		]), 'with' => 1],
 		'field50' => '?string',
 		'field51' => ['type' => 'union', 'with' => true],
+		'field52' => ['type' => '?'.TestEnum::class, 'with' => null, 'default' => TestEnum::first],
 		'field6' => ['type' => 'union[]', 'default' => []],
 		'field61' => ['type' => 'DateInterval', 'default' => null, 'silent' => true],
 		'field7' => ['type' => 'mixed[]', 'default' => null],

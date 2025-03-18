@@ -130,8 +130,10 @@ class PhpFilesSpecSource implements \IteratorAggregate
 			}
 			$inner_type = $this->getType($el_type, true);
 			$new_type = new MapType($inner_type);
-		} elseif (\is_a($type_name, TypeDef::class)) {
+		} elseif (\is_a($type_name, TypeDef::class, true)) {
 			$new_type = new $type_name;
+		} elseif(\is_a($type_name, \BackedEnum::class, true)) {
+			$new_type = new BackedEnumTypeDef(new ClassName($type_name));
 		} else {
 			$new_type = new DynamicTypeDef(new ClassName($type_name));
 		}

@@ -224,6 +224,7 @@ class DefaultFieldDef implements FieldDef
 			} else {
 				if ($default !== null) {
 					$def_val = $default->getValue();
+//					$def_code = $this->type->varExport($def_val, $indent);
 					$def_code = Utils::plainVarExport($def_val, $indent);
 					$body .= $indent."\$$property_name = ".$def_code.";\n";
 				}
