@@ -19,7 +19,7 @@ class TimeStampType implements TypeDef
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($this->nullable ? "$value_expression === null ? null : " : '').$value_expression.'->getTimestamp()';
+		return $value_expression.($this->nullable ? '?' : '').'->getTimestamp()';
 	}
 
 	public function getDeserializer(string $value_expression, string $indent) : string

@@ -26,7 +26,7 @@ class DynamicTypeDef implements TypeDef
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($this->nullable ? "$value_expression === null ? null : " : '').$value_expression.'->jsonSerialize()';
+		return $value_expression.($this->nullable ? '?' : '').'->jsonSerialize()';
 	}
 
 	public function getDeserializer(string $value_expression, string $indent) : string

@@ -150,7 +150,7 @@ class DTOGenerator
 		$body .= "\t * @return $return\n";
 		$body .= "\t * @throws \\InvalidArgumentException\n";
 		$body .= "\t */\n";
-		$body .= "\t"."public static function deserialize(\$data) : self {\n";
+		$body .= "\t"."public static function deserialize(object|array \$data) : self {\n";
 		if (!$fields) {
 			$body .= "\t\t"."if (!\is_array(\$data) && !\is_object(\$data)) {\n";
 			$body .= "\t\t\t"."throw new \InvalidArgumentException('Array or object expected');\n";
@@ -231,11 +231,7 @@ class DTOGenerator
 	 */
 	private function generateSerializerMethod(Specification $spec) : string
 	{
-		$body = "\t/**\n";
-		$body .= "\t * @return array|\stdClass\n";
-		$body .= "\t */\n";
-		$body .= "\t#[\ReturnTypeWillChange]\n";
-		$body .= "\t"."public function jsonSerialize()";
+		$body = "\t"."public function jsonSerialize()";
 		$fields = $spec->getFields();
 		if (empty($fields)) {
 			$body .= " : object {\n";
@@ -243,7 +239,7 @@ class DTOGenerator
 			$body .= "\t}\n";
 			return $body;
 		}
-		$body .= " {\n";
+		$body .= " : array|object {\n";
 		$body .= "\n\t\t"."\$result = [];\n\n";
 		foreach ($fields as $field) {
 			$body .= $field->makeSerializerFragment('$result', "\t\t");

@@ -21,7 +21,7 @@ class DateTimeType implements TypeDef
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return ($this->nullable ? "$value_expression === null ? null : " : '').$value_expression."->format('$this->serialize_format')";
+		return $value_expression.($this->nullable ? '?' : '')."->format('$this->serialize_format')";
 	}
 
 	public function getDeserializer(string $value_expression, string $indent) : string

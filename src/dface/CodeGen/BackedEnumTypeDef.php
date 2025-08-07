@@ -26,7 +26,7 @@ class BackedEnumTypeDef implements TypeDef
 
 	public function getSerializer(string $value_expression, string $indent) : string
 	{
-		return  ($this->nullable ? "$value_expression === null ? null : " : '').$value_expression.'->value';
+		return $value_expression.($this->nullable ? '?' : '').'->value';
 	}
 
 	public function getDeserializer(string $value_expression, string $indent) : string
